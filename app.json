@@ -1,28 +1,27 @@
 {
   "expo": {
-    "name": "mommy-s-stock-hub",
-    "slug": "mommy-s-stock-hub",
+    "name": "Inventy",
+    "slug": "inventy",
     "version": "1.0.0",
+    "platforms": ["ios", "android"],
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "inventy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.mommysstockhub"
+      "bundleIdentifier": "com.anonymous.inventy"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.mommysstockhub"
+      "package": "com.anonymous.inventy"
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",

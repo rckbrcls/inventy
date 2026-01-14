@@ -117,7 +117,7 @@ export default function HomeScreen() {
           <ThemedText
             style={[styles.title, { flexShrink: 1, textAlign: "left" }]}
           >
-            Bem-vindo(a) ao Mommy Stock Hub!
+            Bem-vindo(a) ao Inventy!
           </ThemedText>
         </View>
 
