@@ -1,6 +1,6 @@
-# 💼 Mommy’s Stock HUB
+# 💼 Inventy
 
-**Mommy’s Stock HUB** is a simple and intuitive inventory management app built specifically for small businesses. Developed with ❤️ using **React Native**, it helps shop owners manage products, track stock levels, and stay on top of their inventory — all from a mobile device.
+**Inventy** is a simple and intuitive inventory management app built specifically for small businesses. Developed with ❤️ using **React Native**, it helps shop owners manage products, track stock levels, and stay on top of their inventory — all from a mobile device.
 
 ---
 
@@ -29,13 +29,13 @@
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/your-username/mommys-stock-hub.git
+git clone https://github.com/your-username/inventy.git
 ```
 
 2. **Install dependencies:**
 
 ```bash
-cd mommys-stock-hub
+cd inventy
 npm install
 ```
 
@@ -55,7 +55,7 @@ This will open the Expo developer tools in your browser. From there, you can:
 
 ## 👩‍👦 Inspiration
 
-This app was born from a personal story — it was originally created to help a friend’s mom manage her small store with ease. She needed a solution that didn’t require technical skills but still offered powerful features to track and organize her stock. **Mommy’s Stock HUB** was built to be **simple**, **friendly**, and **practical** — like a digital assistant in her pocket, making her everyday tasks easier and more efficient.
+This app was born from a personal story — it was originally created to help a friend’s mom manage her small store with ease. She needed a solution that didn’t require technical skills but still offered powerful features to track and organize her stock. **Inventy** was built to be **simple**, **friendly**, and **practical** — like a digital assistant in her pocket, making her everyday tasks easier and more efficient.
 
 ---
 
