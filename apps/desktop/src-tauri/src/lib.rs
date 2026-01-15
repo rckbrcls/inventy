@@ -1,3 +1,6 @@
+pub mod models;
+pub mod repositories;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   let migrations = vec![
