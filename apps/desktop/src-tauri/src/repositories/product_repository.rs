@@ -1,5 +1,5 @@
-use crate::models::product_model::{Product, ProductCategory};
-use sqlx::{SqlitePool, Result};
+use crate::models::product_model::Product;
+use sqlx::{Result, SqlitePool};
 
 pub struct ProductRepository {
     pool: SqlitePool,
@@ -10,9 +10,7 @@ impl ProductRepository {
         Self { pool }
     }
 
-    pub async fn create(&self, product: Product, categories: Vec<ProductCategory>) -> Result<Product> {
-        let mut tx = self.pool.begin().await?;
-
+    pub async fn create(&self, product: Product) -> Result<Product> {
         let sql = r#"
             INSERT INTO products (
                 id, sku, type, status, name, slug, gtin_ean, price, promotional_price, cost_price,
@@ -25,7 +23,7 @@ impl ProductRepository {
             RETURNING *
         "#;
 
-        let created_product = sqlx::query_as::<_, Product>(sql)
+        sqlx::query_as::<_, Product>(sql)
             .bind(&product.id)
             .bind(&product.sku)
             .bind(&product.r#type)
@@ -51,28 +49,8 @@ impl ProductRepository {
             .bind(&product.sync_status)
             .bind(&product.created_at)
             .bind(&product.updated_at)
-            .fetch_one(&mut *tx)
-            .await?;
-
-        for category in categories {
-            let cat_sql = r#"
-                INSERT INTO product_categories (
-                    product_id, category_id, position, _status, created_at, updated_at
-                ) VALUES ($1, $2, $3, $4, $5, $6)
-            "#;
-            sqlx::query(cat_sql)
-                .bind(&created_product.id)
-                .bind(&category.category_id)
-                .bind(&category.position)
-                .bind(&category.sync_status)
-                .bind(&category.created_at)
-                .bind(&category.updated_at)
-                .execute(&mut *tx)
-                .await?;
-        }
-
-        tx.commit().await?;
-        Ok(created_product)
+            .fetch_one(&self.pool)
+            .await
     }
 
     pub async fn update(&self, product: Product) -> Result<Product> {
@@ -135,19 +113,9 @@ impl ProductRepository {
     }
 
     pub async fn delete(&self, id: &str) -> Result<()> {
-        let mut tx = self.pool.begin().await?;
+        let sql = "DELETE FROM products WHERE id = $1";
 
-        sqlx::query("DELETE FROM product_categories WHERE product_id = $1")
-            .bind(id)
-            .execute(&mut *tx)
-            .await?;
-
-        sqlx::query("DELETE FROM products WHERE id = $1")
-            .bind(id)
-            .execute(&mut *tx)
-            .await?;
-
-        tx.commit().await?;
+        sqlx::query(sql).bind(id).execute(&self.pool).await?;
         Ok(())
     }
 
@@ -156,14 +124,6 @@ impl ProductRepository {
         sqlx::query_as::<_, Product>(sql)
             .bind(id)
             .fetch_optional(&self.pool)
-            .await
-    }
-
-    pub async fn get_categories(&self, product_id: &str) -> Result<Vec<ProductCategory>> {
-        let sql = "SELECT * FROM product_categories WHERE product_id = $1 ORDER BY position ASC";
-        sqlx::query_as::<_, ProductCategory>(sql)
-            .bind(product_id)
-            .fetch_all(&self.pool)
             .await
     }
 
