@@ -200,4 +200,11 @@ impl UserRepository {
             .fetch_all(&self.pool)
             .await
     }
+
+    pub async fn list(&self) -> Result<Vec<User>> {
+        let sql = "SELECT * FROM users ORDER BY created_at DESC";
+        sqlx::query_as::<_, User>(sql)
+            .fetch_all(&self.pool)
+            .await
+    }
 }

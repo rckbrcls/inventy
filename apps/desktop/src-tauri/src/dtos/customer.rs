@@ -115,3 +115,59 @@ impl CreateCustomerDTO {
         (customer, addresses, group_memberships)
     }
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateCustomerDTO {
+    pub id: String,
+    pub r#type: Option<String>,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub company_name: Option<String>,
+    pub tax_id: Option<String>,
+    pub tax_id_type: Option<String>,
+    pub state_tax_id: Option<String>,
+    pub status: Option<String>,
+    pub currency: Option<String>,
+    pub language: Option<String>,
+    pub tags: Option<String>,
+    pub accepts_marketing: Option<bool>,
+    pub customer_group_id: Option<String>,
+    pub notes: Option<String>,
+    pub metadata: Option<String>,
+    pub custom_attributes: Option<String>,
+}
+
+impl UpdateCustomerDTO {
+    pub fn into_models(self) -> Customer {
+        let now = Utc::now();
+        Customer {
+            id: self.id,
+            r#type: self.r#type.unwrap_or_else(|| "individual".to_string()),
+            email: self.email,
+            phone: self.phone,
+            first_name: self.first_name,
+            last_name: self.last_name,
+            company_name: self.company_name,
+            tax_id: self.tax_id,
+            tax_id_type: self.tax_id_type,
+            state_tax_id: self.state_tax_id,
+            status: self.status,
+            currency: self.currency,
+            language: self.language,
+            tags: self.tags,
+            accepts_marketing: self.accepts_marketing,
+            customer_group_id: self.customer_group_id,
+            total_spent: None,
+            orders_count: None,
+            last_order_at: None,
+            notes: self.notes,
+            metadata: self.metadata,
+            custom_attributes: self.custom_attributes,
+            sync_status: Some("updated".to_string()),
+            created_at: None,
+            updated_at: Some(now),
+        }
+    }
+}

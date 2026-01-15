@@ -23,6 +23,7 @@ pub struct CreateTransactionDTO {
     pub shipping_method: Option<String>,
     pub shipping_address: Option<String>,
     pub billing_address: Option<String>,
+    pub location_id: Option<String>,
     pub items: Vec<CreateTransactionItemDTO>,
 }
 
