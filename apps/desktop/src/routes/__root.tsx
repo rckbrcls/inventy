@@ -1,8 +1,6 @@
 import { HeadContent, Scripts, createRootRoute, Outlet, useLocation, Link } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { useEffect } from 'react'
-import { initDb } from '../lib/db/init'
 
 import appCss from '../styles.css?url'
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar'
@@ -50,10 +48,6 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
-  useEffect(() => {
-    initDb().catch(console.error)
-  }, [])
-
   const location = useLocation()
 
   return (
