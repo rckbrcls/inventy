@@ -1,109 +1,62 @@
-# Arquitetura e Regras de Negócio: Inventy Desktop
+# Arquitetura e Regras de Negócio: Inventy
 
 ## 1. Arquitetura do Sistema
 
-O sistema segue um modelo **Local Server (Mãe) + Satellites (Filhos)**.
+O sistema segue um modelo **Hybrid Cloud + Local Nodes**. A estratégia é **Offline-First**, garantindo que o app funcione sem internet, sincronizando os dados quando houver conexão.
 
 ### Componentes
 
-1.  **Mother Node (Desktop)**:
-    - **Stack**: Tauri v2 + Next.js + Rust (Backend) + SQLite.
-    - **Responsabilidade**: Fonte da verdade (Source of Truth). Gerencia conflitos, backups e serve a API de sincronização na rede local.
-2.  **Satellite Nodes (Mobile/Outros Desktops)**:
-    - **Stack**: React Native + WatermelonDB/Op-SQLite.
-    - **Responsabilidade**: Operação offline-first. Sincroniza dados periodicamente com o Mother Node.
+1.  **Cloud Provider (Supabase/Postgres)**:
+    - **Responsabilidade**: _Single Source of Truth_ (Fonte Única da Verdade). Armazena todos os dados de todos os usuários e dispositivos.
+    - **Funcionalidades**: Autenticação, Armazenamento de Arquivos e Banco de Dados Relacional.
 
-## 2. Schema de Banco de Dados (Versão Robusta)
+2.  **Mother Node (Desktop)**:
+    - **Stack**: Tauri v2 + Vite + React (Frontend) + Rust (Backend) + SQLite.
+    - **Responsabilidade**: Interface administrativa e ponto principal de entrada de dados no desktop. Sincroniza dados locais com o Supabase.
 
-Para suportar sincronização distribuída e integridade, **todas as tabelas devem usar UUIDs** como chave primária e colunas de controle de versão (`created_at`, `updated_at`, `deleted_at`).
+3.  **Satellite Nodes (Mobile/Web)**:
+    - **Stack**: React Native (Mobile) / React (Web).
+    - **Responsabilidade**: Operação rápida e portátil. Mobile usa SQLite local e sincroniza via Cloud Sync com o Supabase.
 
-### Tabela: `inventory_items`
+## 2. Esquema de Banco de Dados
 
-Representa os produtos no estoque.
+Para suportar sincronização distribuída (estilo WatermelonDB), todas as tabelas utilizam **UUIDs** como chave primária e colunas de controle de versão.
 
-```sql
-CREATE TABLE inventory_items (
-  id TEXT PRIMARY KEY NOT NULL, -- UUID
-  name TEXT NOT NULL,
-  sku TEXT, -- Código de barras ou identificador único legível
-  category TEXT,
-  description TEXT,
+### Colunas de Sincronização Obrigatórias:
 
-  -- Controle de Estoque
-  quantity REAL NOT NULL DEFAULT 0,
-  min_stock_level REAL DEFAULT 5, -- Para gerar alertas de reposição
-  location TEXT, -- Prateleira A, Gaveta 2, etc.
+- `_status`: Indica se o registro foi `created`, `updated` ou `deleted`.
+- `_changed`: Timestamp ou hash para controle de versão fino.
+- `updated_at`: Timestamp Unix (ou ISO 8601) usado como âncora de sincronização.
 
-  -- Valores
-  cost_price REAL, -- Preço de custo (para cálculo de lucro)
-  selling_price REAL, -- Preço de venda sugerido
+> [!NOTE]
+> Para detalhes técnicos de cada tabela, consulte o [DATABASE_SCHEMA.md](file:///Users/erickpatrickbarcelos/codes/inventy/apps/desktop/docs/DATABASE_SCHEMA.md).
 
-  -- Sync Metadata
-  created_at TEXT NOT NULL, -- ISO 8601
-  updated_at TEXT NOT NULL,
-  deleted_at TEXT -- Se preenchido, o item foi excluído (Soft Delete)
-);
-```
+## 3. Sincronização em Nuvem (Cloud Sync)
 
-### Tabela: `debtors` (Clientes)
+A sincronização entre os nós locais (SQLite) e a nuvem (Supabase/Postgres) segue um protocolo de **Eventual Consistency**.
 
-Pessoas que possuem débitos ou histórico com a loja.
+### Fluxo de Trabalho
 
-```sql
-CREATE TABLE debtors (
-  id TEXT PRIMARY KEY NOT NULL, -- UUID
-  name TEXT NOT NULL,
-  phone TEXT,
-  email TEXT,
-  notes TEXT,
+1.  **Operação Local**: Toda escrita é feita primeiro no banco local (SQLite). O registro é marcado com `_status = 'updated'`.
+2.  **Background Sync**: Um serviço em segundo plano busca registros com `_status != 'synced'`.
+3.  **Pull (Download)**: O app pede ao Supabase: "Dê-me tudo que mudou desde `last_pulled_at`".
+4.  **Push (Upload)**: O app envia ao Supabase as mudanças locais.
+5.  **Resolução de Conflitos**: O padrão adotado é **Last Write Wins (LWW)** baseado no timestamp `updated_at`.
 
-  -- Cache de Estado (Calculado via movements, mas persistido para performance)
-  current_balance REAL DEFAULT 0,
-  status TEXT DEFAULT 'active', -- 'active', 'blocked', 'archived'
+### Por que manter SQLite localmente?
 
-  -- Sync Metadata
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL,
-  deleted_at TEXT
-);
-```
+- **Zero Latência**: Operações de interface não dependem da rede.
+- **Offline Total**: O usuário pode realizar vendas e cadastros no meio do mato ou em galpões sem sinal.
+- **Privacidade**: O arquivo `.db` fica na máquina do usuário.
 
-### Tabela: `inventory_movements` (Logs)
+## 4. Regras de Negócio e Gestão
 
-Log imutável de tudo que entra e sai. Essencial para auditoria.
+### Gestão de Estoque (Ledger)
 
-```sql
-CREATE TABLE inventory_movements (
-  id TEXT PRIMARY KEY NOT NULL,
-  item_id TEXT NOT NULL REFERENCES inventory_items(id),
-  debtor_id TEXT REFERENCES debtors(id), -- Opcional, se foi saída para um cliente específico
-
-  type TEXT NOT NULL, -- 'IN' (Compra), 'OUT' (Venda), 'ADJUST' (Correção), 'RETURN' (Devolução)
-  quantity_change REAL NOT NULL, -- Positivo para entrada, Negativo para saída
-
-  unit_price_snapshot REAL, -- Preço unitário no momento da movimentação
-  reason TEXT, -- 'Venda Balcão', 'Venda Fiado', 'Perda/Validade', etc.
-
-  occurred_at TEXT NOT NULL, -- Data real da movimentação
-  created_at TEXT NOT NULL -- Data do registro no banco
-);
-```
-
-## 3. Regras de Negócio e Sync
-
-### Mecânica "Mother-Satellite"
-
-1.  **Descoberta**: O Desktop anuncia seu IP via mDNS (Bonjour). O Mobile escaneia e encontra `Inventy Server`.
-2.  **Pull (Mobile -> Pede dados)**: Mobile envia seu `last_pulled_at`. Desktop responde com todos registros onde `updated_at > last_pulled_at`.
-3.  **Push (Mobile -> Envia dados)**: Mobile envia registros criados/alterados offline. Desktop aplica (Last Write Wins) e atualiza o `updated_at`.
-
-### Gestão de Estoque
-
-- **Saldo**: O campo `quantity` em `inventory_items` é a verdade atual. Ele deve ser eventualmente consistente com a soma dos `inventory_movements`.
-- **Edição Concorrente**: Se Desktop e Mobile editarem a quantidade do mesmo item ao mesmo tempo, a edição com `updated_at` mais recente vence.
+- **Imutabilidade**: O estoque não é apenas um número estático. Cada alteração (Entrada/Saída) gera um log em `inventory_movements`.
+- **Saldo de Cache**: O campo `quantity` em `inventory_items` é um cache do somatório dos logs para performance.
 
 ### Fiado (Débitos)
 
-- Uma venda "Fiado" gera:
-  1.  Um `inventory_movement` (Tipo 'OUT', devedor preenchido).
-  2.  Uma atualização no `debtors` somando o valor ao `current_balance`.
+- Uma venda fiada vincula um `purchase_id` a um `debtor_id`.
+- O saldo do cliente (`current_balance`) é atualizado atomicamente durante a transação.
