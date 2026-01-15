@@ -17,6 +17,16 @@ import { ArrowUpDown, ChevronDown, MoreHorizontal, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -26,6 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Table,
   TableBody,
@@ -34,6 +45,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { InventoryRepository } from "@/lib/db/repositories/inventory-repository"
 
 export const Route = createFileRoute("/inventory")({
   component: Inventory,
@@ -42,54 +54,11 @@ export const Route = createFileRoute("/inventory")({
 type InventoryItem = {
   id: string
   name: string
-  sku: string
+  sku?: string
   quantity: number
-  price: number
+  price?: number
   status: "in-stock" | "low-stock" | "out-of-stock"
 }
-
-const data: InventoryItem[] = [
-  {
-    id: "m5gr84i9",
-    name: "Coca Cola 350ml",
-    sku: "COCA-350",
-    quantity: 120,
-    price: 3.5,
-    status: "in-stock",
-  },
-  {
-    id: "3u1re74n",
-    name: "Heineken 600ml",
-    sku: "HEIN-600",
-    quantity: 24,
-    price: 9.0,
-    status: "in-stock",
-  },
-  {
-    id: "derv1ws0",
-    name: "Batata Frita Lays",
-    sku: "LAYS-ORIG",
-    quantity: 5,
-    price: 12.0,
-    status: "low-stock",
-  },
-  {
-    id: "5kma53ae",
-    name: "Água Mineral 500ml",
-    sku: "H2O-500",
-    quantity: 0,
-    price: 2.0,
-    status: "out-of-stock",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Chocolate Snickers",
-    sku: "BS-SNICK",
-    quantity: 45,
-    price: 4.5,
-    status: "in-stock",
-  },
-]
 
 export const columns: ColumnDef<InventoryItem>[] = [
   {
@@ -117,7 +86,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
   {
     accessorKey: "sku",
     header: "SKU",
-    cell: ({ row }) => <div className="uppercase">{row.getValue("sku")}</div>,
+    cell: ({ row }) => <div className="uppercase">{row.getValue("sku") || "-"}</div>,
   },
   {
     accessorKey: "name",
@@ -157,7 +126,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
     accessorKey: "price",
     header: () => <div className="text-right">Price</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("price"))
+      const amount = parseFloat(row.getValue("price") || "0")
       const formatted = new Intl.NumberFormat("pt-BR", {
         style: "currency",
         currency: "BRL",
@@ -205,6 +174,7 @@ export const columns: ColumnDef<InventoryItem>[] = [
 ]
 
 function Inventory() {
+  const [data, setData] = React.useState<InventoryItem[]>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -212,6 +182,69 @@ function Inventory() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+
+  // Form State
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+  const [newItemName, setNewItemName] = React.useState("")
+  const [newItemSku, setNewItemSku] = React.useState("")
+  const [newItemQuantity, setNewItemQuantity] = React.useState("")
+  const [newItemPrice, setNewItemPrice] = React.useState("")
+  const [newItemMinStock, setNewItemMinStock] = React.useState("5")
+
+  const fetchInventory = React.useCallback(async () => {
+    console.log('[InventoryRoute] fetchInventory called')
+    try {
+      const items = await InventoryRepository.getAll()
+      console.log('[InventoryRoute] fetched items:', items)
+      const formattedItems: InventoryItem[] = items.map(item => ({
+        id: item.id,
+        name: item.name,
+        sku: item.sku,
+        quantity: item.quantity,
+        price: item.selling_price,
+        status: item.quantity === 0
+          ? "out-of-stock"
+          : (item.quantity < (item.min_stock_level || 5) ? "low-stock" : "in-stock")
+      }))
+      setData(formattedItems)
+    } catch (error) {
+      console.error("Failed to fetch inventory:", error)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    fetchInventory()
+  }, [fetchInventory])
+
+  const handleSaveItem = async () => {
+    if (!newItemName) return
+
+    try {
+      const newItemPayload = {
+        name: newItemName,
+        sku: newItemSku,
+        quantity: parseFloat(newItemQuantity) || 0,
+        selling_price: parseFloat(newItemPrice) || 0,
+        min_stock_level: parseFloat(newItemMinStock) || 5,
+      }
+      console.log('[InventoryRoute] Creating item with payload:', newItemPayload)
+
+      await InventoryRepository.create(newItemPayload)
+
+      // Reset form
+      setNewItemName("")
+      setNewItemSku("")
+      setNewItemQuantity("")
+      setNewItemPrice("")
+      setNewItemMinStock("5")
+      setIsDialogOpen(false)
+
+      // Refresh list
+      fetchInventory()
+    } catch (error) {
+      console.error("Failed to create item:", error)
+    }
+  }
 
   const table = useReactTable({
     data,
@@ -270,9 +303,89 @@ function Inventory() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Add Item
-          </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Add Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add Inventory Item</DialogTitle>
+                <DialogDescription>
+                  Create a new product record in the inventory.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="sku" className="text-right">
+                    SKU
+                  </Label>
+                  <Input
+                    id="sku"
+                    value={newItemSku}
+                    onChange={(e) => setNewItemSku(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="quantity" className="text-right">
+                    Quantity
+                  </Label>
+                  <Input
+                    id="quantity"
+                    type="number"
+                    value={newItemQuantity}
+                    onChange={(e) => setNewItemQuantity(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="price" className="text-right">
+                    Price
+                  </Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={newItemPrice}
+                    onChange={(e) => setNewItemPrice(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="minStock" className="text-right">
+                    Min Stock
+                  </Label>
+                  <Input
+                    id="minStock"
+                    type="number"
+                    value={newItemMinStock}
+                    onChange={(e) => setNewItemMinStock(e.target.value)}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline" type="button">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleSaveItem}>Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <div className="rounded-md border">
