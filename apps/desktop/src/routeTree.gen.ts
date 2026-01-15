@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PairingRouteImport } from './routes/pairing'
+import { Route as MovementsRouteImport } from './routes/movements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsIndexRouteImport } from './routes/transactions/index'
 import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
@@ -27,6 +28,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const PairingRoute = PairingRouteImport.update({
   id: '/pairing',
   path: '/pairing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MovementsRoute = MovementsRouteImport.update({
+  id: '/movements',
+  path: '/movements',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,6 +73,7 @@ const DebtorsNewRoute = DebtorsNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/debtors/new': typeof DebtorsNewRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/debtors/new': typeof DebtorsNewRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/debtors/new': typeof DebtorsNewRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/movements'
     | '/pairing'
     | '/settings'
     | '/debtors/new'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/movements'
     | '/pairing'
     | '/settings'
     | '/debtors/new'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/movements'
     | '/pairing'
     | '/settings'
     | '/debtors/new'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  MovementsRoute: typeof MovementsRoute
   PairingRoute: typeof PairingRoute
   SettingsRoute: typeof SettingsRoute
   DebtorsNewRoute: typeof DebtorsNewRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/pairing'
       fullPath: '/pairing'
       preLoaderRoute: typeof PairingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movements': {
+      id: '/movements'
+      path: '/movements'
+      fullPath: '/movements'
+      preLoaderRoute: typeof MovementsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -217,6 +237,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  MovementsRoute: MovementsRoute,
   PairingRoute: PairingRoute,
   SettingsRoute: SettingsRoute,
   DebtorsNewRoute: DebtorsNewRoute,
