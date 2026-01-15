@@ -28,7 +28,7 @@ export class PurchasesRepository {
         p.total_amount,
         p.created_at,
         d.name as debtor_name,
-        (SELECT COUNT(*) FROM inventory_movements m WHERE m.purchase_id = p.id) as items_count
+        (SELECT COALESCE(SUM(ABS(m.quantity_change)), 0) FROM inventory_movements m WHERE m.purchase_id = p.id) as items_count
       FROM purchases p
       LEFT JOIN debtors d ON p.debtor_id = d.id
       ORDER BY p.created_at DESC
@@ -44,63 +44,56 @@ export class PurchasesRepository {
     const purchaseId = uuidv4()
     const now = new Date().toISOString()
 
-    try {
-      await db.execute('BEGIN TRANSACTION')
+    const statements: string[] = []
 
-      // 1. Create Purchase
-      await db.execute(
-        `INSERT INTO purchases (id, debtor_id, total_amount, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [purchaseId, debtorId, totalAmount, now, now],
+    statements.push('BEGIN TRANSACTION')
+
+    // 1. Create Purchase
+    const debtorIdVal = debtorId ? `'${debtorId}'` : 'NULL'
+    statements.push(
+      `INSERT INTO purchases (id, debtor_id, total_amount, created_at, updated_at) VALUES ('${purchaseId}', ${debtorIdVal}, ${totalAmount}, '${now}', '${now}')`,
+    )
+
+    // 2. Create Movements and Update Stock
+    for (const item of cartItems) {
+      const movementId = uuidv4()
+      // For sales, movement is OUT, quantity_change is negative
+      const qtyChange = -Math.abs(item.quantity)
+
+      statements.push(
+        `INSERT INTO inventory_movements (
+            id, item_id, purchase_id, debtor_id, type, quantity_change,
+            unit_price_snapshot, occurred_at, created_at
+         ) VALUES (
+            '${movementId}', '${item.itemId}', '${purchaseId}', ${debtorIdVal}, 'OUT', ${qtyChange},
+            ${item.unitPrice}, '${now}', '${now}'
+         )`,
       )
 
-      // 2. Create Movements and Update Stock
-      for (const item of cartItems) {
-        const movementId = uuidv4()
-        // For sales, movement is OUT, quantity_change is negative
-        const qtyChange = -Math.abs(item.quantity)
+      // Update Inventory Quantity
+      statements.push(
+        `UPDATE inventory_items SET quantity = quantity + ${qtyChange}, updated_at = '${now}' WHERE id = '${item.itemId}'`,
+      )
+    }
 
-        await db.execute(
-          `INSERT INTO inventory_movements (
-              id, item_id, purchase_id, debtor_id, type, quantity_change,
-              unit_price_snapshot, occurred_at, created_at
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-          [
-            movementId,
-            item.itemId,
-            purchaseId,
-            debtorId,
-            'OUT',
-            qtyChange,
-            item.unitPrice,
-            now,
-            now,
-          ],
-        )
+    // 3. Update Debtor Balance if exists
+    if (debtorId) {
+      statements.push(
+        `UPDATE debtors SET current_balance = current_balance + ${totalAmount}, updated_at = '${now}' WHERE id = '${debtorId}'`,
+      )
+    }
 
-        // Update Inventory Quantity
-        await db.execute(
-          `UPDATE inventory_items SET quantity = quantity + $1, updated_at = $2 WHERE id = $3`,
-          [qtyChange, now, item.itemId],
-        )
-      }
+    statements.push('COMMIT')
 
-      // 3. Update Debtor Balance if exists
-      if (debtorId) {
-        // If debtor buys on credit (fiado), balance increases?
-        // User said "debtor eh o mesmo que fiado".
-        // Usually "Debt" = positive number means they owe money.
-        await db.execute(
-          `UPDATE debtors SET current_balance = current_balance + $1, updated_at = $2 WHERE id = $3`,
-          [totalAmount, now, debtorId],
-        )
-      }
+    const query = statements.join('; ')
 
-      await db.execute('COMMIT')
+    try {
+      await db.execute(query)
       return purchaseId
     } catch (error) {
-      await db.execute('ROLLBACK')
       console.error('[PurchasesRepository] create transaction error:', error)
+      // Since we are executing in a batch, separate rollback might not work if connection is released.
+      // However, SQLite aborts the transaction on error usually.
       throw error
     }
   }

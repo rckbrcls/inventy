@@ -165,19 +165,19 @@ function NewTransaction() {
         </div>
 
         <ScrollArea className="flex-1 rounded-md border p-4">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 p-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {filteredItems.map((item) => (
               <Card
                 key={item.id}
                 className="cursor-pointer transition-colors hover:bg-muted/50"
                 onClick={() => addToCart(item)}
               >
-                <CardHeader className="p-4">
+                <CardHeader className="px-4">
                   <CardTitle className="text-sm font-medium leading-none">
                     {item.name}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-4 pt-0">
+                <CardContent className="px-4">
                   <div className="text-sm text-muted-foreground">{item.sku}</div>
                   <div className="mt-2 font-bold">
                     {new Intl.NumberFormat("pt-BR", {
