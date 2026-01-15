@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useEffect, useState } from "react"
+import { SettingsRepository } from "@/lib/db/repositories/settings-repository"
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -25,6 +27,67 @@ export const Route = createFileRoute("/settings")({
 
 function Settings() {
   const { theme, setTheme } = useTheme()
+  const [storeName, setStoreName] = useState("")
+  const [ownerEmail, setOwnerEmail] = useState("")
+  const [serverPort, setServerPort] = useState("3000")
+  const [serverProtocol, setServerProtocol] = useState("http")
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSavingProfile, setIsSavingProfile] = useState(false)
+  const [isSavingNetwork, setIsSavingNetwork] = useState(false)
+
+  useEffect(() => {
+    loadSettings()
+  }, [])
+
+  async function loadSettings() {
+    try {
+      const settings = await SettingsRepository.getAll()
+      if (settings.store_name) setStoreName(settings.store_name)
+      if (settings.owner_email) setOwnerEmail(settings.owner_email)
+      if (settings.server_port) setServerPort(settings.server_port)
+      if (settings.server_protocol) setServerProtocol(settings.server_protocol)
+    } catch (error) {
+      console.error("Failed to load settings:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  async function handleSaveProfile() {
+    try {
+      setIsSavingProfile(true)
+      await SettingsRepository.set("store_name", storeName)
+      await SettingsRepository.set("owner_email", ownerEmail)
+      // Visual feedback could be added here (e.g., toast)
+    } catch (error) {
+      console.error("Failed to save profile:", error)
+    } finally {
+      setIsSavingProfile(false)
+    }
+  }
+
+  async function handleSaveNetwork() {
+    try {
+      setIsSavingNetwork(true)
+      await SettingsRepository.set("server_port", serverPort)
+      await SettingsRepository.set("server_protocol", serverProtocol)
+    } catch (error) {
+      console.error("Failed to save network settings:", error)
+    } finally {
+      setIsSavingNetwork(false)
+    }
+  }
+
+  async function handleRestartServer() {
+    console.log("Restarting server with:", { serverPort, serverProtocol });
+    // TODO: Implement actual restart logic
+    alert("Server restart triggering...");
+  }
+
+  if (isLoading) {
+    return <div className="p-8">Loading settings...</div>
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -45,15 +108,28 @@ function Settings() {
           <CardContent className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="store-name">Store Name</Label>
-              <Input id="store-name" placeholder="My Awesome Store" defaultValue="Inventy Local Store" />
+              <Input
+                id="store-name"
+                placeholder="My Awesome Store"
+                value={storeName}
+                onChange={(e) => setStoreName(e.target.value)}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="owner-email">Owner Email</Label>
-              <Input id="owner-email" type="email" placeholder="owner@example.com" />
+              <Input
+                id="owner-email"
+                type="email"
+                placeholder="owner@example.com"
+                value={ownerEmail}
+                onChange={(e) => setOwnerEmail(e.target.value)}
+              />
             </div>
           </CardContent>
           <CardFooter className="border-t px-6 py-4">
-            <Button>Save Profile</Button>
+            <Button onClick={handleSaveProfile} disabled={isSavingProfile}>
+              {isSavingProfile ? "Saving..." : "Save Profile"}
+            </Button>
           </CardFooter>
         </Card>
 
@@ -68,11 +144,18 @@ function Settings() {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="port">Server Port</Label>
-                <Input id="port" defaultValue="3000" />
+                <Input
+                  id="port"
+                  value={serverPort}
+                  onChange={(e) => setServerPort(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="protocol">Protocol</Label>
-                <Select defaultValue="http">
+                <Select
+                  value={serverProtocol}
+                  onValueChange={setServerProtocol}
+                >
                   <SelectTrigger id="protocol">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -86,12 +169,22 @@ function Settings() {
             <div className="rounded-md bg-muted p-4">
               <div className="text-sm font-medium">Local IP Address</div>
               <div className="text-xs text-muted-foreground break-all">
-                The server is running at: <span className="font-mono text-foreground">http://192.168.1.50:3000</span>
+                The server is running at:{" "}
+                <span className="font-mono text-foreground">
+                  {serverProtocol}://192.168.1.50:{serverPort}
+                </span>
               </div>
             </div>
           </CardContent>
           <CardFooter className="border-t px-6 py-4">
-            <Button variant="secondary">Restart Server</Button>
+            <div className="flex w-full gap-2 justify-start">
+              <Button onClick={handleSaveNetwork} disabled={isSavingNetwork}>
+                {isSavingNetwork ? "Saving..." : "Save Configuration"}
+              </Button>
+              <Button variant="destructive" onClick={handleRestartServer}>
+                Restart Server
+              </Button>
+            </div>
           </CardFooter>
         </Card>
 
@@ -105,7 +198,10 @@ function Settings() {
           <CardContent className="space-y-4">
             <div className="grid gap-2">
               <Label>Theme</Label>
-              <Select value={theme} onValueChange={(val) => setTheme(val as "light" | "dark" | "system")}>
+              <Select
+                value={theme}
+                onValueChange={(val) => setTheme(val as "light" | "dark" | "system")}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select theme" />
                 </SelectTrigger>

@@ -38,3 +38,12 @@ export interface InventoryMovement {
   occurred_at: string
   created_at: string
 }
+
+export interface Setting {
+  id: string
+  key: string
+  value: string | null
+  created_at: string
+  updated_at: string
+  deleted_at?: string | null
+}

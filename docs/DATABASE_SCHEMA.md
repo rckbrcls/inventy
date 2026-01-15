@@ -122,6 +122,19 @@ Tabela append-only que registra **toda** entrada e saída.
 | `occurred_at`         | `INTEGER` | Sim         | Data real da ocorrência (pode ser retroativa).                       |
 | ...                   | ...       | ...         | Colunas de Sync (`_status`, `_changed`).                             |
 
+### 3.4 `settings` (Configurações)
+
+Armazena chaves e valores de configuração do sistema (ex: Perfil da Loja, Rede).
+
+| Coluna       | Tipo      | Obrigatório | Descrição                                        |
+| :----------- | :-------- | :---------- | :----------------------------------------------- |
+| `id`         | `TEXT`    | Sim         | UUID v4.                                         |
+| `key`        | `TEXT`    | Sim         | Chave da configuração (ex: `store_name`). Único. |
+| `value`      | `TEXT`    | Não         | Valor da configuração.                           |
+| `created_at` | `INTEGER` | Sim         | Timestamp.                                       |
+| `updated_at` | `INTEGER` | Sim         | Timestamp.                                       |
+| ...          | ...       | ...         | Colunas de Sync (`_status`, `_changed`).         |
+
 ---
 
 ## 4. Índices e Performance
