@@ -1,5 +1,5 @@
 use sqlx::{SqlitePool, Result};
-use crate::models::user::User;
+use crate::models::user::{User, UserIdentity, UserSession, UserRole};
 
 pub struct UserRepository {
     pool: SqlitePool,
@@ -10,7 +10,14 @@ impl UserRepository {
         Self { pool }
     }
 
-    pub async fn create(&self, user: User) -> Result<User> {
+    pub async fn create(
+        &self,
+        user: User,
+        identities: Vec<UserIdentity>,
+        roles: Vec<UserRole>,
+    ) -> Result<User> {
+        let mut tx = self.pool.begin().await?;
+
         let sql = r#"
             INSERT INTO users (
                 id, email, phone, password_hash, security_stamp, is_email_verified,
@@ -22,28 +29,70 @@ impl UserRepository {
             RETURNING *
         "#;
 
-        sqlx::query_as::<_, User>(sql)
-            .bind(user.id)
-            .bind(user.email)
-            .bind(user.phone)
-            .bind(user.password_hash)
-            .bind(user.security_stamp)
-            .bind(user.is_email_verified)
-            .bind(user.is_phone_verified)
-            .bind(user.failed_login_attempts)
-            .bind(user.lockout_end_at)
-            .bind(user.mfa_enabled)
-            .bind(user.mfa_secret)
-            .bind(user.mfa_backup_codes)
-            .bind(user.last_login_at)
-            .bind(user.last_login_ip)
-            .bind(user.status_internal)
-            .bind(user.created_at)
-            .bind(user.updated_at)
-            .bind(user.profile_type)
-            .bind(user.status)
-            .fetch_one(&self.pool)
-            .await
+        let created_user = sqlx::query_as::<_, User>(sql)
+            .bind(&user.id)
+            .bind(&user.email)
+            .bind(&user.phone)
+            .bind(&user.password_hash)
+            .bind(&user.security_stamp)
+            .bind(&user.is_email_verified)
+            .bind(&user.is_phone_verified)
+            .bind(&user.failed_login_attempts)
+            .bind(&user.lockout_end_at)
+            .bind(&user.mfa_enabled)
+            .bind(&user.mfa_secret)
+            .bind(&user.mfa_backup_codes)
+            .bind(&user.last_login_at)
+            .bind(&user.last_login_ip)
+            .bind(&user.status_internal)
+            .bind(&user.created_at)
+            .bind(&user.updated_at)
+            .bind(&user.profile_type)
+            .bind(&user.status)
+            .fetch_one(&mut *tx)
+            .await?;
+
+        for identity in identities {
+            let id_sql = r#"
+                INSERT INTO user_identities (
+                    id, user_id, provider, provider_user_id, access_token,
+                    refresh_token, expires_at, profile_data, _status, created_at, updated_at
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            "#;
+            sqlx::query(id_sql)
+                .bind(&identity.id)
+                .bind(&created_user.id)
+                .bind(&identity.provider)
+                .bind(&identity.provider_user_id)
+                .bind(&identity.access_token)
+                .bind(&identity.refresh_token)
+                .bind(&identity.expires_at)
+                .bind(&identity.profile_data)
+                .bind(&identity.sync_status)
+                .bind(&identity.created_at)
+                .bind(&identity.updated_at)
+                .execute(&mut *tx)
+                .await?;
+        }
+
+        for role in roles {
+            let role_sql = r#"
+                INSERT INTO user_roles (
+                    user_id, role_id, _status, created_at, updated_at
+                ) VALUES ($1, $2, $3, $4, $5)
+            "#;
+            sqlx::query(role_sql)
+                .bind(&created_user.id)
+                .bind(&role.role_id)
+                .bind(&role.sync_status)
+                .bind(&role.created_at)
+                .bind(&role.updated_at)
+                .execute(&mut *tx)
+                .await?;
+        }
+
+        tx.commit().await?;
+        Ok(created_user)
     }
 
     pub async fn update(&self, user: User) -> Result<User> {
@@ -93,11 +142,62 @@ impl UserRepository {
             .await
     }
 
+    pub async fn delete(&self, id: &str) -> Result<()> {
+        let mut tx = self.pool.begin().await?;
+
+        sqlx::query("DELETE FROM user_identities WHERE user_id = $1")
+            .bind(id)
+            .execute(&mut *tx)
+            .await?;
+
+        sqlx::query("DELETE FROM user_roles WHERE user_id = $1")
+            .bind(id)
+            .execute(&mut *tx)
+            .await?;
+
+        sqlx::query("DELETE FROM user_sessions WHERE user_id = $1")
+            .bind(id)
+            .execute(&mut *tx)
+            .await?;
+
+        sqlx::query("DELETE FROM users WHERE id = $1")
+            .bind(id)
+            .execute(&mut *tx)
+            .await?;
+
+        tx.commit().await?;
+        Ok(())
+    }
+
     pub async fn get_by_id(&self, id: &str) -> Result<Option<User>> {
         let sql = "SELECT * FROM users WHERE id = $1";
         sqlx::query_as::<_, User>(sql)
             .bind(id)
             .fetch_optional(&self.pool)
+            .await
+    }
+
+    pub async fn get_identities(&self, user_id: &str) -> Result<Vec<UserIdentity>> {
+        let sql = "SELECT * FROM user_identities WHERE user_id = $1";
+        sqlx::query_as::<_, UserIdentity>(sql)
+            .bind(user_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
+    pub async fn get_sessions(&self, user_id: &str) -> Result<Vec<UserSession>> {
+        let sql = "SELECT * FROM user_sessions WHERE user_id = $1 ORDER BY last_active_at DESC";
+        sqlx::query_as::<_, UserSession>(sql)
+            .bind(user_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
+    pub async fn get_roles(&self, user_id: &str) -> Result<Vec<UserRole>> {
+        let sql = "SELECT * FROM user_roles WHERE user_id = $1";
+        sqlx::query_as::<_, UserRole>(sql)
+            .bind(user_id)
+            .fetch_all(&self.pool)
             .await
     }
 }

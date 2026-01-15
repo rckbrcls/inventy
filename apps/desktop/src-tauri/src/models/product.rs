@@ -34,3 +34,15 @@ pub struct Product {
     pub created_at: Option<DateTime<Utc>>, // DEFAULT CURRENT_TIMESTAMP
     pub updated_at: Option<DateTime<Utc>>, // DEFAULT CURRENT_TIMESTAMP
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
+pub struct ProductCategory {
+    pub product_id: String,
+    pub category_id: String,
+    pub position: Option<i64>,
+    #[serde(rename = "_status")]
+    #[sqlx(rename = "_status")]
+    pub sync_status: Option<String>,
+    pub created_at: Option<DateTime<Utc>>,
+    pub updated_at: Option<DateTime<Utc>>,
+}
