@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AnalyticsRepository, DashboardStats, DailyMovementStat } from "@/lib/db/repositories/analytics-repository"
+import { useLocalStorage } from "@/hooks/use-local-storage"
 
 export const Route = createFileRoute("/")({ component: Dashboard })
 
@@ -42,21 +43,11 @@ const chartConfig = {
 } satisfies ChartConfig
 
 function Dashboard() {
-  const [activeChart, setActiveChart] = React.useState<keyof typeof chartConfig>(
-    () => (localStorage.getItem("dashboard_activeChart") as keyof typeof chartConfig) || "stockIn"
-  )
+  const [activeChart, setActiveChart] = useLocalStorage<keyof typeof chartConfig>("dashboard_activeChart", "stockIn")
   const [stats, setStats] = React.useState<DashboardStats | null>(null)
   const [chartData, setChartData] = React.useState<DailyMovementStat[]>([])
-  const [timeRange, setTimeRange] = React.useState(() => localStorage.getItem("dashboard_timeRange") || "30d")
+  const [timeRange, setTimeRange] = useLocalStorage("dashboard_timeRange", "30d")
   const [loading, setLoading] = React.useState(true)
-
-  React.useEffect(() => {
-    localStorage.setItem("dashboard_activeChart", activeChart)
-  }, [activeChart])
-
-  React.useEffect(() => {
-    localStorage.setItem("dashboard_timeRange", timeRange)
-  }, [timeRange])
 
   React.useEffect(() => {
     async function loadData() {
