@@ -1,34 +1,39 @@
-# Tutorial de Criação de Repositórios (Best Practices)
+# Rust/Tauri Repository Standards
 
-Este guia define o padrão ouro para implementação de repositórios Rust no `src-tauri`, combinando segurança, tipagem e consistência.
+Role: Expert Rust Backend Engineer specializing in SQLx and Tauri.
+Context: Implementing repository methods for `src-tauri`.
 
-## O Padrão "Hybrid Safety"
+## Core Philosophy: Hybrid Safety
 
-Devemos combinar o melhor de 4 abordagens para garantir código robusto:
+You must adhere to the following 5 strict rules when generating repository code:
 
-1.  **Tipagem Automática**: Usar `query_as` para mapear o retorno do banco direto para Structs.
-2.  **Consistência de Dados**: Usar `RETURNING *` no SQL para garantir que o objeto em memória reflete exatamente o estado do banco (ex: datas geradas, defaults).
-3.  **Segurança de Binds**: Usar parâmetros numerados (`$1`, `$2`...) em vez de posicionais (`?`) para evitar erros silenciosos ao alterar a ordem dos campos.
-4.  **Organização**: Separar o SQL em uma variável string `let sql = ...` para manter a legibilidade do código Rust quando houver muitas colunas.
-5.  **Datas em UTC**: Sempre utilizar `chrono::DateTime<Utc>` para campos de data/hora, garantindo compatibilidade entre SQLite e Postgres.
+1.  **Strict Typing**: ALWAYS use `sqlx::query_as::<_, StructName>` instead of generic row mapping.
+2.  **Source of Truth**: Mutation queries (INSERT/UPDATE) MUST end with `RETURNING *` to reflect DB state (triggers, defaults).
+3.  **Bind Safety**: Use Numbered Parameters (`$1`, `$2`, etc.) exclusively. NEVER use positional `?`.
+4.  **Readability**: If a query has >3 parameters, extract the SQL into a raw string variable (`let sql = r#"... #;`) before the `query_as` call.
+5.  **Time Standardization**: All date/time fields must be `chrono::DateTime<Utc>`.
 
-## Exemplo Prático: Método `create`
+## Negative Constraints (Do NOT do this)
+
+- DO NOT use `query!` macro (macros break complex type inference in some IDEs/contexts).
+- DO NOT return the input struct directly; always return the `fetch_one` result.
+- DO NOT perform manual field mapping (`row.get("field")`).
+
+## Code Pattern Reference
+
+### Pattern: CREATE Method
 
 ```rust
 pub async fn create(&self, item: Item) -> Result<Item> {
-    // 1. SQL Separado e Legível
-    // Note o uso de raw string (r#""#) para suportar múltiplas linhas sem sujeira
+    // RULE: Separate SQL for readability
     let sql = r#"
-        INSERT INTO items (
-            id, name, price, status, created_at, updated_at
-        )
-        VALUES ($1, $2, $3, $4, $5, $6) -- 2. Parâmetros Numerados ($1, $2...)
-        RETURNING *                     -- 3. Retorno da Verdade do Banco
+        INSERT INTO items (id, name, price, status, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6) -- RULE: Numbered params
+        RETURNING * -- RULE: Return DB truth
     "#;
 
-    // 4. query_as para Tipagem Forte
     sqlx::query_as::<_, Item>(sql)
-        .bind(item.id)          // $1 -> Garante que ID vai para o $1, independente da ordem visual
+        .bind(item.id)          // $1
         .bind(item.name)        // $2
         .bind(item.price)       // $3
         .bind(item.status)      // $4
@@ -37,9 +42,10 @@ pub async fn create(&self, item: Item) -> Result<Item> {
         .fetch_one(&self.pool)
         .await
 }
+
 ```
 
-## Exemplo Prático: Método `update`
+### Pattern: UPDATE Method
 
 ```rust
 pub async fn update(&self, item: Item) -> Result<Item> {
@@ -49,12 +55,12 @@ pub async fn update(&self, item: Item) -> Result<Item> {
             price = $3,
             status = $4,
             updated_at = $5
-        WHERE id = $1           -- $1 usado no WHERE, mas pode ser o primeiro bind!
+        WHERE id = $1
         RETURNING *
     "#;
 
     sqlx::query_as::<_, Item>(sql)
-        .bind(item.id)          // $1 -> Vinculado ao WHERE id = $1
+        .bind(item.id)          // $1 (Matches WHERE clause)
         .bind(item.name)        // $2
         .bind(item.price)       // $3
         .bind(item.status)      // $4
@@ -62,14 +68,5 @@ pub async fn update(&self, item: Item) -> Result<Item> {
         .fetch_one(&self.pool)
         .await
 }
+
 ```
-
-## Comparativo: Por que mudar?
-
-| Abordagem               | Problema Resolvido                                                                                        |
-| :---------------------- | :-------------------------------------------------------------------------------------------------------- |
-| **`sqlx::query_as`**    | Evita `row.get("col")` manual e erros de digitação de nomes de colunas.                                   |
-| **`RETURNING *`**       | Garante que dados gerados pelo banco (Triggers, Auto-increment, Defaults) voltem para o Rust atualizados. |
-| **`$1, $2 (Numbered)`** | Evita bugs críticos onde dados são salvos na coluna errada se a ordem mudar no SQL ou no Bind.            |
-| **`let sql = ...`**     | Melhora drasticamente a leitura (Code Cleanliness) quando a query tem muitas colunas (20+).               |
-| **`DateTime<Utc>`**     | Garante que o timestamp salvo seja agnóstico de fuso horário, prevenindo bugs de sincronização.           |

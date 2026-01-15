@@ -9,3 +9,5 @@ pub mod customer;
 pub mod customer_group;
 pub mod customer_group_membership;
 pub mod customer_address;
+pub mod user;
+pub mod transaction;
