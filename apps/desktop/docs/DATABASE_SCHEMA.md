@@ -171,3 +171,57 @@ Para garantir a velocidade de busca e sincronização, os seguintes índices sã
 1.  **Sync Index**: `CREATE INDEX idx_items_updated_at ON inventory_items (updated_at);` (Essencial para o `PULL` changes).
 2.  **Search Index**: `CREATE INDEX idx_items_name_sku ON inventory_items (name, sku);` (Para busca rápida no POS).
 3.  **Relationship Index**: `CREATE INDEX idx_movements_item ON inventory_movements (item_id);` (Para calcular histórico do item).
+
+---
+
+## 5. Consultas Analíticas e Window Functions
+
+O sistema utiliza recursos avançados do SQL (Window Functions e Agregações) para gerar métricas de performance em tempo real.
+
+### 5.1 Análise de Crescimento (Window Functions)
+
+Para calcular o crescimento percentual do cadastro de itens mês a mês ("+20.1% from last month"), utilizamos uma combinação de Common Table Expressions (CTEs) e funções de janela `SUM() OVER` e `LAG() OVER`.
+
+```sql
+WITH monthly_new AS (
+  -- Agrupa novos itens por mês
+  SELECT
+    strftime('%Y-%m', created_at) as month,
+    COUNT(*) as new_items
+  FROM inventory_items
+  WHERE deleted_at IS NULL
+  GROUP BY month
+),
+running_totals AS (
+  -- Calcula o total acumulado até aquele mês (Running Total)
+  SELECT
+    month,
+    SUM(new_items) OVER (ORDER BY month) as total_at_month_end
+  FROM monthly_new
+),
+final_stats AS (
+  -- Compara o total acumulado atual com o do mês anterior
+  SELECT
+    total_at_month_end,
+    LAG(total_at_month_end) OVER (ORDER BY month) as prev_total
+  FROM running_totals
+)
+SELECT * FROM final_stats ORDER BY total_at_month_end DESC LIMIT 1;
+```
+
+### 5.2 Fluxo de Estoque Diário (Agregação Condicional)
+
+Para alimentar os gráficos de "Stock In" vs "Stock Out", realizamos uma agregação diária com pivotamento condicional.
+
+```sql
+SELECT
+  strftime('%Y-%m-%d', occurred_at) as date,
+  -- Soma apenas entradas para a coluna stockIn
+  SUM(CASE WHEN type = 'IN' THEN quantity_change ELSE 0 END) as stockIn,
+  -- Soma saídas e ajustes (em módulo) para stockOut
+  SUM(CASE WHEN type IN ('OUT', 'ADJUST') THEN ABS(quantity_change) ELSE 0 END) as stockOut
+FROM inventory_movements
+WHERE occurred_at >= date('now', '-30 days')
+GROUP BY date
+ORDER BY date ASC;
+```
