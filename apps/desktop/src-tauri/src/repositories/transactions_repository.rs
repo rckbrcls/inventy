@@ -1,3 +1,4 @@
+use crate::db::DbTransaction;
 use crate::models::transaction_model::Transaction;
 use sqlx::{Result, SqlitePool};
 
@@ -109,6 +110,41 @@ impl TransactionsRepository {
         let sql = "SELECT * FROM transactions ORDER BY created_at DESC";
         sqlx::query_as::<_, Transaction>(sql)
             .fetch_all(&self.pool)
+            .await
+    }
+
+    // ============================================================
+    // Transaction-aware methods for atomic operations
+    // ============================================================
+
+    /// Get transaction by ID within a database transaction
+    pub async fn get_by_id_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        id: &str,
+    ) -> Result<Option<Transaction>> {
+        let sql = "SELECT * FROM transactions WHERE id = $1";
+        sqlx::query_as::<_, Transaction>(sql)
+            .bind(id)
+            .fetch_optional(&mut **tx)
+            .await
+    }
+
+    /// Update only the status of a transaction within a database transaction
+    pub async fn update_status_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        id: &str,
+        status: &str,
+    ) -> Result<Transaction> {
+        let sql = r#"
+            UPDATE transactions
+            SET status = $2, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, Transaction>(sql)
+            .bind(id)
+            .bind(status)
+            .fetch_one(&mut **tx)
             .await
     }
 }

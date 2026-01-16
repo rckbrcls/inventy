@@ -1,6 +1,12 @@
 -- Migração Inicial SQLite
 -- Adaptada de DDL.md e ARCHITECTURE.md
 -- Ordem ajustada para satisfazer Foreign Keys
+--
+-- CONVENÇÕES:
+-- - ON DELETE CASCADE: apenas em join tables e tabelas dependentes sem valor próprio
+-- - ON DELETE SET NULL: para FKs opcionais onde o registro pai pode ser removido
+-- - ON DELETE RESTRICT (default): para FKs críticas onde deleção deve ser bloqueada
+-- - Soft Delete (_status = 'deleted'): usado para todas as tabelas de negócio
 
 -- 1. Lojas (Shops) - Base da hierarquia
 CREATE TABLE IF NOT EXISTS shops (
@@ -27,7 +33,7 @@ CREATE TABLE IF NOT EXISTS shops (
 -- 2. Marcas (Depende de Shops)
 CREATE TABLE IF NOT EXISTS brands (
     id TEXT PRIMARY KEY,
-    shop_id TEXT NOT NULL REFERENCES shops(id),
+    shop_id TEXT NOT NULL REFERENCES shops(id) ON DELETE RESTRICT,
     name TEXT NOT NULL,
     slug TEXT NOT NULL,
     logo_url TEXT,
@@ -50,8 +56,8 @@ CREATE TABLE IF NOT EXISTS brands (
 -- 3. Categorias (Depende de Shops)
 CREATE TABLE IF NOT EXISTS categories (
     id TEXT PRIMARY KEY,
-    shop_id TEXT NOT NULL REFERENCES shops(id),
-    parent_id TEXT REFERENCES categories(id) ON DELETE SET NULL,
+    shop_id TEXT NOT NULL REFERENCES shops(id) ON DELETE RESTRICT,
+    parent_id TEXT REFERENCES categories(id) ON DELETE SET NULL, -- Categoria órfã vira raiz
     name TEXT NOT NULL,
     slug TEXT NOT NULL,
     description TEXT,
@@ -92,15 +98,15 @@ CREATE TABLE IF NOT EXISTS products (
     depth_mm INTEGER DEFAULT 0,
     attributes TEXT, -- JSONB
     metadata TEXT,   -- JSONB
-    category_id TEXT REFERENCES categories(id),
-    brand_id TEXT REFERENCES brands(id),
-    parent_id TEXT REFERENCES products(id),
+    category_id TEXT REFERENCES categories(id) ON DELETE SET NULL, -- Produto sem categoria é válido
+    brand_id TEXT REFERENCES brands(id) ON DELETE SET NULL, -- Produto sem marca é válido
+    parent_id TEXT REFERENCES products(id) ON DELETE SET NULL, -- Variante órfã vira produto principal
     _status TEXT DEFAULT 'created',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. Product Categories (Join Table)
+-- 5. Product Categories (Join Table) - CASCADE em ambos
 CREATE TABLE IF NOT EXISTS product_categories (
     product_id TEXT REFERENCES products(id) ON DELETE CASCADE,
     category_id TEXT REFERENCES categories(id) ON DELETE CASCADE,
@@ -117,14 +123,17 @@ CREATE TABLE IF NOT EXISTS locations (
     name TEXT NOT NULL,
     type TEXT NOT NULL CHECK (type IN ('warehouse', 'store', 'transit', 'virtual')),
     is_sellable INTEGER DEFAULT 1,
-    address_data TEXT -- JSONB
+    address_data TEXT, -- JSONB
+    _status TEXT DEFAULT 'created',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 7. Níveis de Estoque (Inventory Levels)
 CREATE TABLE IF NOT EXISTS inventory_levels (
     id TEXT PRIMARY KEY,
-    product_id TEXT NOT NULL REFERENCES products(id),
-    location_id TEXT NOT NULL REFERENCES locations(id),
+    product_id TEXT NOT NULL REFERENCES products(id) ON DELETE RESTRICT, -- Não deletar produto com estoque
+    location_id TEXT NOT NULL REFERENCES locations(id) ON DELETE RESTRICT, -- Não deletar location com estoque
     batch_number TEXT,
     serial_number TEXT,
     expiry_date DATE,
@@ -156,7 +165,7 @@ CREATE TABLE IF NOT EXISTS customers (
     language TEXT DEFAULT 'pt',
     tags TEXT, -- TEXT[]
     accepts_marketing INTEGER DEFAULT 0,
-    customer_group_id TEXT, -- FK definhada abaixo se necessario, ou circular
+    customer_group_id TEXT, -- FK definida após customer_groups
     total_spent REAL DEFAULT 0,
     orders_count INTEGER DEFAULT 0,
     last_order_at DATETIME,
@@ -171,7 +180,7 @@ CREATE TABLE IF NOT EXISTS customers (
 -- 9. Grupos de Clientes (Customer Groups) - Depende de Shops
 CREATE TABLE IF NOT EXISTS customer_groups (
     id TEXT PRIMARY KEY,
-    shop_id TEXT NOT NULL REFERENCES shops(id),
+    shop_id TEXT NOT NULL REFERENCES shops(id) ON DELETE RESTRICT,
     name TEXT NOT NULL,
     code TEXT,
     description TEXT,
@@ -189,7 +198,7 @@ CREATE TABLE IF NOT EXISTS customer_groups (
     UNIQUE (shop_id, code)
 );
 
--- 10. Membros de Grupos de Clientes
+-- 10. Membros de Grupos de Clientes (Join Table) - CASCADE em ambos
 CREATE TABLE IF NOT EXISTS customer_group_memberships (
     customer_id TEXT REFERENCES customers(id) ON DELETE CASCADE,
     customer_group_id TEXT REFERENCES customer_groups(id) ON DELETE CASCADE,
@@ -199,10 +208,10 @@ CREATE TABLE IF NOT EXISTS customer_group_memberships (
     PRIMARY KEY (customer_id, customer_group_id)
 );
 
--- 11. Endereços de Clientes
+-- 11. Endereços de Clientes - CASCADE ao deletar customer
 CREATE TABLE IF NOT EXISTS customer_addresses (
     id TEXT PRIMARY KEY,
-    customer_id TEXT NOT NULL REFERENCES customers(id),
+    customer_id TEXT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
     type TEXT DEFAULT 'shipping',
     is_default INTEGER DEFAULT 0,
     first_name TEXT,
@@ -250,9 +259,9 @@ CREATE TABLE IF NOT EXISTS transactions (
     type TEXT NOT NULL CHECK (type IN ('sale', 'purchase', 'transfer', 'return', 'adjustment')),
     status TEXT NOT NULL DEFAULT 'draft',
     channel TEXT,
-    customer_id TEXT REFERENCES customers(id),
-    supplier_id TEXT, -- Sem tabela de suppliers definida no DDL, mas existe no conceito
-    staff_id TEXT REFERENCES users(id),
+    customer_id TEXT REFERENCES customers(id) ON DELETE SET NULL, -- Manter transação sem cliente
+    supplier_id TEXT, -- Sem tabela de suppliers definida no DDL
+    staff_id TEXT REFERENCES users(id) ON DELETE SET NULL, -- Manter transação sem staff
     currency TEXT DEFAULT 'BRL',
     total_items REAL DEFAULT 0,
     total_shipping REAL DEFAULT 0,
@@ -266,11 +275,11 @@ CREATE TABLE IF NOT EXISTS transactions (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 14. Itens da Transação
+-- 14. Itens da Transação - CASCADE ao deletar transaction
 CREATE TABLE IF NOT EXISTS transaction_items (
     id TEXT PRIMARY KEY,
-    transaction_id TEXT NOT NULL REFERENCES transactions(id),
-    product_id TEXT REFERENCES products(id),
+    transaction_id TEXT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+    product_id TEXT REFERENCES products(id) ON DELETE SET NULL, -- Manter item com snapshot
     sku_snapshot TEXT,
     name_snapshot TEXT,
     quantity REAL NOT NULL,
@@ -287,8 +296,8 @@ CREATE TABLE IF NOT EXISTS transaction_items (
 -- 15. Movimentações de Estoque
 CREATE TABLE IF NOT EXISTS inventory_movements (
     id TEXT PRIMARY KEY,
-    transaction_id TEXT REFERENCES transactions(id),
-    inventory_level_id TEXT REFERENCES inventory_levels(id),
+    transaction_id TEXT REFERENCES transactions(id) ON DELETE SET NULL, -- Manter histórico
+    inventory_level_id TEXT REFERENCES inventory_levels(id) ON DELETE RESTRICT, -- Não deletar level com movimentações
     type TEXT CHECK (type IN ('in', 'out')),
     quantity REAL NOT NULL,
     previous_balance REAL,
@@ -301,7 +310,7 @@ CREATE TABLE IF NOT EXISTS inventory_movements (
 -- 16. Pagamentos
 CREATE TABLE IF NOT EXISTS payments (
     id TEXT PRIMARY KEY,
-    transaction_id TEXT NOT NULL REFERENCES transactions(id),
+    transaction_id TEXT NOT NULL REFERENCES transactions(id) ON DELETE RESTRICT, -- Não deletar transação com pagamentos
     amount REAL NOT NULL,
     currency TEXT DEFAULT 'BRL',
     provider TEXT NOT NULL,
@@ -323,7 +332,7 @@ CREATE TABLE IF NOT EXISTS payments (
 -- 17. Estornos/Reembolsos
 CREATE TABLE IF NOT EXISTS refunds (
     id TEXT PRIMARY KEY,
-    payment_id TEXT NOT NULL REFERENCES payments(id),
+    payment_id TEXT NOT NULL REFERENCES payments(id) ON DELETE RESTRICT, -- Não deletar payment com refunds
     amount REAL NOT NULL,
     status TEXT DEFAULT 'pending',
     reason TEXT,
@@ -331,14 +340,14 @@ CREATE TABLE IF NOT EXISTS refunds (
     _status TEXT DEFAULT 'created',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_by TEXT REFERENCES users(id)
+    created_by TEXT REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- 18. Checkouts
 CREATE TABLE IF NOT EXISTS checkouts (
     id TEXT PRIMARY KEY,
     token TEXT UNIQUE NOT NULL,
-    user_id TEXT REFERENCES users(id),
+    user_id TEXT REFERENCES users(id) ON DELETE SET NULL, -- Manter checkout abandonado
     email TEXT,
     items TEXT DEFAULT '[]', -- JSONB
     shipping_address TEXT, -- JSONB
@@ -367,8 +376,8 @@ CREATE TABLE IF NOT EXISTS orders (
     order_number INTEGER, -- Sequencial gerado via logica de app ou tabela auxiliar
     idempotency_key TEXT UNIQUE,
     channel TEXT DEFAULT 'web',
-    shop_id TEXT REFERENCES shops(id),
-    customer_id TEXT REFERENCES customers(id),
+    shop_id TEXT REFERENCES shops(id) ON DELETE RESTRICT,
+    customer_id TEXT REFERENCES customers(id) ON DELETE SET NULL, -- Manter order sem cliente
     status TEXT DEFAULT 'open',
     payment_status TEXT DEFAULT 'unpaid',
     fulfillment_status TEXT DEFAULT 'unfulfilled',
@@ -398,8 +407,8 @@ CREATE TABLE IF NOT EXISTS orders (
 -- 20. Envios (Shipments)
 CREATE TABLE IF NOT EXISTS shipments (
     id TEXT PRIMARY KEY,
-    order_id TEXT NOT NULL REFERENCES orders(id),
-    location_id TEXT REFERENCES locations(id),
+    order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE, -- Deletar shipments com order
+    location_id TEXT REFERENCES locations(id) ON DELETE SET NULL,
     status TEXT DEFAULT 'pending',
     carrier_company TEXT,
     carrier_service TEXT,
@@ -425,10 +434,10 @@ CREATE TABLE IF NOT EXISTS shipments (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 21. Itens de Envio
+-- 21. Itens de Envio - CASCADE ao deletar shipment
 CREATE TABLE IF NOT EXISTS shipment_items (
     id TEXT PRIMARY KEY,
-    shipment_id TEXT NOT NULL REFERENCES shipments(id),
+    shipment_id TEXT NOT NULL REFERENCES shipments(id) ON DELETE CASCADE,
     order_item_id TEXT NOT NULL,
     quantity INTEGER NOT NULL,
     batch_number TEXT,
@@ -438,10 +447,10 @@ CREATE TABLE IF NOT EXISTS shipment_items (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 22. Eventos de Envio
+-- 22. Eventos de Envio - CASCADE ao deletar shipment
 CREATE TABLE IF NOT EXISTS shipment_events (
     id TEXT PRIMARY KEY,
-    shipment_id TEXT REFERENCES shipments(id),
+    shipment_id TEXT REFERENCES shipments(id) ON DELETE CASCADE,
     status TEXT,
     description TEXT,
     location TEXT,
@@ -452,7 +461,7 @@ CREATE TABLE IF NOT EXISTS shipment_events (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 23. Identidades de Usuário
+-- 23. Identidades de Usuário - CASCADE ao deletar user
 CREATE TABLE IF NOT EXISTS user_identities (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -468,7 +477,7 @@ CREATE TABLE IF NOT EXISTS user_identities (
     UNIQUE (provider, provider_user_id)
 );
 
--- 24. Sessões de Usuário
+-- 24. Sessões de Usuário - CASCADE ao deletar user
 CREATE TABLE IF NOT EXISTS user_sessions (
     id TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -495,10 +504,10 @@ CREATE TABLE IF NOT EXISTS roles (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 26. User Roles
+-- 26. User Roles (Join Table) - CASCADE em ambos
 CREATE TABLE IF NOT EXISTS user_roles (
-    user_id TEXT REFERENCES users(id),
-    role_id TEXT REFERENCES roles(id),
+    user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+    role_id TEXT REFERENCES roles(id) ON DELETE CASCADE,
     _status TEXT DEFAULT 'created',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -513,10 +522,10 @@ CREATE TABLE IF NOT EXISTS inquiries (
     status TEXT DEFAULT 'new',
     priority TEXT DEFAULT 'normal',
     source TEXT DEFAULT 'web_form',
-    customer_id TEXT REFERENCES customers(id),
+    customer_id TEXT REFERENCES customers(id) ON DELETE SET NULL,
     requester_data TEXT NOT NULL, -- JSONB
     department TEXT,
-    assigned_staff_id TEXT REFERENCES users(id),
+    assigned_staff_id TEXT REFERENCES users(id) ON DELETE SET NULL, -- Inquiry sem responsável
     subject TEXT,
     related_order_id TEXT,
     related_product_id TEXT,
@@ -528,10 +537,10 @@ CREATE TABLE IF NOT EXISTS inquiries (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 28. Mensagens de Inquérito
+-- 28. Mensagens de Inquérito - CASCADE ao deletar inquiry
 CREATE TABLE IF NOT EXISTS inquiry_messages (
     id TEXT PRIMARY KEY,
-    inquiry_id TEXT NOT NULL REFERENCES inquiries(id),
+    inquiry_id TEXT NOT NULL REFERENCES inquiries(id) ON DELETE CASCADE,
     sender_type TEXT NOT NULL CHECK (sender_type IN ('customer', 'staff', 'bot')),
     sender_id TEXT,
     body TEXT,
@@ -547,9 +556,9 @@ CREATE TABLE IF NOT EXISTS inquiry_messages (
 -- 29. Avaliações
 CREATE TABLE IF NOT EXISTS reviews (
     id TEXT PRIMARY KEY,
-    order_id TEXT NOT NULL REFERENCES orders(id),
-    customer_id TEXT REFERENCES customers(id),
-    product_id TEXT REFERENCES products(id),
+    order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    customer_id TEXT REFERENCES customers(id) ON DELETE SET NULL,
+    product_id TEXT REFERENCES products(id) ON DELETE SET NULL,
     rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
     title TEXT,
     body TEXT,
@@ -559,3 +568,288 @@ CREATE TABLE IF NOT EXISTS reviews (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 30. Métricas de Produtos (agregados)
+CREATE TABLE IF NOT EXISTS product_metrics (
+    product_id TEXT PRIMARY KEY REFERENCES products(id) ON DELETE CASCADE,
+    average_rating REAL DEFAULT 0,
+    review_count INTEGER DEFAULT 0,
+    _status TEXT DEFAULT 'created',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- TRIGGERS (Apenas validação, auditoria e automações defensivas)
+-- Lógica de negócio deve ficar na Service Layer (Rust)
+-- ============================================================
+
+-- 1. Trigger: Validar estoque antes de movimentação de saída
+-- DEFENSIVO: Previne movimentações que deixariam o estoque negativo
+CREATE TRIGGER IF NOT EXISTS trg_validate_stock_before_movement
+BEFORE INSERT ON inventory_movements
+WHEN NEW.type = 'out'
+BEGIN
+    SELECT CASE
+        WHEN (SELECT quantity_on_hand - quantity_reserved FROM inventory_levels WHERE id = NEW.inventory_level_id) < NEW.quantity
+        THEN RAISE(ABORT, 'Estoque insuficiente para esta movimentação')
+    END;
+END;
+
+-- 2. Trigger: Atualizar inventory_levels após INSERT em inventory_movements
+-- AUTOMAÇÃO: Mantém quantity_on_hand sincronizado
+CREATE TRIGGER IF NOT EXISTS trg_inventory_movement_update_level
+AFTER INSERT ON inventory_movements
+BEGIN
+    UPDATE inventory_levels
+    SET
+        quantity_on_hand = CASE
+            WHEN NEW.type = 'in' THEN quantity_on_hand + NEW.quantity
+            WHEN NEW.type = 'out' THEN quantity_on_hand - NEW.quantity
+            ELSE quantity_on_hand
+        END,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.inventory_level_id;
+END;
+
+-- 3. Trigger: Marcar estoque como expirado ao inserir com data passada
+-- DEFENSIVO: Garante consistência de stock_status
+CREATE TRIGGER IF NOT EXISTS trg_expire_stock_on_insert
+AFTER INSERT ON inventory_levels
+WHEN NEW.expiry_date IS NOT NULL AND NEW.expiry_date < date('now')
+BEGIN
+    UPDATE inventory_levels
+    SET stock_status = 'expired', updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+END;
+
+-- ============================================================
+-- TABELA DE AUDIT LOG
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id TEXT PRIMARY KEY,
+    table_name TEXT NOT NULL,
+    record_id TEXT NOT NULL,
+    action TEXT NOT NULL CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),
+    old_data TEXT,  -- JSONB com dados anteriores
+    new_data TEXT,  -- JSONB com dados novos
+    changed_by TEXT,  -- user_id se disponível
+    ip_address TEXT,
+    user_agent TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- TRIGGERS DE AUDITORIA (tabelas críticas)
+-- ============================================================
+
+-- Audit: transactions
+CREATE TRIGGER IF NOT EXISTS trg_audit_transactions_insert
+AFTER INSERT ON transactions
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'transactions',
+        NEW.id,
+        'INSERT',
+        json_object(
+            'id', NEW.id,
+            'type', NEW.type,
+            'status', NEW.status,
+            'customer_id', NEW.customer_id,
+            'total_net', NEW.total_net
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_audit_transactions_update
+AFTER UPDATE ON transactions
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, old_data, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'transactions',
+        NEW.id,
+        'UPDATE',
+        json_object(
+            'type', OLD.type,
+            'status', OLD.status,
+            'total_net', OLD.total_net
+        ),
+        json_object(
+            'type', NEW.type,
+            'status', NEW.status,
+            'total_net', NEW.total_net
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+-- Audit: inventory_movements
+CREATE TRIGGER IF NOT EXISTS trg_audit_inventory_movements_insert
+AFTER INSERT ON inventory_movements
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'inventory_movements',
+        NEW.id,
+        'INSERT',
+        json_object(
+            'id', NEW.id,
+            'type', NEW.type,
+            'quantity', NEW.quantity,
+            'inventory_level_id', NEW.inventory_level_id,
+            'previous_balance', NEW.previous_balance,
+            'new_balance', NEW.new_balance
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+-- Audit: payments
+CREATE TRIGGER IF NOT EXISTS trg_audit_payments_insert
+AFTER INSERT ON payments
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'payments',
+        NEW.id,
+        'INSERT',
+        json_object(
+            'id', NEW.id,
+            'amount', NEW.amount,
+            'status', NEW.status,
+            'provider', NEW.provider,
+            'method', NEW.method
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_audit_payments_update
+AFTER UPDATE ON payments
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, old_data, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'payments',
+        NEW.id,
+        'UPDATE',
+        json_object(
+            'amount', OLD.amount,
+            'status', OLD.status
+        ),
+        json_object(
+            'amount', NEW.amount,
+            'status', NEW.status
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+-- Audit: orders
+CREATE TRIGGER IF NOT EXISTS trg_audit_orders_insert
+AFTER INSERT ON orders
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'orders',
+        NEW.id,
+        'INSERT',
+        json_object(
+            'id', NEW.id,
+            'order_number', NEW.order_number,
+            'status', NEW.status,
+            'payment_status', NEW.payment_status,
+            'total_price', NEW.total_price
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+CREATE TRIGGER IF NOT EXISTS trg_audit_orders_update
+AFTER UPDATE ON orders
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, old_data, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'orders',
+        NEW.id,
+        'UPDATE',
+        json_object(
+            'status', OLD.status,
+            'payment_status', OLD.payment_status,
+            'fulfillment_status', OLD.fulfillment_status
+        ),
+        json_object(
+            'status', NEW.status,
+            'payment_status', NEW.payment_status,
+            'fulfillment_status', NEW.fulfillment_status
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+-- Audit: refunds
+CREATE TRIGGER IF NOT EXISTS trg_audit_refunds_insert
+AFTER INSERT ON refunds
+BEGIN
+    INSERT INTO audit_logs (id, table_name, record_id, action, new_data, created_at)
+    VALUES (
+        lower(hex(randomblob(16))),
+        'refunds',
+        NEW.id,
+        'INSERT',
+        json_object(
+            'id', NEW.id,
+            'payment_id', NEW.payment_id,
+            'amount', NEW.amount,
+            'status', NEW.status,
+            'reason', NEW.reason
+        ),
+        CURRENT_TIMESTAMP
+    );
+END;
+
+-- ============================================================
+-- ÍNDICES PARA PERFORMANCE
+-- ============================================================
+
+-- Índices para buscas frequentes
+CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku);
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_inventory_levels_product ON inventory_levels(product_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_inventory_levels_location ON inventory_levels(location_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_inventory_levels_status ON inventory_levels(stock_status) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_customers_phone ON customers(phone) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_customers_status ON customers(status) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions(type) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_transactions_customer ON transactions(customer_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_transactions_created ON transactions(created_at) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_orders_number ON orders(order_number) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_payments_transaction ON payments(transaction_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_shipments_order ON shipments(order_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_shipments_status ON shipments(status) WHERE _status != 'deleted';
+
+CREATE INDEX IF NOT EXISTS idx_audit_logs_table ON audit_logs(table_name, created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_record ON audit_logs(record_id);

@@ -1,5 +1,6 @@
+use crate::db::DbTransaction;
 use crate::models::checkout_model::Checkout;
-use sqlx::{SqlitePool, Result};
+use sqlx::{Result, SqlitePool};
 
 pub struct CheckoutsRepository {
     pool: SqlitePool,
@@ -24,29 +25,29 @@ impl CheckoutsRepository {
         "#;
 
         sqlx::query_as::<_, Checkout>(sql)
-            .bind(checkout.id)                        // $1
-            .bind(checkout.token)                     // $2
-            .bind(checkout.user_id)                   // $3
-            .bind(checkout.email)                     // $4
-            .bind(checkout.items)                     // $5
-            .bind(checkout.shipping_address)          // $6
-            .bind(checkout.billing_address)           // $7
-            .bind(checkout.shipping_line)             // $8
-            .bind(checkout.applied_discount_codes)    // $9
-            .bind(checkout.currency)                 // $10
-            .bind(checkout.subtotal_price)           // $11
-            .bind(checkout.total_tax)               // $12
-            .bind(checkout.total_shipping)          // $13
-            .bind(checkout.total_discounts)         // $14
-            .bind(checkout.total_price)             // $15
-            .bind(checkout.status)                  // $16
-            .bind(checkout.reservation_expires_at)  // $17
-            .bind(checkout.completed_at)             // $18
-            .bind(checkout.metadata)                // $19
-            .bind(checkout.recovery_url)             // $20
-            .bind(checkout.sync_status)             // $21
-            .bind(checkout.created_at)               // $22
-            .bind(checkout.updated_at)               // $23
+            .bind(checkout.id) // $1
+            .bind(checkout.token) // $2
+            .bind(checkout.user_id) // $3
+            .bind(checkout.email) // $4
+            .bind(checkout.items) // $5
+            .bind(checkout.shipping_address) // $6
+            .bind(checkout.billing_address) // $7
+            .bind(checkout.shipping_line) // $8
+            .bind(checkout.applied_discount_codes) // $9
+            .bind(checkout.currency) // $10
+            .bind(checkout.subtotal_price) // $11
+            .bind(checkout.total_tax) // $12
+            .bind(checkout.total_shipping) // $13
+            .bind(checkout.total_discounts) // $14
+            .bind(checkout.total_price) // $15
+            .bind(checkout.status) // $16
+            .bind(checkout.reservation_expires_at) // $17
+            .bind(checkout.completed_at) // $18
+            .bind(checkout.metadata) // $19
+            .bind(checkout.recovery_url) // $20
+            .bind(checkout.sync_status) // $21
+            .bind(checkout.created_at) // $22
+            .bind(checkout.updated_at) // $23
             .fetch_one(&self.pool)
             .await
     }
@@ -80,28 +81,28 @@ impl CheckoutsRepository {
         "#;
 
         sqlx::query_as::<_, Checkout>(sql)
-            .bind(checkout.id)                        // $1
-            .bind(checkout.token)                     // $2
-            .bind(checkout.user_id)                   // $3
-            .bind(checkout.email)                     // $4
-            .bind(checkout.items)                     // $5
-            .bind(checkout.shipping_address)          // $6
-            .bind(checkout.billing_address)           // $7
-            .bind(checkout.shipping_line)             // $8
-            .bind(checkout.applied_discount_codes)    // $9
-            .bind(checkout.currency)                 // $10
-            .bind(checkout.subtotal_price)           // $11
-            .bind(checkout.total_tax)               // $12
-            .bind(checkout.total_shipping)          // $13
-            .bind(checkout.total_discounts)         // $14
-            .bind(checkout.total_price)             // $15
-            .bind(checkout.status)                  // $16
-            .bind(checkout.reservation_expires_at)  // $17
-            .bind(checkout.completed_at)             // $18
-            .bind(checkout.metadata)                // $19
-            .bind(checkout.recovery_url)             // $20
-            .bind(checkout.sync_status)             // $21
-            .bind(checkout.updated_at)               // $22
+            .bind(checkout.id) // $1
+            .bind(checkout.token) // $2
+            .bind(checkout.user_id) // $3
+            .bind(checkout.email) // $4
+            .bind(checkout.items) // $5
+            .bind(checkout.shipping_address) // $6
+            .bind(checkout.billing_address) // $7
+            .bind(checkout.shipping_line) // $8
+            .bind(checkout.applied_discount_codes) // $9
+            .bind(checkout.currency) // $10
+            .bind(checkout.subtotal_price) // $11
+            .bind(checkout.total_tax) // $12
+            .bind(checkout.total_shipping) // $13
+            .bind(checkout.total_discounts) // $14
+            .bind(checkout.total_price) // $15
+            .bind(checkout.status) // $16
+            .bind(checkout.reservation_expires_at) // $17
+            .bind(checkout.completed_at) // $18
+            .bind(checkout.metadata) // $19
+            .bind(checkout.recovery_url) // $20
+            .bind(checkout.sync_status) // $21
+            .bind(checkout.updated_at) // $22
             .fetch_one(&self.pool)
             .await
     }
@@ -135,11 +136,45 @@ impl CheckoutsRepository {
     pub async fn delete(&self, id: &str) -> Result<()> {
         let sql = "DELETE FROM checkouts WHERE id = $1";
 
-        sqlx::query(sql)
-            .bind(id)
-            .execute(&self.pool)
-            .await?;
+        sqlx::query(sql).bind(id).execute(&self.pool).await?;
 
         Ok(())
+    }
+
+    // ============================================================
+    // Transaction-aware methods for atomic operations
+    // ============================================================
+
+    /// Get checkout by ID within a database transaction
+    pub async fn get_by_id_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        id: &str,
+    ) -> Result<Option<Checkout>> {
+        let sql = "SELECT * FROM checkouts WHERE id = $1";
+        sqlx::query_as::<_, Checkout>(sql)
+            .bind(id)
+            .fetch_optional(&mut **tx)
+            .await
+    }
+
+    /// Update checkout status within a database transaction
+    pub async fn update_status_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        id: &str,
+        status: &str,
+    ) -> Result<Checkout> {
+        let sql = r#"
+            UPDATE checkouts
+            SET status = $2,
+                completed_at = CASE WHEN $2 = 'completed' THEN CURRENT_TIMESTAMP ELSE completed_at END,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, Checkout>(sql)
+            .bind(id)
+            .bind(status)
+            .fetch_one(&mut **tx)
+            .await
     }
 }

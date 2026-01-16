@@ -1,3 +1,4 @@
+use crate::db::DbTransaction;
 use crate::models::transaction_model::TransactionItem;
 use sqlx::{Result, SqlitePool};
 
@@ -65,6 +66,22 @@ impl TransactionItemsRepository {
         sqlx::query_as::<_, TransactionItem>(sql)
             .bind(transaction_id)
             .fetch_all(&self.pool)
+            .await
+    }
+
+    // ============================================================
+    // Transaction-aware methods for atomic operations
+    // ============================================================
+
+    /// Find all items for a transaction within a database transaction
+    pub async fn find_by_transaction_id_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        transaction_id: &str,
+    ) -> Result<Vec<TransactionItem>> {
+        let sql = "SELECT * FROM transaction_items WHERE transaction_id = $1";
+        sqlx::query_as::<_, TransactionItem>(sql)
+            .bind(transaction_id)
+            .fetch_all(&mut **tx)
             .await
     }
 }

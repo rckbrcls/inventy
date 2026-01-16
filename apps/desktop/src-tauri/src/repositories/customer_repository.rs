@@ -1,3 +1,4 @@
+use crate::db::DbTransaction;
 use crate::models::customer_model::Customer;
 use sqlx::{Result, SqlitePool};
 
@@ -149,6 +150,52 @@ impl CustomerRepository {
         sqlx::query_as::<_, Customer>(sql)
             .bind(search_pattern)
             .fetch_all(&self.pool)
+            .await
+    }
+
+    // ============================================================
+    // Transaction-aware methods for atomic operations
+    // ============================================================
+
+    /// Increment customer stats after a completed sale within a transaction
+    pub async fn increment_stats_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        customer_id: &str,
+        amount: f64,
+    ) -> Result<Customer> {
+        let sql = r#"
+            UPDATE customers
+            SET total_spent = total_spent + $2,
+                orders_count = orders_count + 1,
+                last_order_at = CURRENT_TIMESTAMP,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, Customer>(sql)
+            .bind(customer_id)
+            .bind(amount)
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    /// Decrement customer stats after a return within a transaction
+    pub async fn decrement_stats_with_tx<'a>(
+        tx: &mut DbTransaction<'a>,
+        customer_id: &str,
+        amount: f64,
+    ) -> Result<Customer> {
+        let sql = r#"
+            UPDATE customers
+            SET total_spent = MAX(0, total_spent - $2),
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, Customer>(sql)
+            .bind(customer_id)
+            .bind(amount)
+            .fetch_one(&mut **tx)
             .await
     }
 }
