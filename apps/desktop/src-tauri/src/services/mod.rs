@@ -6,5 +6,6 @@ pub mod payment_service;
 pub mod product_service;
 pub mod review_service;
 pub mod shipment_service;
+pub mod shop_service;
 pub mod transaction_service;
 pub mod user_service;
