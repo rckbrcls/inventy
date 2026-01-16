@@ -137,4 +137,123 @@ impl ShipmentsRepository {
             .fetch_all(&self.pool)
             .await
     }
+
+    // ============================================================
+    // Transaction-aware methods (for use in services)
+    // ============================================================
+
+    pub async fn create_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        shipment: Shipment,
+    ) -> Result<Shipment> {
+        let sql = r#"
+            INSERT INTO shipments (
+                id, order_id, location_id, status, carrier_company, carrier_service,
+                tracking_number, tracking_url, weight_g, height_mm, width_mm, depth_mm,
+                package_type, shipping_label_url, invoice_url, invoice_key,
+                cost_amount, insurance_amount, estimated_delivery_at,
+                shipped_at, delivered_at, metadata, customs_info,
+                _status, created_at, updated_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
+            RETURNING *
+        "#;
+
+        sqlx::query_as::<_, Shipment>(sql)
+            .bind(&shipment.id)
+            .bind(&shipment.order_id)
+            .bind(&shipment.location_id)
+            .bind(&shipment.status)
+            .bind(&shipment.carrier_company)
+            .bind(&shipment.carrier_service)
+            .bind(&shipment.tracking_number)
+            .bind(&shipment.tracking_url)
+            .bind(&shipment.weight_g)
+            .bind(&shipment.height_mm)
+            .bind(&shipment.width_mm)
+            .bind(&shipment.depth_mm)
+            .bind(&shipment.package_type)
+            .bind(&shipment.shipping_label_url)
+            .bind(&shipment.invoice_url)
+            .bind(&shipment.invoice_key)
+            .bind(&shipment.cost_amount)
+            .bind(&shipment.insurance_amount)
+            .bind(&shipment.estimated_delivery_at)
+            .bind(&shipment.shipped_at)
+            .bind(&shipment.delivered_at)
+            .bind(&shipment.metadata)
+            .bind(&shipment.customs_info)
+            .bind(&shipment.sync_status)
+            .bind(&shipment.created_at)
+            .bind(&shipment.updated_at)
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn get_by_id_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+    ) -> Result<Option<Shipment>> {
+        let sql = "SELECT * FROM shipments WHERE id = $1";
+        sqlx::query_as::<_, Shipment>(sql)
+            .bind(id)
+            .fetch_optional(&mut **tx)
+            .await
+    }
+
+    pub async fn update_status_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+        status: &str,
+    ) -> Result<Shipment> {
+        let sql = r#"
+            UPDATE shipments SET status = $2, updated_at = $3 WHERE id = $1 RETURNING *
+        "#;
+        sqlx::query_as::<_, Shipment>(sql)
+            .bind(id)
+            .bind(status)
+            .bind(chrono::Utc::now())
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn update_shipped_at_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+        tracking_number: Option<&str>,
+    ) -> Result<Shipment> {
+        let sql = r#"
+            UPDATE shipments
+            SET status = 'shipped', shipped_at = $2, tracking_number = COALESCE($3, tracking_number), updated_at = $4
+            WHERE id = $1
+            RETURNING *
+        "#;
+        let now = chrono::Utc::now();
+        sqlx::query_as::<_, Shipment>(sql)
+            .bind(id)
+            .bind(now)
+            .bind(tracking_number)
+            .bind(now)
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn update_delivered_at_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+    ) -> Result<Shipment> {
+        let sql = r#"
+            UPDATE shipments
+            SET status = 'delivered', delivered_at = $2, updated_at = $3
+            WHERE id = $1
+            RETURNING *
+        "#;
+        let now = chrono::Utc::now();
+        sqlx::query_as::<_, Shipment>(sql)
+            .bind(id)
+            .bind(now)
+            .bind(now)
+            .fetch_one(&mut **tx)
+            .await
+    }
 }

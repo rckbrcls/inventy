@@ -59,4 +59,34 @@ impl ShipmentEventsRepository {
             .fetch_all(&self.pool)
             .await
     }
+
+    // ============================================================
+    // Transaction-aware methods (for use in services)
+    // ============================================================
+
+    pub async fn create_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        event: ShipmentEvent,
+    ) -> Result<ShipmentEvent> {
+        let event_sql = r#"
+            INSERT INTO shipment_events (
+                id, shipment_id, status, description, location,
+                happened_at, raw_data, _status, created_at, updated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, ShipmentEvent>(event_sql)
+            .bind(&event.id)
+            .bind(&event.shipment_id)
+            .bind(&event.status)
+            .bind(&event.description)
+            .bind(&event.location)
+            .bind(&event.happened_at)
+            .bind(&event.raw_data)
+            .bind(&event.sync_status)
+            .bind(&event.created_at)
+            .bind(&event.updated_at)
+            .fetch_one(&mut **tx)
+            .await
+    }
 }

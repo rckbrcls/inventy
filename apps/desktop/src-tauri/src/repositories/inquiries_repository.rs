@@ -114,4 +114,121 @@ impl InquiriesRepository {
             .fetch_all(&self.pool)
             .await
     }
+
+    // ============================================================
+    // Transaction-aware methods (for use in services)
+    // ============================================================
+
+    pub async fn create_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        inquiry: Inquiry,
+    ) -> Result<Inquiry> {
+        let sql = r#"
+            INSERT INTO inquiries (
+                id, protocol_number, type, status, priority, source,
+                customer_id, requester_data, department, assigned_staff_id,
+                subject, related_order_id, related_product_id, metadata,
+                sla_due_at, resolved_at, _status, created_at, updated_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+            RETURNING *
+        "#;
+
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(&inquiry.id)
+            .bind(&inquiry.protocol_number)
+            .bind(&inquiry.r#type)
+            .bind(&inquiry.status)
+            .bind(&inquiry.priority)
+            .bind(&inquiry.source)
+            .bind(&inquiry.customer_id)
+            .bind(&inquiry.requester_data)
+            .bind(&inquiry.department)
+            .bind(&inquiry.assigned_staff_id)
+            .bind(&inquiry.subject)
+            .bind(&inquiry.related_order_id)
+            .bind(&inquiry.related_product_id)
+            .bind(&inquiry.metadata)
+            .bind(&inquiry.sla_due_at)
+            .bind(&inquiry.resolved_at)
+            .bind(&inquiry.sync_status)
+            .bind(&inquiry.created_at)
+            .bind(&inquiry.updated_at)
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn get_by_id_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+    ) -> Result<Option<Inquiry>> {
+        let sql = "SELECT * FROM inquiries WHERE id = $1";
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(id)
+            .fetch_optional(&mut **tx)
+            .await
+    }
+
+    pub async fn update_status_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+        status: &str,
+    ) -> Result<Inquiry> {
+        let sql = r#"
+            UPDATE inquiries SET status = $2, updated_at = $3 WHERE id = $1 RETURNING *
+        "#;
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(id)
+            .bind(status)
+            .bind(chrono::Utc::now())
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn resolve_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+    ) -> Result<Inquiry> {
+        let sql = r#"
+            UPDATE inquiries SET
+                status = 'resolved',
+                resolved_at = $2,
+                updated_at = $2
+            WHERE id = $1
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(id)
+            .bind(chrono::Utc::now())
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn assign_staff_with_tx(
+        tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
+        id: &str,
+        staff_id: &str,
+    ) -> Result<Inquiry> {
+        let sql = r#"
+            UPDATE inquiries SET
+                assigned_staff_id = $2,
+                updated_at = $3
+            WHERE id = $1
+            RETURNING *
+        "#;
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(id)
+            .bind(staff_id)
+            .bind(chrono::Utc::now())
+            .fetch_one(&mut **tx)
+            .await
+    }
+
+    pub async fn find_by_status(&self, status: &str) -> Result<Vec<Inquiry>> {
+        let sql = "SELECT * FROM inquiries WHERE status = $1 ORDER BY created_at DESC";
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(status)
+            .fetch_all(&self.pool)
+            .await
+    }
 }

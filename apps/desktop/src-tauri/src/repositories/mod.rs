@@ -22,6 +22,7 @@ pub mod customer_group_memberships_repository;
 pub mod inquiry_messages_repository;
 pub mod inventory_movements_repository;
 pub mod product_categories_repository;
+pub mod product_metrics_repository;
 pub mod shipment_events_repository;
 pub mod shipment_items_repository;
 pub mod transaction_items_repository;
