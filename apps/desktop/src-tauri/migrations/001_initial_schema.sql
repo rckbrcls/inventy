@@ -623,6 +623,85 @@ BEGIN
     WHERE id = NEW.id;
 END;
 
+-- 4. Trigger: Atualizar métricas de produto ao inserir review
+CREATE TRIGGER IF NOT EXISTS trg_reviews_metrics_insert
+AFTER INSERT ON reviews
+WHEN NEW.product_id IS NOT NULL
+BEGIN
+    INSERT INTO product_metrics (product_id, average_rating, review_count, updated_at)
+    VALUES (NEW.product_id, NEW.rating, 1, CURRENT_TIMESTAMP)
+    ON CONFLICT(product_id) DO UPDATE SET
+        average_rating = CASE
+            WHEN review_count <= 0 THEN NEW.rating
+            ELSE ((average_rating * review_count) + NEW.rating) / (review_count + 1)
+        END,
+        review_count = review_count + 1,
+        updated_at = CURRENT_TIMESTAMP;
+END;
+
+-- 5. Trigger: Atualizar métricas ao alterar rating do review
+CREATE TRIGGER IF NOT EXISTS trg_reviews_metrics_update_rating
+AFTER UPDATE OF rating ON reviews
+WHEN NEW.product_id IS NOT NULL AND OLD.product_id = NEW.product_id AND OLD.rating != NEW.rating
+BEGIN
+    UPDATE product_metrics
+    SET
+        average_rating = CASE
+            WHEN review_count <= 0 THEN NEW.rating
+            ELSE ((average_rating * review_count) - OLD.rating + NEW.rating) / review_count
+        END,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE product_id = NEW.product_id;
+END;
+
+-- 6. Trigger: Atualizar métricas ao mover review para outro produto
+CREATE TRIGGER IF NOT EXISTS trg_reviews_metrics_update_product
+AFTER UPDATE OF product_id ON reviews
+WHEN OLD.product_id IS NOT NULL AND NEW.product_id IS NOT NULL AND OLD.product_id != NEW.product_id
+BEGIN
+    UPDATE product_metrics
+    SET
+        average_rating = CASE
+            WHEN review_count <= 1 THEN 0
+            ELSE ((average_rating * review_count) - OLD.rating) / (review_count - 1)
+        END,
+        review_count = CASE
+            WHEN review_count <= 0 THEN 0
+            ELSE review_count - 1
+        END,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE product_id = OLD.product_id;
+
+    INSERT INTO product_metrics (product_id, average_rating, review_count, updated_at)
+    VALUES (NEW.product_id, NEW.rating, 1, CURRENT_TIMESTAMP)
+    ON CONFLICT(product_id) DO UPDATE SET
+        average_rating = CASE
+            WHEN review_count <= 0 THEN NEW.rating
+            ELSE ((average_rating * review_count) + NEW.rating) / (review_count + 1)
+        END,
+        review_count = review_count + 1,
+        updated_at = CURRENT_TIMESTAMP;
+END;
+
+-- 7. Trigger: Atualizar métricas ao remover review
+CREATE TRIGGER IF NOT EXISTS trg_reviews_metrics_delete
+AFTER DELETE ON reviews
+WHEN OLD.product_id IS NOT NULL
+BEGIN
+    UPDATE product_metrics
+    SET
+        average_rating = CASE
+            WHEN review_count <= 1 THEN 0
+            ELSE ((average_rating * review_count) - OLD.rating) / (review_count - 1)
+        END,
+        review_count = CASE
+            WHEN review_count <= 0 THEN 0
+            ELSE review_count - 1
+        END,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE product_id = OLD.product_id;
+END;
+
 -- ============================================================
 -- TABELA DE AUDIT LOG
 -- ============================================================

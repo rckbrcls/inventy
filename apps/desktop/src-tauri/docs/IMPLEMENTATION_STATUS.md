@@ -77,7 +77,7 @@ Status das implementações por tabela do schema.
 
 | Tabela | Service | Tx Methods | Triggers | Indexes | Status |
 | --- | --- | --- | --- | --- | --- |
-| `reviews` | ✅ ReviewService | ✅ 4 métodos | ❌ | ✅ 2 idx | 🔧 Trigger |
+| `reviews` | ✅ ReviewService | ✅ 4 métodos | ✅ | ✅ 2 idx | ✅ OK |
 | `product_metrics` | ✅ via ReviewService | ✅ 4 métodos | ❌ | ❌ | 🔧 Index |
 
 ---
@@ -110,11 +110,14 @@ Status das implementações por tabela do schema.
 | `ReviewService`      | `reviews`, `product_metrics`                     | ✅ Pronto |
 | `InquiryService` tx  | `inquiries`, `inquiry_messages`                  | ✅ Pronto |
 
-### 2. Triggers Sugeridos
+### 2. Triggers Implementados
 
-| Trigger                     | Tabela    | Função                                                  |
-| --------------------------- | --------- | ------------------------------------------------------- |
-| `trg_review_update_metrics` | `reviews` | Atualizar `product_metrics` ao inserir/atualizar review |
+| Trigger                              | Tabela    | Função                                                        |
+| ------------------------------------ | --------- | ------------------------------------------------------------- |
+| `trg_reviews_metrics_insert`         | `reviews` | Atualizar `product_metrics` ao inserir review                 |
+| `trg_reviews_metrics_update_rating`  | `reviews` | Recalcular métricas ao alterar rating do review               |
+| `trg_reviews_metrics_update_product` | `reviews` | Ajustar métricas ao mudar o produto do review                 |
+| `trg_reviews_metrics_delete`         | `reviews` | Atualizar `product_metrics` ao remover review                 |
 
 ### 3. Indexes Pendentes
 
@@ -130,5 +133,5 @@ Status das implementações por tabela do schema.
 | --------------- | ----- | --- | -------- |
 | Tabelas         | 31    | 16  | 15       |
 | Services com Tx | 7     | 7   | 0        |
-| Triggers        | 11    | 11  | 1        |
+| Triggers        | 15    | 15  | 0        |
 | Indexes         | 57    | 57  | 0        |
