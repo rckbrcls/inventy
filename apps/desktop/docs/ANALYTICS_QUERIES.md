@@ -53,7 +53,7 @@ GROUP BY DATE(created_at)
 ORDER BY date ASC;
 ```
 
-### 3. Receita por Método de Pagamento ao Longo do Tempo
+### 3. Receita por Método de Pagamento ao Longo do Tempo ✅ CONCLUÍDO
 
 ```sql
 -- Receita diária por método de pagamento (Pix, Cartão, etc.)
@@ -78,7 +78,7 @@ ORDER BY date ASC, payment_method;
 
 ## Bar Chart
 
-### 4. Top 10 Produtos Mais Vendidos (por Quantidade)
+### 4. Top 10 Produtos Mais Vendidos (por Quantidade) ✅ CONCLUÍDO
 
 ```sql
 -- Produtos mais vendidos nos últimos 30 dias
@@ -100,7 +100,7 @@ ORDER BY total_quantity DESC
 LIMIT 10;
 ```
 
-### 5. Receita por Categoria
+### 5. Receita por Categoria ✅ CONCLUÍDO
 
 ```sql
 -- Receita total por categoria
@@ -121,7 +121,7 @@ GROUP BY c.id, c.name
 ORDER BY total_revenue DESC;
 ```
 
-### 6. Vendas Mensais (Últimos 12 Meses)
+### 6. Vendas Mensais (Últimos 12 Meses) ✅ CONCLUÍDO
 
 ```sql
 -- Receita mensal dos últimos 12 meses
@@ -138,7 +138,7 @@ GROUP BY strftime('%Y-%m', created_at)
 ORDER BY month ASC;
 ```
 
-### 7. Produtos por Status de Estoque (Baixo, Médio, Alto)
+### 7. Produtos por Status de Estoque (Baixo, Médio, Alto) ✅ CONCLUÍDO
 
 ```sql
 -- Classificação de produtos por nível de estoque
@@ -175,7 +175,7 @@ ORDER BY
 
 ## Line Chart
 
-### 8. Tendência de Vendas Diárias (com Média Móvel de 7 dias)
+### 8. Tendência de Vendas Diárias (com Média Móvel de 7 dias) ✅ CONCLUÍDO
 
 ```sql
 -- Vendas diárias com média móvel de 7 dias usando window functions
@@ -199,7 +199,7 @@ GROUP BY DATE(created_at)
 ORDER BY date ASC;
 ```
 
-### 9. Crescimento de Clientes ao Longo do Tempo
+### 9. Crescimento de Clientes ao Longo do Tempo ✅ CONCLUÍDO
 
 ```sql
 -- Novos clientes por mês e crescimento acumulado
@@ -220,7 +220,7 @@ GROUP BY strftime('%Y-%m', created_at)
 ORDER BY month ASC;
 ```
 
-### 10. Ticket Médio ao Longo do Tempo
+### 10. Ticket Médio ao Longo do Tempo ✅ CONCLUÍDO
 
 ```sql
 -- Ticket médio (AOV - Average Order Value) por mês
@@ -246,7 +246,7 @@ ORDER BY month ASC;
 
 ## Pie Chart
 
-### 11. Distribuição de Vendas por Método de Pagamento
+### 11. Distribuição de Vendas por Método de Pagamento ✅ CONCLUÍDO
 
 ```sql
 -- Percentual de vendas por método de pagamento
@@ -267,7 +267,7 @@ GROUP BY p.method
 ORDER BY total_amount DESC;
 ```
 
-### 12. Distribuição de Produtos por Categoria
+### 12. Distribuição de Produtos por Categoria ✅ CONCLUÍDO
 
 ```sql
 -- Quantidade de produtos por categoria
@@ -286,7 +286,7 @@ GROUP BY c.id, c.name
 ORDER BY product_count DESC;
 ```
 
-### 13. Distribuição de Pedidos por Status
+### 13. Distribuição de Pedidos por Status ✅ CONCLUÍDO
 
 ```sql
 -- Pedidos por status de pagamento
@@ -309,7 +309,7 @@ GROUP BY payment_status
 ORDER BY order_count DESC;
 ```
 
-### 14. Distribuição de Clientes por Grupo
+### 14. Distribuição de Clientes por Grupo ✅ CONCLUÍDO
 
 ```sql
 -- Clientes por grupo de cliente
@@ -333,7 +333,7 @@ ORDER BY customer_count DESC;
 
 ## Radar Chart
 
-### 15. Métricas de Performance por Mês (Vendas, Receita, Clientes, Estoque)
+### 15. Métricas de Performance por Mês (Vendas, Receita, Clientes, Estoque) ✅ CONCLUÍDO
 
 ```sql
 -- Múltiplas métricas normalizadas para radar chart
@@ -380,7 +380,7 @@ normalized AS (
 SELECT * FROM normalized ORDER BY month ASC;
 ```
 
-### 16. Métricas por Produto (Vendas, Receita, Margem, Estoque)
+### 16. Métricas por Produto (Vendas, Receita, Margem, Estoque) ✅ CONCLUÍDO
 
 ```sql
 -- Métricas normalizadas por produto para radar chart
@@ -416,7 +416,7 @@ ORDER BY total_revenue DESC;
 
 ## Radial Chart
 
-### 17. Progresso de Meta de Vendas Mensal
+### 17. Progresso de Meta de Vendas Mensal ✅ CONCLUÍDO
 
 ```sql
 -- Progresso para meta de vendas do mês atual
@@ -441,7 +441,7 @@ SELECT
 FROM monthly_target;
 ```
 
-### 18. Taxa de Conversão de Carrinhos para Pedidos
+### 18. Taxa de Conversão de Carrinhos para Pedidos ✅ CONCLUÍDO
 
 ```sql
 -- Taxa de conversão de checkouts para orders
@@ -466,7 +466,7 @@ SELECT
 FROM conversion_metrics;
 ```
 
-### 19. Percentual de Estoque Ocupado (Capacidade)
+### 19. Percentual de Estoque Ocupado (Capacidade) ✅ CONCLUÍDO
 
 ```sql
 -- Percentual de estoque utilizado (baseado em um limite teórico)
@@ -493,7 +493,7 @@ FROM inventory_capacity;
 
 ## Queries Avançadas com Window Functions
 
-### 20. Ranking de Produtos com Percentil
+### 20. Ranking de Produtos com Percentil ✅ CONCLUÍDO
 
 ```sql
 -- Ranking de produtos com percentil de vendas
@@ -517,7 +517,7 @@ ORDER BY total_revenue DESC
 LIMIT 20;
 ```
 
-### 21. Comparação Mês a Mês (MoM - Month over Month)
+### 21. Comparação Mês a Mês (MoM - Month over Month) ✅ CONCLUÍDO
 
 ```sql
 -- Crescimento mês a mês usando LAG
@@ -538,7 +538,7 @@ GROUP BY strftime('%Y-%m', created_at)
 ORDER BY month ASC;
 ```
 
-### 22. Vendas Acumuladas por Período (YTD - Year to Date)
+### 22. Vendas Acumuladas por Período (YTD - Year to Date) ✅ CONCLUÍDO
 
 ```sql
 -- Vendas acumuladas do ano (YTD)

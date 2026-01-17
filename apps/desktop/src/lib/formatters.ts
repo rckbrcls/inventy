@@ -24,3 +24,17 @@ export const formatDateTime = (value: string | Date | null | undefined) => {
     timeStyle: "short",
   }).format(date)
 }
+
+export const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr)
+  if (Number.isNaN(date.getTime())) {
+    return dateStr
+  }
+  return date.toLocaleDateString("pt-BR")
+}
+
+export const formatMonth = (monthStr: string) => {
+  const [year, month] = monthStr.split("-")
+  const date = new Date(parseInt(year), parseInt(month) - 1)
+  return date.toLocaleDateString("pt-BR", { month: "short", year: "numeric" })
+}
