@@ -24,9 +24,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { PaymentEditSheet } from "@/components/forms/payment-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Payment, PaymentsRepository } from "@/lib/db/repositories/payments-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 const getStatusVariant = (status: string) => {
   switch (status) {
@@ -63,11 +63,10 @@ const getMethodLabel = (method: string) => {
 }
 
 export function PaymentsTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<Payment[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editPayment, setEditPayment] = React.useState<Payment | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -102,8 +101,7 @@ export function PaymentsTable() {
   }
 
   const handleEdit = (payment: Payment) => {
-    setEditPayment(payment)
-    setIsEditOpen(true)
+    navigate({ to: "/payments/$paymentId/edit", params: { paymentId: payment.id } })
   }
 
   const columns: ColumnDef<Payment>[] = React.useMemo(
@@ -276,13 +274,6 @@ export function PaymentsTable() {
         filterPlaceholder="Filter by transaction..."
         emptyMessage="No payments found."
         action={{ label: "New Payment", to: "/payments/new" }}
-      />
-
-      <PaymentEditSheet
-        payment={editPayment}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

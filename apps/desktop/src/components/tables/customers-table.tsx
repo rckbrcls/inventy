@@ -24,18 +24,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { CustomerEditSheet } from "@/components/forms/customer-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Customer, CustomersRepository } from "@/lib/db/repositories/customers-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type CustomerRow = Customer
 
 export function CustomersTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<CustomerRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editCustomer, setEditCustomer] = React.useState<Customer | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -70,8 +69,7 @@ export function CustomersTable() {
   }
 
   const handleEdit = (customer: Customer) => {
-    setEditCustomer(customer)
-    setIsEditOpen(true)
+    navigate({ to: "/customers/$customerId/edit", params: { customerId: customer.id } })
   }
 
   const getDisplayName = (customer: CustomerRow) => {
@@ -234,13 +232,6 @@ export function CustomersTable() {
         filterPlaceholder="Filter customers..."
         emptyMessage="No customers found."
         action={{ label: "New Customer", to: "/customers/new" }}
-      />
-
-      <CustomerEditSheet
-        customer={editCustomer}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

@@ -24,16 +24,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { BrandEditSheet } from "@/components/forms/brand-edit-sheet"
 import { formatDateTime } from "@/lib/formatters"
 import { Brand, BrandsRepository } from "@/lib/db/repositories/brands-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 export function BrandsTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<Brand[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editBrand, setEditBrand] = React.useState<Brand | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -68,8 +67,7 @@ export function BrandsTable() {
   }
 
   const handleEdit = (brand: Brand) => {
-    setEditBrand(brand)
-    setIsEditOpen(true)
+    navigate({ to: "/brands/$brandId/edit", params: { brandId: brand.id } })
   }
 
   const columns: ColumnDef<Brand>[] = React.useMemo(
@@ -215,13 +213,6 @@ export function BrandsTable() {
         filterPlaceholder="Filter brands..."
         emptyMessage="No brands found."
         action={{ label: "New Brand", to: "/brands/new" }}
-      />
-
-      <BrandEditSheet
-        brand={editBrand}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

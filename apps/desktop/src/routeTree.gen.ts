@@ -35,7 +35,18 @@ import { Route as CategoriesNewRouteImport } from './routes/categories/new'
 import { Route as BrandsNewRouteImport } from './routes/brands/new'
 import { Route as CustomersGroupsIndexRouteImport } from './routes/customers/groups/index'
 import { Route as CustomersAddressesIndexRouteImport } from './routes/customers/addresses/index'
+import { Route as TransactionsTransactionIdEditRouteImport } from './routes/transactions/$transactionId/edit'
+import { Route as RefundsRefundIdEditRouteImport } from './routes/refunds/$refundId/edit'
+import { Route as ProductsProductIdEditRouteImport } from './routes/products/$productId/edit'
+import { Route as PaymentsPaymentIdEditRouteImport } from './routes/payments/$paymentId/edit'
+import { Route as OrdersOrderIdEditRouteImport } from './routes/orders/$orderId/edit'
+import { Route as InventoryInventoryLevelIdEditRouteImport } from './routes/inventory/$inventoryLevelId/edit'
 import { Route as CustomersAddressesNewRouteImport } from './routes/customers/addresses/new'
+import { Route as CustomersCustomerIdEditRouteImport } from './routes/customers/$customerId/edit'
+import { Route as CheckoutsCheckoutIdEditRouteImport } from './routes/checkouts/$checkoutId/edit'
+import { Route as CategoriesCategoryIdEditRouteImport } from './routes/categories/$categoryId/edit'
+import { Route as BrandsBrandIdEditRouteImport } from './routes/brands/$brandId/edit'
+import { Route as CustomersAddressesAddressIdEditRouteImport } from './routes/customers/addresses/$addressId/edit'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -167,11 +178,70 @@ const CustomersAddressesIndexRoute = CustomersAddressesIndexRouteImport.update({
   path: '/customers/addresses/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TransactionsTransactionIdEditRoute =
+  TransactionsTransactionIdEditRouteImport.update({
+    id: '/transactions/$transactionId/edit',
+    path: '/transactions/$transactionId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const RefundsRefundIdEditRoute = RefundsRefundIdEditRouteImport.update({
+  id: '/refunds/$refundId/edit',
+  path: '/refunds/$refundId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsProductIdEditRoute = ProductsProductIdEditRouteImport.update({
+  id: '/products/$productId/edit',
+  path: '/products/$productId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsPaymentIdEditRoute = PaymentsPaymentIdEditRouteImport.update({
+  id: '/payments/$paymentId/edit',
+  path: '/payments/$paymentId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersOrderIdEditRoute = OrdersOrderIdEditRouteImport.update({
+  id: '/orders/$orderId/edit',
+  path: '/orders/$orderId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryInventoryLevelIdEditRoute =
+  InventoryInventoryLevelIdEditRouteImport.update({
+    id: '/inventory/$inventoryLevelId/edit',
+    path: '/inventory/$inventoryLevelId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CustomersAddressesNewRoute = CustomersAddressesNewRouteImport.update({
   id: '/customers/addresses/new',
   path: '/customers/addresses/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomersCustomerIdEditRoute = CustomersCustomerIdEditRouteImport.update({
+  id: '/customers/$customerId/edit',
+  path: '/customers/$customerId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutsCheckoutIdEditRoute = CheckoutsCheckoutIdEditRouteImport.update({
+  id: '/checkouts/$checkoutId/edit',
+  path: '/checkouts/$checkoutId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesCategoryIdEditRoute =
+  CategoriesCategoryIdEditRouteImport.update({
+    id: '/categories/$categoryId/edit',
+    path: '/categories/$categoryId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BrandsBrandIdEditRoute = BrandsBrandIdEditRouteImport.update({
+  id: '/brands/$brandId/edit',
+  path: '/brands/$brandId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomersAddressesAddressIdEditRoute =
+  CustomersAddressesAddressIdEditRouteImport.update({
+    id: '/customers/addresses/$addressId/edit',
+    path: '/customers/addresses/$addressId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -198,9 +268,20 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsIndexRoute
   '/refunds': typeof RefundsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
+  '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
+  '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
+  '/checkouts/$checkoutId/edit': typeof CheckoutsCheckoutIdEditRoute
+  '/customers/$customerId/edit': typeof CustomersCustomerIdEditRoute
   '/customers/addresses/new': typeof CustomersAddressesNewRoute
+  '/inventory/$inventoryLevelId/edit': typeof InventoryInventoryLevelIdEditRoute
+  '/orders/$orderId/edit': typeof OrdersOrderIdEditRoute
+  '/payments/$paymentId/edit': typeof PaymentsPaymentIdEditRoute
+  '/products/$productId/edit': typeof ProductsProductIdEditRoute
+  '/refunds/$refundId/edit': typeof RefundsRefundIdEditRoute
+  '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
   '/customers/addresses': typeof CustomersAddressesIndexRoute
   '/customers/groups': typeof CustomersGroupsIndexRoute
+  '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -227,9 +308,20 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsIndexRoute
   '/refunds': typeof RefundsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
+  '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
+  '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
+  '/checkouts/$checkoutId/edit': typeof CheckoutsCheckoutIdEditRoute
+  '/customers/$customerId/edit': typeof CustomersCustomerIdEditRoute
   '/customers/addresses/new': typeof CustomersAddressesNewRoute
+  '/inventory/$inventoryLevelId/edit': typeof InventoryInventoryLevelIdEditRoute
+  '/orders/$orderId/edit': typeof OrdersOrderIdEditRoute
+  '/payments/$paymentId/edit': typeof PaymentsPaymentIdEditRoute
+  '/products/$productId/edit': typeof ProductsProductIdEditRoute
+  '/refunds/$refundId/edit': typeof RefundsRefundIdEditRoute
+  '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
   '/customers/addresses': typeof CustomersAddressesIndexRoute
   '/customers/groups': typeof CustomersGroupsIndexRoute
+  '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -257,9 +349,20 @@ export interface FileRoutesById {
   '/products/': typeof ProductsIndexRoute
   '/refunds/': typeof RefundsIndexRoute
   '/transactions/': typeof TransactionsIndexRoute
+  '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
+  '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
+  '/checkouts/$checkoutId/edit': typeof CheckoutsCheckoutIdEditRoute
+  '/customers/$customerId/edit': typeof CustomersCustomerIdEditRoute
   '/customers/addresses/new': typeof CustomersAddressesNewRoute
+  '/inventory/$inventoryLevelId/edit': typeof InventoryInventoryLevelIdEditRoute
+  '/orders/$orderId/edit': typeof OrdersOrderIdEditRoute
+  '/payments/$paymentId/edit': typeof PaymentsPaymentIdEditRoute
+  '/products/$productId/edit': typeof ProductsProductIdEditRoute
+  '/refunds/$refundId/edit': typeof RefundsRefundIdEditRoute
+  '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
   '/customers/addresses/': typeof CustomersAddressesIndexRoute
   '/customers/groups/': typeof CustomersGroupsIndexRoute
+  '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -288,9 +391,20 @@ export interface FileRouteTypes {
     | '/products'
     | '/refunds'
     | '/transactions'
+    | '/brands/$brandId/edit'
+    | '/categories/$categoryId/edit'
+    | '/checkouts/$checkoutId/edit'
+    | '/customers/$customerId/edit'
     | '/customers/addresses/new'
+    | '/inventory/$inventoryLevelId/edit'
+    | '/orders/$orderId/edit'
+    | '/payments/$paymentId/edit'
+    | '/products/$productId/edit'
+    | '/refunds/$refundId/edit'
+    | '/transactions/$transactionId/edit'
     | '/customers/addresses'
     | '/customers/groups'
+    | '/customers/addresses/$addressId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -317,9 +431,20 @@ export interface FileRouteTypes {
     | '/products'
     | '/refunds'
     | '/transactions'
+    | '/brands/$brandId/edit'
+    | '/categories/$categoryId/edit'
+    | '/checkouts/$checkoutId/edit'
+    | '/customers/$customerId/edit'
     | '/customers/addresses/new'
+    | '/inventory/$inventoryLevelId/edit'
+    | '/orders/$orderId/edit'
+    | '/payments/$paymentId/edit'
+    | '/products/$productId/edit'
+    | '/refunds/$refundId/edit'
+    | '/transactions/$transactionId/edit'
     | '/customers/addresses'
     | '/customers/groups'
+    | '/customers/addresses/$addressId/edit'
   id:
     | '__root__'
     | '/'
@@ -346,9 +471,20 @@ export interface FileRouteTypes {
     | '/products/'
     | '/refunds/'
     | '/transactions/'
+    | '/brands/$brandId/edit'
+    | '/categories/$categoryId/edit'
+    | '/checkouts/$checkoutId/edit'
+    | '/customers/$customerId/edit'
     | '/customers/addresses/new'
+    | '/inventory/$inventoryLevelId/edit'
+    | '/orders/$orderId/edit'
+    | '/payments/$paymentId/edit'
+    | '/products/$productId/edit'
+    | '/refunds/$refundId/edit'
+    | '/transactions/$transactionId/edit'
     | '/customers/addresses/'
     | '/customers/groups/'
+    | '/customers/addresses/$addressId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -376,9 +512,20 @@ export interface RootRouteChildren {
   ProductsIndexRoute: typeof ProductsIndexRoute
   RefundsIndexRoute: typeof RefundsIndexRoute
   TransactionsIndexRoute: typeof TransactionsIndexRoute
+  BrandsBrandIdEditRoute: typeof BrandsBrandIdEditRoute
+  CategoriesCategoryIdEditRoute: typeof CategoriesCategoryIdEditRoute
+  CheckoutsCheckoutIdEditRoute: typeof CheckoutsCheckoutIdEditRoute
+  CustomersCustomerIdEditRoute: typeof CustomersCustomerIdEditRoute
   CustomersAddressesNewRoute: typeof CustomersAddressesNewRoute
+  InventoryInventoryLevelIdEditRoute: typeof InventoryInventoryLevelIdEditRoute
+  OrdersOrderIdEditRoute: typeof OrdersOrderIdEditRoute
+  PaymentsPaymentIdEditRoute: typeof PaymentsPaymentIdEditRoute
+  ProductsProductIdEditRoute: typeof ProductsProductIdEditRoute
+  RefundsRefundIdEditRoute: typeof RefundsRefundIdEditRoute
+  TransactionsTransactionIdEditRoute: typeof TransactionsTransactionIdEditRoute
   CustomersAddressesIndexRoute: typeof CustomersAddressesIndexRoute
   CustomersGroupsIndexRoute: typeof CustomersGroupsIndexRoute
+  CustomersAddressesAddressIdEditRoute: typeof CustomersAddressesAddressIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -565,11 +712,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomersAddressesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/transactions/$transactionId/edit': {
+      id: '/transactions/$transactionId/edit'
+      path: '/transactions/$transactionId/edit'
+      fullPath: '/transactions/$transactionId/edit'
+      preLoaderRoute: typeof TransactionsTransactionIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refunds/$refundId/edit': {
+      id: '/refunds/$refundId/edit'
+      path: '/refunds/$refundId/edit'
+      fullPath: '/refunds/$refundId/edit'
+      preLoaderRoute: typeof RefundsRefundIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products/$productId/edit': {
+      id: '/products/$productId/edit'
+      path: '/products/$productId/edit'
+      fullPath: '/products/$productId/edit'
+      preLoaderRoute: typeof ProductsProductIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/$paymentId/edit': {
+      id: '/payments/$paymentId/edit'
+      path: '/payments/$paymentId/edit'
+      fullPath: '/payments/$paymentId/edit'
+      preLoaderRoute: typeof PaymentsPaymentIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders/$orderId/edit': {
+      id: '/orders/$orderId/edit'
+      path: '/orders/$orderId/edit'
+      fullPath: '/orders/$orderId/edit'
+      preLoaderRoute: typeof OrdersOrderIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory/$inventoryLevelId/edit': {
+      id: '/inventory/$inventoryLevelId/edit'
+      path: '/inventory/$inventoryLevelId/edit'
+      fullPath: '/inventory/$inventoryLevelId/edit'
+      preLoaderRoute: typeof InventoryInventoryLevelIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/customers/addresses/new': {
       id: '/customers/addresses/new'
       path: '/customers/addresses/new'
       fullPath: '/customers/addresses/new'
       preLoaderRoute: typeof CustomersAddressesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customers/$customerId/edit': {
+      id: '/customers/$customerId/edit'
+      path: '/customers/$customerId/edit'
+      fullPath: '/customers/$customerId/edit'
+      preLoaderRoute: typeof CustomersCustomerIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkouts/$checkoutId/edit': {
+      id: '/checkouts/$checkoutId/edit'
+      path: '/checkouts/$checkoutId/edit'
+      fullPath: '/checkouts/$checkoutId/edit'
+      preLoaderRoute: typeof CheckoutsCheckoutIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$categoryId/edit': {
+      id: '/categories/$categoryId/edit'
+      path: '/categories/$categoryId/edit'
+      fullPath: '/categories/$categoryId/edit'
+      preLoaderRoute: typeof CategoriesCategoryIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brands/$brandId/edit': {
+      id: '/brands/$brandId/edit'
+      path: '/brands/$brandId/edit'
+      fullPath: '/brands/$brandId/edit'
+      preLoaderRoute: typeof BrandsBrandIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customers/addresses/$addressId/edit': {
+      id: '/customers/addresses/$addressId/edit'
+      path: '/customers/addresses/$addressId/edit'
+      fullPath: '/customers/addresses/$addressId/edit'
+      preLoaderRoute: typeof CustomersAddressesAddressIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -600,9 +824,20 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsIndexRoute: ProductsIndexRoute,
   RefundsIndexRoute: RefundsIndexRoute,
   TransactionsIndexRoute: TransactionsIndexRoute,
+  BrandsBrandIdEditRoute: BrandsBrandIdEditRoute,
+  CategoriesCategoryIdEditRoute: CategoriesCategoryIdEditRoute,
+  CheckoutsCheckoutIdEditRoute: CheckoutsCheckoutIdEditRoute,
+  CustomersCustomerIdEditRoute: CustomersCustomerIdEditRoute,
   CustomersAddressesNewRoute: CustomersAddressesNewRoute,
+  InventoryInventoryLevelIdEditRoute: InventoryInventoryLevelIdEditRoute,
+  OrdersOrderIdEditRoute: OrdersOrderIdEditRoute,
+  PaymentsPaymentIdEditRoute: PaymentsPaymentIdEditRoute,
+  ProductsProductIdEditRoute: ProductsProductIdEditRoute,
+  RefundsRefundIdEditRoute: RefundsRefundIdEditRoute,
+  TransactionsTransactionIdEditRoute: TransactionsTransactionIdEditRoute,
   CustomersAddressesIndexRoute: CustomersAddressesIndexRoute,
   CustomersGroupsIndexRoute: CustomersGroupsIndexRoute,
+  CustomersAddressesAddressIdEditRoute: CustomersAddressesAddressIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -24,20 +24,19 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { CategoryEditSheet } from "@/components/forms/category-edit-sheet"
 import { formatDateTime } from "@/lib/formatters"
 import { Category, CategoriesRepository } from "@/lib/db/repositories/categories-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type CategoryWithParentName = Category & {
   parent_name?: string | null
 }
 
 export function CategoriesTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<CategoryWithParentName[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editCategory, setEditCategory] = React.useState<Category | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -82,8 +81,7 @@ export function CategoriesTable() {
   }
 
   const handleEdit = (category: Category) => {
-    setEditCategory(category)
-    setIsEditOpen(true)
+    navigate({ to: "/categories/$categoryId/edit", params: { categoryId: category.id } })
   }
 
   const columns: ColumnDef<CategoryWithParentName>[] = React.useMemo(
@@ -210,14 +208,6 @@ export function CategoriesTable() {
         filterPlaceholder="Filter categories..."
         emptyMessage="No categories found."
         action={{ label: "New Category", to: "/categories/new" }}
-      />
-
-      <CategoryEditSheet
-        category={editCategory}
-        categories={data}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

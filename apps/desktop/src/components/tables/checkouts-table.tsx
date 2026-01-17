@@ -24,9 +24,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { CheckoutEditSheet } from "@/components/forms/checkout-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Checkout, CheckoutsRepository } from "@/lib/db/repositories/checkouts-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type CheckoutRow = Checkout
 
@@ -37,11 +37,10 @@ const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | 
 }
 
 export function CheckoutsTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<CheckoutRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editCheckout, setEditCheckout] = React.useState<Checkout | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -76,8 +75,7 @@ export function CheckoutsTable() {
   }
 
   const handleEdit = (checkout: Checkout) => {
-    setEditCheckout(checkout)
-    setIsEditOpen(true)
+    navigate({ to: "/checkouts/$checkoutId/edit", params: { checkoutId: checkout.id } })
   }
 
   const getItemsCount = (items: string | null): number => {
@@ -275,13 +273,6 @@ export function CheckoutsTable() {
         filterPlaceholder="Filter by email..."
         emptyMessage="No checkouts found."
         action={{ label: "New Checkout", to: "/checkouts/new" }}
-      />
-
-      <CheckoutEditSheet
-        checkout={editCheckout}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

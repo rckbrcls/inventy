@@ -24,9 +24,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { OrderEditSheet } from "@/components/forms/order-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Order, OrdersRepository } from "@/lib/db/repositories/orders-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type OrderRow = Order
 
@@ -79,12 +79,11 @@ const getFulfillmentStatusBadgeVariant = (status: string | null) => {
 }
 
 export function OrdersTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<OrderRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
   const [cancelId, setCancelId] = React.useState<string | null>(null)
-  const [editOrder, setEditOrder] = React.useState<Order | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -134,8 +133,7 @@ export function OrdersTable() {
   }
 
   const handleEdit = (order: Order) => {
-    setEditOrder(order)
-    setIsEditOpen(true)
+    navigate({ to: "/orders/$orderId/edit", params: { orderId: order.id } })
   }
 
   const columns: ColumnDef<OrderRow>[] = React.useMemo(
@@ -318,13 +316,6 @@ export function OrdersTable() {
         filterPlaceholder="Filter orders..."
         emptyMessage="No orders found."
         action={{ label: "New Order", to: "/orders/new" }}
-      />
-
-      <OrderEditSheet
-        order={editOrder}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       {/* Delete Confirmation Dialog */}

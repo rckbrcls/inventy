@@ -24,9 +24,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { TransactionEditSheet } from "@/components/forms/transaction-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Transaction, TransactionsRepository } from "@/lib/db/repositories/transactions-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type TransactionRow = Transaction
 
@@ -63,12 +63,11 @@ const getStatusBadgeVariant = (status: string | null) => {
 }
 
 export function TransactionsTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<TransactionRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
   const [cancelId, setCancelId] = React.useState<string | null>(null)
-  const [editTransaction, setEditTransaction] = React.useState<Transaction | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -118,8 +117,10 @@ export function TransactionsTable() {
   }
 
   const handleEdit = (transaction: Transaction) => {
-    setEditTransaction(transaction)
-    setIsEditOpen(true)
+    navigate({
+      to: "/transactions/$transactionId/edit",
+      params: { transactionId: transaction.id },
+    })
   }
 
   const handleUpdateStatus = async (id: string, status: string) => {
@@ -318,13 +319,6 @@ export function TransactionsTable() {
         filterPlaceholder="Filter transactions..."
         emptyMessage="No transactions found."
         action={{ label: "New Transaction", to: "/transactions/new" }}
-      />
-
-      <TransactionEditSheet
-        transaction={editTransaction}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       {/* Delete Confirmation Dialog */}

@@ -24,14 +24,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { InventoryLevelEditSheet } from "@/components/forms/inventory-level-edit-sheet"
 import { formatDateTime } from "@/lib/formatters"
 import {
   InventoryLevel,
   InventoryLevelsRepository,
 } from "@/lib/db/repositories/inventory-levels-repository"
-import { Location, LocationsRepository } from "@/lib/db/repositories/locations-repository"
-import { Product, ProductsRepository } from "@/lib/db/repositories/products-repository"
+import { LocationsRepository } from "@/lib/db/repositories/locations-repository"
+import { ProductsRepository } from "@/lib/db/repositories/products-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type InventoryLevelRow = InventoryLevel & {
   product_name?: string
@@ -54,13 +54,10 @@ const getStockStatusBadgeVariant = (status: string | null) => {
 }
 
 export function InventoryTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<InventoryLevelRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editItem, setEditItem] = React.useState<InventoryLevel | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
-  const [productsMap, setProductsMap] = React.useState<Map<string, Product>>(new Map())
-  const [locationsMap, setLocationsMap] = React.useState<Map<string, Location>>(new Map())
 
   const loadData = React.useCallback(async () => {
     try {
@@ -73,8 +70,6 @@ export function InventoryTable() {
 
       const prodMap = new Map(products.map((p) => [p.id, p]))
       const locMap = new Map(locations.map((l) => [l.id, l]))
-      setProductsMap(prodMap)
-      setLocationsMap(locMap)
 
       const enrichedData = inventoryLevels.map((level) => ({
         ...level,
@@ -111,8 +106,10 @@ export function InventoryTable() {
   }
 
   const handleEdit = (item: InventoryLevel) => {
-    setEditItem(item)
-    setIsEditOpen(true)
+    navigate({
+      to: "/inventory/$inventoryLevelId/edit",
+      params: { inventoryLevelId: item.id },
+    })
   }
 
   const columns: ColumnDef<InventoryLevelRow>[] = React.useMemo(
@@ -272,15 +269,6 @@ export function InventoryTable() {
         filterPlaceholder="Filter inventory..."
         emptyMessage="No inventory levels found."
         action={{ label: "Add Inventory Level", to: "/inventory/new" }}
-      />
-
-      <InventoryLevelEditSheet
-        item={editItem}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
-        products={Array.from(productsMap.values())}
-        locations={Array.from(locationsMap.values())}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

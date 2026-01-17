@@ -24,11 +24,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { ProductEditSheet } from "@/components/forms/product-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Product, ProductsRepository } from "@/lib/db/repositories/products-repository"
 import { Brand, BrandsRepository } from "@/lib/db/repositories/brands-repository"
 import { Category, CategoriesRepository } from "@/lib/db/repositories/categories-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type ProductRow = Product & {
   brand_name?: string
@@ -36,13 +36,12 @@ type ProductRow = Product & {
 }
 
 export function ProductsTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<ProductRow[]>([])
   const [brands, setBrands] = React.useState<Brand[]>([])
   const [categories, setCategories] = React.useState<Category[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editProduct, setEditProduct] = React.useState<Product | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -93,8 +92,7 @@ export function ProductsTable() {
   }
 
   const handleEdit = (product: Product) => {
-    setEditProduct(product)
-    setIsEditOpen(true)
+    navigate({ to: "/products/$productId/edit", params: { productId: product.id } })
   }
 
   const columns: ColumnDef<ProductRow>[] = React.useMemo(
@@ -263,15 +261,6 @@ export function ProductsTable() {
         filterPlaceholder="Filter products..."
         emptyMessage="No products found."
         action={{ label: "New Product", to: "/products/new" }}
-      />
-
-      <ProductEditSheet
-        product={editProduct}
-        brands={brands}
-        categories={categories}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

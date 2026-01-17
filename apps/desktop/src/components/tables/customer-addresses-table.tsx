@@ -25,7 +25,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { CustomerAddressEditSheet } from "@/components/forms/customer-address-edit-sheet"
 import { formatDateTime } from "@/lib/formatters"
 import {
   CustomerAddress,
@@ -43,8 +42,6 @@ export function CustomerAddressesTable() {
   const [customers, setCustomers] = React.useState<Map<string, Customer>>(new Map())
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editAddress, setEditAddress] = React.useState<CustomerAddress | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -91,8 +88,10 @@ export function CustomerAddressesTable() {
   }
 
   const handleEdit = (address: CustomerAddress) => {
-    setEditAddress(address)
-    setIsEditOpen(true)
+    navigate({
+      to: "/customers/addresses/$addressId/edit",
+      params: { addressId: address.id },
+    })
   }
 
   const getCustomerName = (customerId: string) => {
@@ -266,13 +265,6 @@ export function CustomerAddressesTable() {
         filterPlaceholder="Filter addresses..."
         emptyMessage="No addresses found."
         action={{ label: "New Address", to: "/customers/addresses/new" }}
-      />
-
-      <CustomerAddressEditSheet
-        address={editAddress}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

@@ -24,10 +24,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
-import { RefundEditSheet } from "@/components/forms/refund-edit-sheet"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Refund, RefundsRepository, REFUND_STATUSES, REFUND_REASONS } from "@/lib/db/repositories/refunds-repository"
 import { Payment, PaymentsRepository } from "@/lib/db/repositories/payments-repository"
+import { useNavigate } from "@tanstack/react-router"
 
 type RefundRow = Refund & {
   payment_method?: string
@@ -57,12 +57,11 @@ const getReasonLabel = (reason: string | null) => {
 }
 
 export function RefundsTable() {
+  const navigate = useNavigate()
   const [data, setData] = React.useState<RefundRow[]>([])
   const [payments, setPayments] = React.useState<Payment[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
-  const [editRefund, setEditRefund] = React.useState<Refund | null>(null)
-  const [isEditOpen, setIsEditOpen] = React.useState(false)
 
   const loadData = React.useCallback(async () => {
     try {
@@ -113,8 +112,7 @@ export function RefundsTable() {
   }
 
   const handleEdit = (refund: Refund) => {
-    setEditRefund(refund)
-    setIsEditOpen(true)
+    navigate({ to: "/refunds/$refundId/edit", params: { refundId: refund.id } })
   }
 
   const columns: ColumnDef<RefundRow>[] = React.useMemo(
@@ -262,14 +260,6 @@ export function RefundsTable() {
         filterPlaceholder="Filter refunds..."
         emptyMessage="No refunds found."
         action={{ label: "New Refund", to: "/refunds/new" }}
-      />
-
-      <RefundEditSheet
-        refund={editRefund}
-        payments={payments}
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        onSuccess={loadData}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
