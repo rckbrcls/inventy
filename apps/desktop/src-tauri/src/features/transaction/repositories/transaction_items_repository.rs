@@ -11,6 +11,34 @@ impl TransactionItemsRepository {
         Self { pool }
     }
 
+    pub async fn create(&self, item: TransactionItem) -> Result<TransactionItem> {
+        let sql = r#"
+            INSERT INTO transaction_items (
+                id, transaction_id, product_id, sku_snapshot, name_snapshot,
+                quantity, unit_price, unit_cost, attributes_snapshot, tax_details,
+                _status, created_at, updated_at
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            RETURNING *
+        "#;
+
+        sqlx::query_as::<_, TransactionItem>(sql)
+            .bind(&item.id)
+            .bind(&item.transaction_id)
+            .bind(&item.product_id)
+            .bind(&item.sku_snapshot)
+            .bind(&item.name_snapshot)
+            .bind(&item.quantity)
+            .bind(&item.unit_price)
+            .bind(&item.unit_cost)
+            .bind(&item.attributes_snapshot)
+            .bind(&item.tax_details)
+            .bind(&item.sync_status)
+            .bind(&item.created_at)
+            .bind(&item.updated_at)
+            .fetch_one(&self.pool)
+            .await
+    }
+
     pub async fn create_many(&self, items: Vec<TransactionItem>) -> Result<Vec<TransactionItem>> {
         let mut tx = self.pool.begin().await?;
         let mut created_items = Vec::new();
@@ -49,6 +77,45 @@ impl TransactionItemsRepository {
         Ok(created_items)
     }
 
+    pub async fn update(&self, item: TransactionItem) -> Result<TransactionItem> {
+        let sql = r#"
+            UPDATE transaction_items SET
+                product_id = $2,
+                sku_snapshot = $3,
+                name_snapshot = $4,
+                quantity = $5,
+                unit_price = $6,
+                unit_cost = $7,
+                attributes_snapshot = $8,
+                tax_details = $9,
+                _status = $10,
+                updated_at = $11
+            WHERE id = $1
+            RETURNING *
+        "#;
+
+        sqlx::query_as::<_, TransactionItem>(sql)
+            .bind(&item.id)
+            .bind(&item.product_id)
+            .bind(&item.sku_snapshot)
+            .bind(&item.name_snapshot)
+            .bind(&item.quantity)
+            .bind(&item.unit_price)
+            .bind(&item.unit_cost)
+            .bind(&item.attributes_snapshot)
+            .bind(&item.tax_details)
+            .bind(&item.sync_status)
+            .bind(&item.updated_at)
+            .fetch_one(&self.pool)
+            .await
+    }
+
+    pub async fn delete(&self, id: &str) -> Result<()> {
+        let sql = "DELETE FROM transaction_items WHERE id = $1";
+        sqlx::query(sql).bind(id).execute(&self.pool).await?;
+        Ok(())
+    }
+
     pub async fn delete_by_transaction_id(&self, transaction_id: &str) -> Result<()> {
         let sql = "DELETE FROM transaction_items WHERE transaction_id = $1";
         sqlx::query(sql)
@@ -58,11 +125,26 @@ impl TransactionItemsRepository {
         Ok(())
     }
 
+    pub async fn get_by_id(&self, id: &str) -> Result<Option<TransactionItem>> {
+        let sql = "SELECT * FROM transaction_items WHERE id = $1";
+        sqlx::query_as::<_, TransactionItem>(sql)
+            .bind(id)
+            .fetch_optional(&self.pool)
+            .await
+    }
+
+    pub async fn list(&self) -> Result<Vec<TransactionItem>> {
+        let sql = "SELECT * FROM transaction_items ORDER BY created_at DESC";
+        sqlx::query_as::<_, TransactionItem>(sql)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     pub async fn find_by_transaction_id(
         &self,
         transaction_id: &str,
     ) -> Result<Vec<TransactionItem>> {
-        let sql = "SELECT * FROM transaction_items WHERE transaction_id = $1";
+        let sql = "SELECT * FROM transaction_items WHERE transaction_id = $1 ORDER BY created_at ASC";
         sqlx::query_as::<_, TransactionItem>(sql)
             .bind(transaction_id)
             .fetch_all(&self.pool)

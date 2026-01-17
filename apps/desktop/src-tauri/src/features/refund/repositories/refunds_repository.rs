@@ -78,9 +78,16 @@ impl<'a> RefundsRepository<'a> {
     }
 
     pub async fn list_by_payment(&self, payment_id: &str) -> Result<Vec<Refund>> {
-        let sql = "SELECT * FROM refunds WHERE payment_id = $1";
+        let sql = "SELECT * FROM refunds WHERE payment_id = $1 ORDER BY created_at DESC";
         sqlx::query_as::<_, Refund>(sql)
             .bind(payment_id)
+            .fetch_all(self.pool)
+            .await
+    }
+
+    pub async fn list(&self) -> Result<Vec<Refund>> {
+        let sql = "SELECT * FROM refunds ORDER BY created_at DESC";
+        sqlx::query_as::<_, Refund>(sql)
             .fetch_all(self.pool)
             .await
     }

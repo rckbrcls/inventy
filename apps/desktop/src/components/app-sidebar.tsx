@@ -5,6 +5,7 @@ import {
   Home,
   Inbox,
   Layers,
+  MapPin,
   Package,
   Receipt,
   Settings,
@@ -13,6 +14,7 @@ import {
   Tag,
   Undo2,
   Users,
+  UsersRound,
 } from "lucide-react"
 
 import {
@@ -53,6 +55,16 @@ const items = [
     title: "Customers",
     url: "/customers",
     icon: Users,
+  },
+  {
+    title: "Customer Addresses",
+    url: "/customers/addresses",
+    icon: MapPin,
+  },
+  {
+    title: "Customer Groups",
+    url: "/customers/groups",
+    icon: UsersRound,
   },
   {
     title: "Transactions",

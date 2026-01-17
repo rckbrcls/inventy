@@ -17,14 +17,14 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 | Products | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Brand, Category) |
 | Brands | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ➖ |
 | Categories | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Parent) |
-| Customers | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Customers | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
 ### Sub-CRUDs de Customers
 
 | Sub-Domínio | UI Table | List (Backend) | Create | Update | Delete |
 |-------------|----------|----------------|--------|--------|--------|
-| customer_addresses | ❌ | ❌ | ❌ | ❌ | ❌ |
-| customer_group_memberships | ❌ | ❌ | ❌ | ❌ | ❌ |
+| customer_addresses | ✅ | ✅ | ✅ | ✅ | ✅ |
+| customer_group_memberships | ✅ | ✅ | ✅ (assign) | ➖ | ✅ |
 
 ---
 
@@ -32,17 +32,17 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 
 | Domínio | UI Table | List (Backend) | Create | Update | Status Actions | Delete (soft) | Filtros/Paginação | FK Navigation |
 |---------|----------|----------------|--------|--------|----------------|---------------|-------------------|---------------|
-| Transactions | ✅ | ❌ | ❌ | ➖ | ❌ | ➖ | ❌ | ❌ |
-| Orders | ✅ | ❌ | ❌ | ➖ | ❌ | ➖ | ❌ | ❌ |
-| Payments | ✅ | ❌ | ❌ | ➖ | ❌ | ➖ | ❌ | ❌ |
-| Refunds | ✅ | ❌ | ❌ | ➖ | ❌ | ➖ | ❌ | ❌ |
-| Checkouts | ✅ | ❌ | ❌ | ➖ | ❌ | ➖ | ❌ | ❌ |
+| Transactions | ✅ | ✅ | ✅ | ✅ | ✅ (complete, cancel, status) | ✅ | ❌ | ❌ |
+| Orders | ✅ | ✅ | ✅ | ✅ | ✅ (cancel, payment, fulfillment) | ✅ | ❌ | ❌ |
+| Payments | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Refunds | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Payment) |
+| Checkouts | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
 ### Sub-CRUDs de Transactions
 
 | Sub-Domínio | UI Table | List (Backend) | Create | Update | Delete |
 |-------------|----------|----------------|--------|--------|--------|
-| transaction_items | ❌ | ❌ | ❌ | ❌ | ❌ |
+| transaction_items | ➖ | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
@@ -85,14 +85,14 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 | List (backend) | Products | ✅ |
 | List (backend) | Brands | ✅ |
 | List (backend) | Categories | ✅ |
-| List (backend) | Customers | ❌ |
+| List (backend) | Customers | ✅ |
 | List (backend) | Inventory | ❌ |
 | List (backend) | Movements | ❌ |
-| List (backend) | Transactions | ❌ |
-| List (backend) | Orders | ❌ |
-| List (backend) | Payments | ❌ |
-| List (backend) | Refunds | ❌ |
-| List (backend) | Checkouts | ❌ |
+| List (backend) | Transactions | ✅ |
+| List (backend) | Orders | ✅ |
+| List (backend) | Payments | ✅ |
+| List (backend) | Refunds | ✅ |
+| List (backend) | Checkouts | ✅ |
 
 ### Alta Prioridade - Formulários CRUD Completo
 | Item | Domínio | Status |
@@ -103,30 +103,32 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 | Formulário de edição | Brands | ✅ |
 | Formulário de criação | Categories | ✅ |
 | Formulário de edição | Categories | ✅ |
-| Formulário de criação | Customers | ❌ |
-| Formulário de edição | Customers | ❌ |
+| Formulário de criação | Customers | ✅ |
+| Formulário de edição | Customers | ✅ |
 
 ### Média Prioridade - Formulários CRUD Parcial
 | Item | Domínio | Status |
 |------|---------|--------|
-| Formulário de criação | Transactions | ❌ |
-| Formulário de criação | Orders | ❌ |
-| Formulário de criação | Payments | ❌ |
-| Formulário de criação | Refunds | ❌ |
-| Formulário de criação | Checkouts | ❌ |
-| Ações de status | Transactions | ❌ |
-| Ações de status | Orders | ❌ |
-| Ações de status | Payments | ❌ |
-| Ações de status | Refunds | ❌ |
-| Ações de status | Checkouts | ❌ |
+| Formulário de criação | Transactions | ✅ |
+| Formulário de criação | Orders | ✅ |
+| Formulário de criação | Payments | ✅ |
+| Formulário de criação | Refunds | ✅ |
+| Formulário de criação | Checkouts | ✅ |
+| Formulário de edição | Transactions | ✅ |
+| Formulário de edição | Checkouts | ✅ |
+| Ações de status | Transactions | ✅ |
+| Ações de status | Orders | ✅ |
+| Ações de status | Payments | ✅ |
+| Ações de status | Refunds | ✅ |
+| Ações de status | Checkouts | ✅ |
 | Ajuste de estoque | Movements | ❌ |
 
 ### Baixa Prioridade
 | Item | Domínio | Status |
 |------|---------|--------|
-| Sub-CRUD | customer_addresses | ❌ |
-| Sub-CRUD | customer_group_memberships | ❌ |
-| Sub-CRUD | transaction_items | ❌ |
+| Sub-CRUD | customer_addresses | ✅ |
+| Sub-CRUD | customer_group_memberships | ✅ |
+| Sub-CRUD | transaction_items | ✅ |
 | Filtros/Ordenação/Paginação backend | Todos | ❌ |
 | Navegação por FKs | Todos | ❌ |
 
@@ -324,6 +326,15 @@ export const {Domain}sRepository = {
 
 | Data | Alteração |
 |------|-----------|
+| 2026-01-17 | Implementado CRUD completo de Transactions (List, Create, Update, Delete, Status Actions: complete, cancel) |
+| 2026-01-17 | Implementado Sub-CRUD de transaction_items (List, Create, Update, Delete) |
+| 2026-01-17 | Implementado Sub-CRUD completo de customer_addresses (List, Create, Update, Delete) |
+| 2026-01-17 | Implementado Sub-CRUD completo de customer_group_memberships (List, Assign, Delete) |
+| 2026-01-17 | Adicionados comandos customer, customer_address, customer_group, customer_group_membership ao invoke_handler |
+| 2026-01-17 | Implementado CRUD completo de Checkouts (List, Create, Update, Delete, Status Actions) |
+| 2026-01-17 | Implementado CRUD completo de Payments (List, Create, Update, Delete, Status Actions) |
+| 2026-01-17 | Implementado CRUD completo de Refunds (List, Create, Update, Delete, FK Navigation Payment) |
+| 2026-01-17 | Implementado CRUD completo de Customers (List, Create, Update, Delete) |
 | 2026-01-17 | Implementado CRUD completo de Categories (List, Create, Update, Delete, FK Navigation Parent) |
 | 2026-01-17 | Implementado CRUD completo de Brands (List, Create, Update, Delete) |
 | 2026-01-17 | Adicionada seção "Arquitetura de Implementação" com padrão para replicar em outros domínios |

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/settings")({
 
 function Settings() {
   const { theme, setTheme } = useTheme()
-  const [storeName, setStoreName] = useState("")
+  const [organizationName, setOrganizationName] = useState("")
   const [ownerEmail, setOwnerEmail] = useState("")
   const [serverPort, setServerPort] = useState("3000")
   const [serverProtocol, setServerProtocol] = useState("http")
@@ -43,7 +43,7 @@ function Settings() {
   async function loadSettings() {
     try {
       const settings = await SettingsRepository.getAll()
-      if (settings.store_name) setStoreName(settings.store_name)
+      if (settings.organization_name) setOrganizationName(settings.organization_name)
       if (settings.owner_email) setOwnerEmail(settings.owner_email)
       if (settings.server_port) setServerPort(settings.server_port)
       if (settings.server_protocol) setServerProtocol(settings.server_protocol)
@@ -57,7 +57,7 @@ function Settings() {
   async function handleSaveProfile() {
     try {
       setIsSavingProfile(true)
-      await SettingsRepository.set("store_name", storeName)
+      await SettingsRepository.set("organization_name", organizationName)
       await SettingsRepository.set("owner_email", ownerEmail)
       toast.success("Profile saved successfully")
     } catch (error) {
@@ -105,19 +105,19 @@ function Settings() {
       <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Store Profile</CardTitle>
+            <CardTitle>Organization Profile</CardTitle>
             <CardDescription>
-              This is how your store will appear to connected devices.
+              This is how your organization will appear to connected devices.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-2">
-              <Label htmlFor="store-name">Store Name</Label>
+              <Label htmlFor="organization-name">Organization Name</Label>
               <Input
-                id="store-name"
-                placeholder="My Awesome Store"
-                value={storeName}
-                onChange={(e) => setStoreName(e.target.value)}
+                id="organization-name"
+                placeholder="My Organization"
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">

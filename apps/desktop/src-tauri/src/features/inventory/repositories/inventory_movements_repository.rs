@@ -68,6 +68,24 @@ impl InventoryMovementsRepository {
             .await
     }
 
+    pub async fn get_all(&self) -> Result<Vec<InventoryMovement>> {
+        let sql = "SELECT * FROM inventory_movements ORDER BY created_at DESC";
+        sqlx::query_as::<_, InventoryMovement>(sql)
+            .fetch_all(&self.pool)
+            .await
+    }
+
+    pub async fn find_by_inventory_level_id(
+        &self,
+        inventory_level_id: &str,
+    ) -> Result<Vec<InventoryMovement>> {
+        let sql = "SELECT * FROM inventory_movements WHERE inventory_level_id = $1 ORDER BY created_at DESC";
+        sqlx::query_as::<_, InventoryMovement>(sql)
+            .bind(inventory_level_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     // ============================================================
     // Transaction-aware methods for atomic operations
     // ============================================================

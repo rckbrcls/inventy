@@ -978,3 +978,18 @@ CREATE INDEX IF NOT EXISTS idx_customer_groups_shop ON customer_groups(shop_id) 
 
 CREATE INDEX IF NOT EXISTS idx_audit_logs_table ON audit_logs(table_name, created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_record ON audit_logs(record_id);
+
+-- ============================================================
+-- TABELA DE CONFIGURACOES (Settings)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS settings (
+    id TEXT PRIMARY KEY,
+    key TEXT UNIQUE NOT NULL,
+    value TEXT,
+    _status TEXT DEFAULT 'created',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_settings_key ON settings(key) WHERE _status != 'deleted';
