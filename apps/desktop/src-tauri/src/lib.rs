@@ -11,7 +11,7 @@ use crate::features::brand::commands::brand_commands::{
     create_brand, update_brand, delete_brand, get_brand, list_brands,
 };
 use crate::features::category::commands::category_commands::{
-    create_category, update_category, delete_category, get_category, list_categories_by_shop,
+    create_category, update_category, delete_category, get_category, list_categories_by_shop, list_categories,
 };
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use tauri::Manager;
@@ -44,7 +44,8 @@ pub fn run() {
             update_category,
             delete_category,
             get_category,
-            list_categories_by_shop
+            list_categories_by_shop,
+            list_categories
         ])
         .setup(|app| {
             let app_data_dir = app.path().app_data_dir()?;

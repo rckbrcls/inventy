@@ -56,4 +56,11 @@ impl CategoryService {
             .await
             .map_err(|e| format!("Failed to list categories by shop: {}", e))
     }
+
+    pub async fn list_categories(&self) -> Result<Vec<Category>, String> {
+        self.repo
+            .list_all()
+            .await
+            .map_err(|e| format!("Failed to list categories: {}", e))
+    }
 }

@@ -2,43 +2,68 @@ import { invoke } from "@tauri-apps/api/core"
 
 export type Category = {
   id: string
+  shop_id: string
+  parent_id: string | null
   name: string
   slug: string
-  parent_id: string | null
   description: string | null
   image_url: string | null
-  is_active: boolean
-  sort_order: number | null
+  banner_url: string | null
+  type: string | null
+  rules: string | null
+  is_visible: boolean
+  sort_order: number
+  seo_title: string | null
+  seo_description: string | null
+  template_suffix: string | null
   metadata: string | null
   _status: string | null
-  created_at: string | null
-  updated_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 export type CreateCategoryDTO = {
+  shop_id: string
+  parent_id?: string
   name: string
   slug: string
-  parent_id?: string
   description?: string
   image_url?: string
-  is_active?: boolean
+  banner_url?: string
+  type?: string
+  rules?: string
+  is_visible?: boolean
   sort_order?: number
+  seo_title?: string
+  seo_description?: string
+  template_suffix?: string
   metadata?: string
 }
 
 export type UpdateCategoryDTO = {
   id: string
+  shop_id?: string
+  parent_id?: string
   name?: string
   slug?: string
-  parent_id?: string
   description?: string
   image_url?: string
-  is_active?: boolean
+  banner_url?: string
+  type?: string
+  rules?: string
+  is_visible?: boolean
   sort_order?: number
+  seo_title?: string
+  seo_description?: string
+  template_suffix?: string
   metadata?: string
 }
 
 export const CategoriesRepository = {
+  async list(): Promise<Category[]> {
+    return invoke("list_categories")
+  },
+
   async listByShop(shopId: string): Promise<Category[]> {
     return invoke("list_categories_by_shop", { shopId })
   },

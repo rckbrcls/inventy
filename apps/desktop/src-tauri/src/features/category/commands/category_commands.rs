@@ -45,3 +45,9 @@ pub async fn list_categories_by_shop(
     let service = CategoryService::new(pool.inner().clone());
     service.list_categories_by_shop(&shop_id).await
 }
+
+#[tauri::command]
+pub async fn list_categories(pool: State<'_, SqlitePool>) -> Result<Vec<Category>, String> {
+    let service = CategoryService::new(pool.inner().clone());
+    service.list_categories().await
+}

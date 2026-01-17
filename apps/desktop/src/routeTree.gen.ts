@@ -26,6 +26,8 @@ import { Route as BrandsIndexRouteImport } from './routes/brands/index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions/new'
 import { Route as ProductsNewRouteImport } from './routes/products/new'
 import { Route as InventoryNewRouteImport } from './routes/inventory/new'
+import { Route as CategoriesNewRouteImport } from './routes/categories/new'
+import { Route as BrandsNewRouteImport } from './routes/brands/new'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -112,12 +114,24 @@ const InventoryNewRoute = InventoryNewRouteImport.update({
   path: '/inventory/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriesNewRoute = CategoriesNewRouteImport.update({
+  id: '/categories/new',
+  path: '/categories/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandsNewRoute = BrandsNewRouteImport.update({
+  id: '/brands/new',
+  path: '/brands/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
+  '/brands/new': typeof BrandsNewRoute
+  '/categories/new': typeof CategoriesNewRoute
   '/inventory/new': typeof InventoryNewRoute
   '/products/new': typeof ProductsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
@@ -137,6 +151,8 @@ export interface FileRoutesByTo {
   '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
+  '/brands/new': typeof BrandsNewRoute
+  '/categories/new': typeof CategoriesNewRoute
   '/inventory/new': typeof InventoryNewRoute
   '/products/new': typeof ProductsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
@@ -157,6 +173,8 @@ export interface FileRoutesById {
   '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
+  '/brands/new': typeof BrandsNewRoute
+  '/categories/new': typeof CategoriesNewRoute
   '/inventory/new': typeof InventoryNewRoute
   '/products/new': typeof ProductsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
@@ -178,6 +196,8 @@ export interface FileRouteTypes {
     | '/movements'
     | '/pairing'
     | '/settings'
+    | '/brands/new'
+    | '/categories/new'
     | '/inventory/new'
     | '/products/new'
     | '/transactions/new'
@@ -197,6 +217,8 @@ export interface FileRouteTypes {
     | '/movements'
     | '/pairing'
     | '/settings'
+    | '/brands/new'
+    | '/categories/new'
     | '/inventory/new'
     | '/products/new'
     | '/transactions/new'
@@ -216,6 +238,8 @@ export interface FileRouteTypes {
     | '/movements'
     | '/pairing'
     | '/settings'
+    | '/brands/new'
+    | '/categories/new'
     | '/inventory/new'
     | '/products/new'
     | '/transactions/new'
@@ -236,6 +260,8 @@ export interface RootRouteChildren {
   MovementsRoute: typeof MovementsRoute
   PairingRoute: typeof PairingRoute
   SettingsRoute: typeof SettingsRoute
+  BrandsNewRoute: typeof BrandsNewRoute
+  CategoriesNewRoute: typeof CategoriesNewRoute
   InventoryNewRoute: typeof InventoryNewRoute
   ProductsNewRoute: typeof ProductsNewRoute
   TransactionsNewRoute: typeof TransactionsNewRoute
@@ -372,6 +398,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventoryNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categories/new': {
+      id: '/categories/new'
+      path: '/categories/new'
+      fullPath: '/categories/new'
+      preLoaderRoute: typeof CategoriesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brands/new': {
+      id: '/brands/new'
+      path: '/brands/new'
+      fullPath: '/brands/new'
+      preLoaderRoute: typeof BrandsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -380,6 +420,8 @@ const rootRouteChildren: RootRouteChildren = {
   MovementsRoute: MovementsRoute,
   PairingRoute: PairingRoute,
   SettingsRoute: SettingsRoute,
+  BrandsNewRoute: BrandsNewRoute,
+  CategoriesNewRoute: CategoriesNewRoute,
   InventoryNewRoute: InventoryNewRoute,
   ProductsNewRoute: ProductsNewRoute,
   TransactionsNewRoute: TransactionsNewRoute,

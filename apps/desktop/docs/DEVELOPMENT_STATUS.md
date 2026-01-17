@@ -15,7 +15,7 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 | Domínio | UI Table | List (Backend) | Create | Update | Delete (soft) | Filtros/Paginação | FK Navigation |
 |---------|----------|----------------|--------|--------|---------------|-------------------|---------------|
 | Products | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ (Brand) |
-| Brands | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Brands | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ➖ |
 | Categories | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Customers | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -83,7 +83,7 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 | Item | Domínio | Status |
 |------|---------|--------|
 | List (backend) | Products | ✅ |
-| List (backend) | Brands | ❌ |
+| List (backend) | Brands | ✅ |
 | List (backend) | Categories | ❌ |
 | List (backend) | Customers | ❌ |
 | List (backend) | Inventory | ❌ |
@@ -99,8 +99,8 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 |------|---------|--------|
 | Formulário de criação | Products | ✅ |
 | Formulário de edição | Products | ✅ |
-| Formulário de criação | Brands | ❌ |
-| Formulário de edição | Brands | ❌ |
+| Formulário de criação | Brands | ✅ |
+| Formulário de edição | Brands | ✅ |
 | Formulário de criação | Categories | ❌ |
 | Formulário de edição | Categories | ❌ |
 | Formulário de criação | Customers | ❌ |
@@ -132,6 +132,186 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 
 ---
 
+## Arquitetura de Implementação (Padrão Products)
+
+Esta seção documenta a arquitetura seguida para implementar o CRUD de Products. Use como referência para replicar nas outras tabelas.
+
+### Diagrama de Fluxo
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              FRONTEND (React)                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐       │
+│  │   Route/Page     │    │   Table Component │    │   Form Component │       │
+│  │  /products/      │───▶│  products-table   │    │  product-edit-   │       │
+│  │  /products/new   │    │      .tsx         │◀──▶│    sheet.tsx     │       │
+│  └──────────────────┘    └────────┬─────────┘    └────────┬─────────┘       │
+│                                   │                       │                  │
+│                                   ▼                       ▼                  │
+│                          ┌──────────────────────────────────┐               │
+│                          │         Repository               │               │
+│                          │  products-repository.ts          │               │
+│                          │  - list(), create(), update()    │               │
+│                          │  - delete(), getById()           │               │
+│                          └────────────────┬─────────────────┘               │
+│                                           │                                  │
+│                                           │ invoke()                         │
+└───────────────────────────────────────────┼──────────────────────────────────┘
+                                            │
+                                            ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              BACKEND (Rust/Tauri)                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐       │
+│  │   lib.rs         │    │   Commands       │    │    Service       │       │
+│  │  invoke_handler  │───▶│  product_        │───▶│  product_        │       │
+│  │  [registra]      │    │  commands.rs     │    │  service.rs      │       │
+│  └──────────────────┘    └──────────────────┘    └────────┬─────────┘       │
+│                                                           │                  │
+│                                                           ▼                  │
+│                                                  ┌──────────────────┐        │
+│                                                  │   Repository     │        │
+│                                                  │  product_        │        │
+│                                                  │  repository.rs   │        │
+│                                                  └────────┬─────────┘        │
+│                                                           │                  │
+│                                                           ▼                  │
+│                                                  ┌──────────────────┐        │
+│                                                  │     SQLite       │        │
+│                                                  │   (sqlx)         │        │
+│                                                  └──────────────────┘        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Estrutura de Arquivos
+
+```
+src/
+├── lib/db/repositories/
+│   └── {domain}-repository.ts      # Repository com tipos e métodos CRUD
+├── components/
+│   ├── tables/
+│   │   └── {domain}-table.tsx      # Tabela com listagem, ações, delete dialog
+│   └── forms/
+│       └── {domain}-edit-sheet.tsx # Sheet lateral para edição
+└── routes/{domain}/
+    ├── index.tsx                   # Rota principal (renderiza a tabela)
+    └── new.tsx                     # Página de criação (formulário completo)
+
+src-tauri/src/
+├── lib.rs                          # Registrar comandos no invoke_handler
+└── features/{domain}/
+    ├── commands/{domain}_commands.rs
+    ├── services/{domain}_service.rs
+    ├── repositories/{domain}_repository.rs
+    ├── dtos/{domain}_dto.rs
+    └── models/{domain}_model.rs
+```
+
+### Checklist para Implementar um Novo Domínio
+
+#### 1. Backend (se comandos não estiverem registrados)
+- [ ] Verificar se comandos existem em `src-tauri/src/features/{domain}/commands/`
+- [ ] Registrar comandos no `invoke_handler` em `src-tauri/src/lib.rs`:
+  ```rust
+  use crate::features::{domain}::commands::{domain}_commands::{
+      create_{domain}, update_{domain}, delete_{domain}, get_{domain}, list_{domains}
+  };
+  ```
+
+#### 2. Repository Frontend
+- [ ] Criar `src/lib/db/repositories/{domain}-repository.ts`
+- [ ] Definir tipos: `{Domain}`, `Create{Domain}DTO`, `Update{Domain}DTO`
+- [ ] Implementar métodos: `list()`, `create()`, `update()`, `delete()`, `getById()`
+
+#### 3. Tabela (Atualizar componente existente)
+- [ ] Importar repository e tipos
+- [ ] Adicionar estados: `data`, `isLoading`, `deleteId`, `editItem`, `isEditOpen`
+- [ ] Implementar `loadData()` com `useCallback` + `useEffect`
+- [ ] Resolver FKs se necessário (buscar entidades relacionadas em paralelo)
+- [ ] Adicionar coluna de ações com `DropdownMenu` (Edit, Delete)
+- [ ] Adicionar `AlertDialog` para confirmação de delete
+- [ ] Adicionar prop `action` no `DataTable` para botão "New"
+
+#### 4. Página de Criação
+- [ ] Criar `src/routes/{domain}/new.tsx`
+- [ ] Implementar formulário com todos os campos do DTO
+- [ ] Marcar campos obrigatórios com `*`
+- [ ] Adicionar selects para FKs (buscar opções do backend)
+- [ ] Validar antes de submeter
+- [ ] Redirecionar para listagem após sucesso
+
+#### 5. Sheet de Edição
+- [ ] Criar `src/components/forms/{domain}-edit-sheet.tsx`
+- [ ] Receber props: `item`, `open`, `onOpenChange`, `onSuccess`
+- [ ] Popular form com dados do item via `useEffect`
+- [ ] Implementar submit com `update()`
+- [ ] Chamar `onSuccess()` para recarregar tabela
+
+#### 6. Gerar Rotas
+- [ ] Executar `npx @tanstack/router-cli generate` para registrar nova rota
+
+### Exemplo de Repository
+
+```typescript
+// src/lib/db/repositories/{domain}-repository.ts
+import { invoke } from "@tauri-apps/api/core"
+
+export type {Domain} = {
+  id: string
+  // ... campos do modelo
+  _status: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export type Create{Domain}DTO = {
+  // campos obrigatórios e opcionais para criação
+}
+
+export type Update{Domain}DTO = {
+  id: string
+  // campos opcionais para update
+}
+
+export const {Domain}sRepository = {
+  async list(): Promise<{Domain}[]> {
+    return invoke("list_{domains}")
+  },
+  async getById(id: string): Promise<{Domain} | null> {
+    return invoke("get_{domain}", { id })
+  },
+  async create(payload: Create{Domain}DTO): Promise<{Domain}> {
+    return invoke("create_{domain}", { payload })
+  },
+  async update(payload: Update{Domain}DTO): Promise<{Domain}> {
+    return invoke("update_{domain}", { payload })
+  },
+  async delete(id: string): Promise<void> {
+    return invoke("delete_{domain}", { id })
+  },
+}
+```
+
+### Padrões de UI
+
+| Componente | Uso |
+|------------|-----|
+| `DataTable` | Listagem com filtro, ordenação, paginação, visibilidade de colunas |
+| `DropdownMenu` | Menu de ações por linha (Edit, Delete, Copy ID) |
+| `AlertDialog` | Confirmação de ações destrutivas (Delete) |
+| `Sheet` | Formulário de edição lateral |
+| `Card` | Agrupamento de campos no formulário de criação |
+| `Select` | Campos com opções fixas (type, status) ou FKs |
+| `Badge` | Status e tipos com cores diferenciadas |
+| `toast` (sonner) | Feedback de sucesso/erro |
+
+---
+
 ## Notas
 
 - **UI Table**: Estrutura da tabela (colunas, componente) existe, mas com `data = []`
@@ -144,6 +324,8 @@ Este documento rastreia o status de implementação das funcionalidades CRUD par
 
 | Data | Alteração |
 |------|-----------|
+| 2026-01-17 | Implementado CRUD completo de Brands (List, Create, Update, Delete) |
+| 2026-01-17 | Adicionada seção "Arquitetura de Implementação" com padrão para replicar em outros domínios |
 | 2026-01-17 | Implementado CRUD completo de Products (List, Create, Update, Delete, FK Navigation) |
 | 2026-01-17 | Corrigido status: UI Tables existem mas List (backend) está pendente |
 | 2026-01-17 | Documento criado com status inicial |

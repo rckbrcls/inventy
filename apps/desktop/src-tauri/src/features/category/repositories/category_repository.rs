@@ -93,6 +93,14 @@ impl CategoriesRepository {
             .await
     }
 
+    pub async fn list_all(&self) -> Result<Vec<Category>> {
+        sqlx::query_as::<_, Category>(
+            "SELECT * FROM categories WHERE _status IS NULL OR _status != 'deleted' ORDER BY sort_order ASC"
+        )
+        .fetch_all(&self.pool)
+        .await
+    }
+
     pub async fn delete(&self, id: &str) -> Result<()> {
         sqlx::query("DELETE FROM categories WHERE id = ?")
             .bind(id)
