@@ -1,3 +1,6 @@
+pub mod brand_dto;
+pub mod category_dto;
+pub mod location_dto;
 pub mod customer_dto;
 pub mod inquiry_dto;
 pub mod product_dto;
@@ -6,6 +9,9 @@ pub mod shop_dto;
 pub mod transaction_dto;
 pub mod user_dto;
 
+pub use brand_dto::*;
+pub use category_dto::*;
+pub use location_dto::*;
 pub use customer_dto::*;
 pub use inquiry_dto::*;
 pub use product_dto::*;

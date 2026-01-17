@@ -31,14 +31,14 @@ Status das implementações por tabela do schema.
 
 ## Tabelas de Catálogo
 
-| Tabela               | Service           | Tx Methods  | Triggers | Indexes  | Status                        |
-| -------------------- | ----------------- | ----------- | -------- | -------- | ----------------------------- |
-| `shops`              | ✅ ShopService    | ✅ 1 método | ❌       | ❌       | ✅ OK                         |
-| `brands`             | ⚠️ sem service    | ❌          | ❌       | ❌       | ❌ CRUD simples               |
-| `categories`         | ⚠️ sem service    | ❌          | ❌       | ❌       | ❌ CRUD simples               |
-| `products`           | ⚠️ ProductService | ❌          | ❌       | ✅ 4 idx | 🔧 Tx se criar com categorias |
-| `product_categories` | ❌ join table     | ❌          | ❌       | ❌       | ❌ CRUD simples               |
-| `locations`          | ⚠️ sem service    | ❌          | ❌       | ❌       | ❌ CRUD simples               |
+| Tabela               | Service             | Tx Methods   | Triggers | Indexes  | Status                        |
+| -------------------- | ------------------- | ------------ | -------- | -------- | ----------------------------- |
+| `shops`              | ✅ ShopService      | ✅ 1 método  | ❌       | ❌       | ✅ OK                         |
+| `brands`             | ✅ BrandService     | ✅ 5 métodos | ❌       | ❌       | ✅ OK                         |
+| `categories`         | ✅ CategoryService  | ✅ 5 métodos | ❌       | ❌       | ✅ OK                         |
+| `products`           | ✅ ProductService   | ✅ 1 método  | ❌       | ✅ 4 idx | ✅ OK                         |
+| `product_categories` | ❌ join table       | ❌           | ❌       | ❌       | ❌ CRUD simples               |
+| `locations`          | ✅ LocationService  | ✅ 5 métodos | ❌       | ❌       | ✅ OK                         |
 
 ---
 

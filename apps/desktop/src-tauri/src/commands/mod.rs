@@ -1,3 +1,6 @@
+pub mod brand_commands;
+pub mod category_commands;
+pub mod location_commands;
 pub mod product_commands;
 pub mod customer_commands;
 pub mod transaction_commands;

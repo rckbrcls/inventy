@@ -61,6 +61,20 @@ pub struct UpdateProductDTO {
     pub parent_id: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProductListFilterDTO {
+    pub shop_id: Option<String>,
+    pub status: Option<String>,
+    pub category_id: Option<String>,
+    pub brand_id: Option<String>,
+    pub query: Option<String>,
+    pub is_shippable: Option<bool>,
+    pub min_price: Option<f64>,
+    pub max_price: Option<f64>,
+    pub page: Option<u32>,
+    pub per_page: Option<u32>,
+}
+
 impl CreateProductDTO {
     pub fn into_models(self) -> (Product, Vec<ProductCategory>) {
         let product_id = Uuid::new_v4().to_string();
