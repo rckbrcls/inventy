@@ -1,28 +1,5 @@
 pub mod db;
-pub mod audit_log;
-pub mod brand;
-pub mod category;
-pub mod checkout;
-pub mod customer;
-pub mod customer_address;
-pub mod customer_group;
-pub mod customer_group_membership;
-pub mod inquiry;
-pub mod inventory;
-pub mod location;
-pub mod order;
-pub mod payment;
-pub mod product;
-pub mod refund;
-pub mod review;
-pub mod role;
-pub mod shipment;
-pub mod shop;
-pub mod transaction;
-pub mod user;
-pub mod user_identity;
-pub mod user_role;
-pub mod user_session;
+pub mod features;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
