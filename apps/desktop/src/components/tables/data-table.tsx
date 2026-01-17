@@ -77,19 +77,19 @@ export function DataTable<TData>({
   const filterColumn = filterColumnId ? table.getColumn(filterColumnId) : undefined
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4 justify-between gap-4">
+    <div className="w-full min-w-0 max-w-full">
+      <div className="flex items-center py-4 justify-between gap-4 min-w-0">
         {filterColumn ? (
           <Input
             placeholder={filterPlaceholder}
             value={(filterColumn.getFilterValue() as string) ?? ""}
             onChange={(event) => filterColumn.setFilterValue(event.target.value)}
-            className="max-w-sm"
+            className="max-w-sm shrink-0"
           />
         ) : (
           <div />
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-2">
@@ -121,7 +121,7 @@ export function DataTable<TData>({
           ) : null}
         </div>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border min-w-0">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
