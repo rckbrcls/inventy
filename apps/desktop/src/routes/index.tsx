@@ -16,6 +16,16 @@ import { CumulativeRevenueAreaChart } from "@/components/charts/cumulative-reven
 import { DailySalesTrendLineChart } from "@/components/charts/daily-sales-trend-line-chart"
 import { TopProductsBarChart } from "@/components/charts/top-products-bar-chart"
 import { PaymentMethodDistributionPieChart } from "@/components/charts/payment-method-distribution-pie-chart"
+import { RevenueByCategoryBarChart } from "@/components/charts/revenue-by-category-bar-chart"
+import { MonthlySalesBarChart } from "@/components/charts/monthly-sales-bar-chart"
+import { CategoryDistributionPieChart } from "@/components/charts/category-distribution-pie-chart"
+import { MonthlySalesProgressRadialChart } from "@/components/charts/monthly-sales-progress-radial-chart"
+import { StockStatusBarChart } from "@/components/charts/stock-status-bar-chart"
+import { CustomerGrowthLineChart } from "@/components/charts/customer-growth-line-chart"
+import { AverageOrderValueLineChart } from "@/components/charts/average-order-value-line-chart"
+import { OrderStatusDistributionPieChart } from "@/components/charts/order-status-distribution-pie-chart"
+import { ConversionRateRadialChart } from "@/components/charts/conversion-rate-radial-chart"
+import { InventoryCapacityRadialChart } from "@/components/charts/inventory-capacity-radial-chart"
 
 export const Route = createFileRoute("/")({ component: Dashboard })
 
@@ -99,9 +109,21 @@ function Dashboard() {
       </div>
         <CumulativeRevenueAreaChart />
         <DailySalesTrendLineChart />
+        <CustomerGrowthLineChart />
+        <AverageOrderValueLineChart />
         <TopProductsBarChart />
+        <RevenueByCategoryBarChart />
+        <MonthlySalesBarChart />
+        <StockStatusBarChart />
         <div className="grid gap-4 md:grid-cols-2">
           <PaymentMethodDistributionPieChart />
+          <OrderStatusDistributionPieChart />
+        </div>
+          <CategoryDistributionPieChart />
+        <div className="grid gap-4 md:grid-cols-3">
+          <MonthlySalesProgressRadialChart />
+          <ConversionRateRadialChart />
+          <InventoryCapacityRadialChart />
         </div>
     </div>
   )

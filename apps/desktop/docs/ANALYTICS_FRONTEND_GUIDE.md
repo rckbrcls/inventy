@@ -849,25 +849,65 @@ Os seguintes componentes foram implementados e estão disponíveis em `src/compo
    - Tipo: Pie Chart
    - Status: Implementado e integrado ao dashboard
 
+5. **Query 5: Receita por Categoria** ✅
+   - Componente: `revenue-by-category-bar-chart.tsx`
+   - Tipo: Vertical Bar Chart
+   - Status: Implementado e integrado ao dashboard
+
+6. **Query 6: Vendas Mensais (Últimos 12 Meses)** ✅
+   - Componente: `monthly-sales-bar-chart.tsx`
+   - Tipo: Vertical Bar Chart
+   - Status: Implementado e integrado ao dashboard
+
+7. **Query 12: Distribuição de Produtos por Categoria** ✅
+   - Componente: `category-distribution-pie-chart.tsx`
+   - Tipo: Pie Chart
+   - Status: Implementado e integrado ao dashboard
+
+8. **Query 17: Progresso de Meta de Vendas Mensal** ✅
+   - Componente: `monthly-sales-progress-radial-chart.tsx`
+   - Tipo: Radial Progress Chart (Gauge/Donut)
+   - Status: Implementado e integrado ao dashboard
+
+9. **Query 7: Produtos por Status de Estoque** ✅
+   - Componente: `stock-status-bar-chart.tsx`
+   - Tipo: Vertical Bar Chart
+   - Status: Implementado e integrado ao dashboard
+
+10. **Query 9: Crescimento de Clientes ao Longo do Tempo** ✅
+    - Componente: `customer-growth-line-chart.tsx`
+    - Tipo: Line Chart com área preenchida
+    - Status: Implementado e integrado ao dashboard
+
+11. **Query 10: Ticket Médio ao Longo do Tempo** ✅
+    - Componente: `average-order-value-line-chart.tsx`
+    - Tipo: Line Chart
+    - Status: Implementado e integrado ao dashboard
+
+12. **Query 13: Distribuição de Pedidos por Status** ✅
+    - Componente: `order-status-distribution-pie-chart.tsx`
+    - Tipo: Pie Chart
+    - Status: Implementado e integrado ao dashboard
+
+13. **Query 18: Taxa de Conversão de Carrinhos para Pedidos** ✅
+    - Componente: `conversion-rate-radial-chart.tsx`
+    - Tipo: Radial Progress Chart (Gauge/Donut)
+    - Status: Implementado e integrado ao dashboard
+
+14. **Query 19: Percentual de Estoque Ocupado** ✅
+    - Componente: `inventory-capacity-radial-chart.tsx`
+    - Tipo: Radial Progress Chart (Gauge/Donut)
+    - Status: Implementado e integrado ao dashboard
+
 ### 📋 Pendente
 
 As seguintes queries ainda precisam ser implementadas:
 
 - Query 2: Vendas e Estoque Movimentado ao Longo do Tempo
 - Query 3: Receita por Método de Pagamento ao Longo do Tempo
-- Query 5: Receita por Categoria
-- Query 6: Vendas Mensais (Últimos 12 Meses)
-- Query 7: Produtos por Status de Estoque
-- Query 9: Crescimento de Clientes ao Longo do Tempo
-- Query 10: Ticket Médio ao Longo do Tempo
-- Query 12: Distribuição de Produtos por Categoria
-- Query 13: Distribuição de Pedidos por Status
 - Query 14: Distribuição de Clientes por Grupo
 - Query 15: Métricas de Performance por Mês
 - Query 16: Métricas por Produto
-- Query 17: Progresso de Meta de Vendas Mensal
-- Query 18: Taxa de Conversão de Carrinhos para Pedidos
-- Query 19: Percentual de Estoque Ocupado
 - Query 20: Ranking de Produtos com Percentil
 - Query 21: Comparação Mês a Mês (MoM)
 - Query 22: Vendas Acumuladas por Período (YTD)
@@ -878,4 +918,4 @@ As seguintes queries ainda precisam ser implementadas:
 
 Este guia mapeia todas as 22 queries analíticas disponíveis para seus respectivos tipos de gráficos. Use este documento como referência ao implementar as visualizações no frontend, garantindo que cada query seja usada no tipo de gráfico mais apropriado para melhor compreensão dos dados.
 
-**Última atualização:** 4 queries implementadas (18.2% completo)
+**Última atualização:** 14 queries implementadas (63.6% completo)
