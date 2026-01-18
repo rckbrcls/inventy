@@ -12,6 +12,12 @@ use crate::features::analytics::commands::analytics_commands::{
     get_monthly_sales_progress, get_conversion_rate, get_inventory_capacity,
     get_product_ranking, get_month_over_month_growth, get_year_to_date_sales,
 };
+use crate::features::module::commands::modules_commands::{
+    get_module, get_module_by_code, list_modules, list_modules_by_category, list_core_modules,
+};
+use crate::features::shop_template::commands::shop_templates_commands::{
+    get_shop_template, get_shop_template_by_code, list_shop_templates, list_shop_templates_by_category,
+};
 use crate::features::product::commands::product_commands::{
     create_product, update_product, delete_product, get_product, list_products, list_products_filtered,
 };
@@ -218,7 +224,18 @@ pub fn run() {
             update_location,
             delete_location,
             get_location,
-            list_locations
+            list_locations,
+            // Modules
+            get_module,
+            get_module_by_code,
+            list_modules,
+            list_modules_by_category,
+            list_core_modules,
+            // Shop Templates
+            get_shop_template,
+            get_shop_template_by_code,
+            list_shop_templates,
+            list_shop_templates_by_category
         ])
         .setup(|app| {
             let app_data_dir = app.path().app_data_dir()?;
@@ -235,12 +252,20 @@ pub fn run() {
                 db_path.to_string_lossy().replace(' ', "%20")
             );
 
-            let migrations = vec![tauri_plugin_sql::Migration {
-                version: 1,
-                description: "create_initial_schema",
-                sql: include_str!("../migrations/001_initial_schema.sql"),
-                kind: tauri_plugin_sql::MigrationKind::Up,
-            }];
+            let migrations = vec![
+                tauri_plugin_sql::Migration {
+                    version: 1,
+                    description: "create_initial_schema",
+                    sql: include_str!("../migrations/001_initial_schema.sql"),
+                    kind: tauri_plugin_sql::MigrationKind::Up,
+                },
+                tauri_plugin_sql::Migration {
+                    version: 2,
+                    description: "modules_system",
+                    sql: include_str!("../migrations/002_modules_system.sql"),
+                    kind: tauri_plugin_sql::MigrationKind::Up,
+                },
+            ];
 
             app.handle().plugin(
                 tauri_plugin_sql::Builder::default()

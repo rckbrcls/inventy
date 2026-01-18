@@ -3,6 +3,7 @@ use sqlx::SqlitePool;
 
 use crate::features::analytics::dtos::analytics_dto::*;
 use crate::features::analytics::repositories::analytics_repository::*;
+use crate::features::shop::services::shop_service::ShopService;
 
 const LOW_STOCK_THRESHOLD: f64 = 5.0;
 
@@ -27,19 +28,42 @@ struct ParsedTimeRange {
 
 pub struct AnalyticsService {
     repo: AnalyticsRepository,
+    shop_service: ShopService,
 }
 
 impl AnalyticsService {
     pub fn new(pool: SqlitePool) -> Self {
         Self {
-            repo: AnalyticsRepository::new(pool),
+            repo: AnalyticsRepository::new(pool.clone()),
+            shop_service: ShopService::new(pool),
         }
     }
 
-    pub async fn get_dashboard_stats(&self) -> Result<DashboardStatsDto, String> {
+    async fn get_features_config(&self, shop_id: Option<String>) -> Option<String> {
+        if let Some(shop_id) = shop_id {
+            if let Ok(Some(shop)) = self.shop_service.get_shop(&shop_id).await {
+                return shop.features_config;
+            }
+        }
+        
+        // Se não especificou shop_id, usar shop padrão
+        if let Ok(Some(shop)) = self.shop_service.get_default_shop().await {
+            return shop.features_config;
+        }
+        
+        None
+    }
+
+    pub async fn get_dashboard_stats(
+        &self,
+        shop_id: Option<String>,
+    ) -> Result<DashboardStatsDto, String> {
+        let features_config = self.get_features_config(shop_id).await;
+        let features_config_str = features_config.as_deref();
+        
         let stats = self
             .repo
-            .get_dashboard_stats(LOW_STOCK_THRESHOLD)
+            .get_dashboard_stats(features_config_str, LOW_STOCK_THRESHOLD)
             .await
             .map_err(|e| format!("Failed to fetch dashboard stats: {}", e))?;
 
@@ -48,15 +72,19 @@ impl AnalyticsService {
 
     pub async fn get_stock_movements(
         &self,
+        shop_id: Option<String>,
         payload: StockMovementsFilterDto,
     ) -> Result<Vec<DailyMovementStatDto>, String> {
+        let features_config = self.get_features_config(shop_id).await;
+        let features_config_str = features_config.as_deref();
+        
         let parsed = parse_time_range(&payload.time_range)?;
         let bucket_format = parsed.bucket.sqlite_format();
         let start_at = parsed.start_at.map(format_sqlite_datetime);
 
         let rows = self
             .repo
-            .get_stock_movements(bucket_format, start_at)
+            .get_stock_movements(features_config_str, bucket_format, start_at)
             .await
             .map_err(|e| format!("Failed to fetch stock movements: {}", e))?;
 
@@ -111,12 +139,15 @@ impl AnalyticsService {
     /// Query 2: Vendas e Estoque Movimentado ao Longo do Tempo (Stacked Area)
     pub async fn get_stock_movements_area(
         &self,
+        shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<StockMovementsAreaDto>, String> {
+        let features_config = self.get_features_config(shop_id).await;
+        let features_config_str = features_config.as_deref();
         let days = days.unwrap_or(90);
         let rows = self
             .repo
-            .get_stock_movements_area(days)
+            .get_stock_movements_area(features_config_str, days)
             .await
             .map_err(|e| format!("Failed to fetch stock movements area: {}", e))?;
 
@@ -228,10 +259,15 @@ impl AnalyticsService {
     }
 
     /// Query 7: Produtos por Status de Estoque (Baixo, Médio, Alto)
-    pub async fn get_stock_status(&self) -> Result<Vec<StockStatusDto>, String> {
+    pub async fn get_stock_status(
+        &self,
+        shop_id: Option<String>,
+    ) -> Result<Vec<StockStatusDto>, String> {
+        let features_config = self.get_features_config(shop_id).await;
+        let features_config_str = features_config.as_deref();
         let rows = self
             .repo
-            .get_stock_status()
+            .get_stock_status(features_config_str)
             .await
             .map_err(|e| format!("Failed to fetch stock status: {}", e))?;
 
@@ -491,12 +527,15 @@ impl AnalyticsService {
     /// Query 18: Taxa de Conversão de Carrinhos para Pedidos
     pub async fn get_conversion_rate(
         &self,
+        shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<ConversionRateDto, String> {
+        let features_config = self.get_features_config(shop_id).await;
+        let features_config_str = features_config.as_deref();
         let days = days.unwrap_or(30);
         let row = self
             .repo
-            .get_conversion_rate(days)
+            .get_conversion_rate(features_config_str, days)
             .await
             .map_err(|e| format!("Failed to fetch conversion rate: {}", e))?;
 
@@ -510,12 +549,15 @@ impl AnalyticsService {
     /// Query 19: Percentual de Estoque Ocupado (Capacidade)
     pub async fn get_inventory_capacity(
         &self,
+        shop_id: Option<String>,
         capacity_limit: Option<f64>,
     ) -> Result<InventoryCapacityDto, String> {
+        let features_config = self.get_features_config(shop_id).await;
+        let features_config_str = features_config.as_deref();
         let capacity_limit = capacity_limit.unwrap_or(10000.0);
         let row = self
             .repo
-            .get_inventory_capacity(capacity_limit)
+            .get_inventory_capacity(features_config_str, capacity_limit)
             .await
             .map_err(|e| format!("Failed to fetch inventory capacity: {}", e))?;
 

@@ -1,6 +1,7 @@
 use crate::features::shop::dtos::shop_dto::{CreateShopDTO, UpdateShopDTO};
 use crate::features::shop::models::shop_model::Shop;
 use crate::features::shop::repositories::shop_repository::ShopsRepository;
+use crate::features::shop_template::services::shop_templates_service::ShopTemplatesService;
 use sqlx::SqlitePool;
 
 pub struct ShopService {
@@ -20,6 +21,37 @@ impl ShopService {
             .create(shop)
             .await
             .map_err(|e| format!("Erro ao criar loja: {}", e))
+    }
+
+    /// Cria uma shop a partir de um template
+    pub async fn create_shop_from_template(
+        &self,
+        payload: CreateShopDTO,
+        template_code: Option<String>,
+    ) -> Result<Shop, String> {
+        let mut create_payload = payload;
+
+        // Se um template foi especificado, buscar e aplicar sua configuração
+        if let Some(template_code) = template_code {
+            let template_service = ShopTemplatesService::new(self.pool.clone());
+            let template = template_service
+                .get_template_by_code(&template_code)
+                .await
+                .map_err(|e| format!("Erro ao buscar template: {}", e))?
+                .ok_or_else(|| format!("Template não encontrado: {}", template_code))?;
+
+            // Aplicar features_config do template se não foi especificado
+            if create_payload.features_config.is_none() {
+                create_payload.features_config = Some(template.features_config);
+            }
+
+            // Aplicar default_settings do template se settings não foi especificado
+            if create_payload.settings.is_none() && template.default_settings.is_some() {
+                create_payload.settings = template.default_settings;
+            }
+        }
+
+        self.create_shop(create_payload).await
     }
 
     pub async fn update_shop(&self, payload: UpdateShopDTO) -> Result<Shop, String> {

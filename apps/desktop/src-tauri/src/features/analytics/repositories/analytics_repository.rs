@@ -1,4 +1,5 @@
 use sqlx::SqlitePool;
+use crate::features::analytics::utils::module_checker;
 
 #[derive(Debug, sqlx::FromRow)]
 pub struct DashboardStatsRow {
@@ -211,7 +212,21 @@ impl AnalyticsRepository {
         Self { pool }
     }
 
-    pub async fn get_dashboard_stats(&self, low_stock_threshold: f64) -> sqlx::Result<DashboardStatsRow> {
+    fn check_module_required(&self, features_config: Option<&str>, module_code: &str) -> sqlx::Result<()> {
+        if !module_checker::is_module_enabled_or_core(features_config, module_code) {
+            return Err(sqlx::Error::Configuration(
+                format!("Module '{}' is not enabled", module_code).into()
+            ));
+        }
+        Ok(())
+    }
+
+    pub async fn get_dashboard_stats(
+        &self,
+        features_config: Option<&str>,
+        low_stock_threshold: f64,
+    ) -> sqlx::Result<DashboardStatsRow> {
+        self.check_module_required(features_config, "inventory")?;
         let sql = r#"
             SELECT
                 COALESCE(SUM(inventory_levels.quantity_on_hand), 0) AS total_items,
@@ -230,9 +245,11 @@ impl AnalyticsRepository {
 
     pub async fn get_stock_movements(
         &self,
+        features_config: Option<&str>,
         bucket_format: &str,
         start_at: Option<String>,
     ) -> sqlx::Result<Vec<StockMovementRow>> {
+        self.check_module_required(features_config, "inventory")?;
         let bucket_expr = format!("strftime('{}', created_at)", bucket_format);
 
         let sql = if start_at.is_some() {
@@ -300,7 +317,12 @@ impl AnalyticsRepository {
     }
 
     /// Query 2: Vendas e Estoque Movimentado ao Longo do Tempo (Stacked Area)
-    pub async fn get_stock_movements_area(&self, days: i64) -> sqlx::Result<Vec<StockMovementsAreaRow>> {
+    pub async fn get_stock_movements_area(
+        &self,
+        features_config: Option<&str>,
+        days: i64,
+    ) -> sqlx::Result<Vec<StockMovementsAreaRow>> {
+        self.check_module_required(features_config, "inventory")?;
         let sql = r#"
             SELECT 
                 DATE(created_at) AS date,
@@ -429,7 +451,11 @@ impl AnalyticsRepository {
     }
 
     /// Query 7: Produtos por Status de Estoque (Baixo, Médio, Alto)
-    pub async fn get_stock_status(&self) -> sqlx::Result<Vec<StockStatusRow>> {
+    pub async fn get_stock_status(
+        &self,
+        features_config: Option<&str>,
+    ) -> sqlx::Result<Vec<StockStatusRow>> {
+        self.check_module_required(features_config, "inventory")?;
         let sql = r#"
             SELECT 
                 CASE 
@@ -786,7 +812,12 @@ impl AnalyticsRepository {
     }
 
     /// Query 18: Taxa de Conversão de Carrinhos para Pedidos
-    pub async fn get_conversion_rate(&self, days: i64) -> sqlx::Result<ConversionRateRow> {
+    pub async fn get_conversion_rate(
+        &self,
+        features_config: Option<&str>,
+        days: i64,
+    ) -> sqlx::Result<ConversionRateRow> {
+        self.check_module_required(features_config, "checkout")?;
         let sql = r#"
             WITH conversion_metrics AS (
                 SELECT 
@@ -816,7 +847,12 @@ impl AnalyticsRepository {
     }
 
     /// Query 19: Percentual de Estoque Ocupado (Capacidade)
-    pub async fn get_inventory_capacity(&self, capacity_limit: f64) -> sqlx::Result<InventoryCapacityRow> {
+    pub async fn get_inventory_capacity(
+        &self,
+        features_config: Option<&str>,
+        capacity_limit: f64,
+    ) -> sqlx::Result<InventoryCapacityRow> {
+        self.check_module_required(features_config, "inventory")?;
         let sql = r#"
             WITH inventory_capacity AS (
                 SELECT 

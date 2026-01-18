@@ -8,18 +8,20 @@ use crate::features::analytics::services::analytics_service::AnalyticsService;
 #[tauri::command]
 pub async fn get_dashboard_stats(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
 ) -> Result<DashboardStatsDto, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_dashboard_stats().await
+    service.get_dashboard_stats(shop_id).await
 }
 
 #[tauri::command]
 pub async fn get_stock_movements(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     payload: StockMovementsFilterDto,
 ) -> Result<Vec<DailyMovementStatDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_stock_movements(payload).await
+    service.get_stock_movements(shop_id, payload).await
 }
 
 // Area Chart Commands
@@ -35,10 +37,11 @@ pub async fn get_cumulative_revenue(
 #[tauri::command]
 pub async fn get_stock_movements_area(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<Vec<StockMovementsAreaDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_stock_movements_area(days).await
+    service.get_stock_movements_area(shop_id, days).await
 }
 
 #[tauri::command]
@@ -81,9 +84,10 @@ pub async fn get_monthly_sales(
 #[tauri::command]
 pub async fn get_stock_status(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
 ) -> Result<Vec<StockStatusDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_stock_status().await
+    service.get_stock_status(shop_id).await
 }
 
 // Line Chart Commands
@@ -182,19 +186,21 @@ pub async fn get_monthly_sales_progress(
 #[tauri::command]
 pub async fn get_conversion_rate(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<ConversionRateDto, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_conversion_rate(days).await
+    service.get_conversion_rate(shop_id, days).await
 }
 
 #[tauri::command]
 pub async fn get_inventory_capacity(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     capacity_limit: Option<f64>,
 ) -> Result<InventoryCapacityDto, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_inventory_capacity(capacity_limit).await
+    service.get_inventory_capacity(shop_id, capacity_limit).await
 }
 
 // Advanced Queries Commands
