@@ -94,6 +94,10 @@ export const CustomersRepository = {
     return invoke("list_customers")
   },
 
+  async listByShop(shopId: string): Promise<Customer[]> {
+    return invoke("list_customers_by_shop", { shopId })
+  },
+
   async getById(id: string): Promise<Customer | null> {
     return invoke("get_customer", { id })
   },

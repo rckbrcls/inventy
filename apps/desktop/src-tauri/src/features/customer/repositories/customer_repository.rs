@@ -138,6 +138,19 @@ impl CustomerRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Customer>> {
+        let sql = r#"
+            SELECT DISTINCT c.* FROM customers c
+            INNER JOIN orders o ON o.customer_id = c.id
+            WHERE o.shop_id = $1
+            ORDER BY c.created_at DESC
+        "#;
+        sqlx::query_as::<_, Customer>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     pub async fn search(&self, query_str: &str) -> Result<Vec<Customer>> {
         let sql = r#"
             SELECT * FROM customers

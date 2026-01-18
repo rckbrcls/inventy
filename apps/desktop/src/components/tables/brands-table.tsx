@@ -27,17 +27,21 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
 import { Brand, BrandsRepository } from "@/lib/db/repositories/brands-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 export function BrandsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<Brand[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
-      const brands = await BrandsRepository.list()
+      const brands = await BrandsRepository.listByShop(shopId)
       setData(brands)
     } catch (error) {
       console.error("Failed to load brands:", error)
@@ -45,7 +49,7 @@ export function BrandsTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

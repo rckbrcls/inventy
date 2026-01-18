@@ -38,11 +38,11 @@ use crate::features::refund::commands::refund_commands::{
     create_refund, update_refund, delete_refund, get_refund, list_refunds, list_refunds_by_payment, update_refund_status,
 };
 use crate::features::order::commands::order_commands::{
-    create_order, update_order, delete_order, get_order, list_orders,
+    create_order, update_order, delete_order, get_order, list_orders, list_orders_by_shop,
     update_order_payment_status, update_order_fulfillment_status, cancel_order,
 };
 use crate::features::customer::commands::customer_commands::{
-    create_customer, update_customer, delete_customer, get_customer, list_customers,
+    create_customer, update_customer, delete_customer, get_customer, list_customers, list_customers_by_shop,
 };
 use crate::features::customer_address::commands::customer_address_commands::{
     create_customer_address, update_customer_address, delete_customer_address,
@@ -57,7 +57,7 @@ use crate::features::customer_group_membership::commands::customer_group_members
     list_customer_group_memberships_by_group, delete_customer_group_membership,
 };
 use crate::features::transaction::commands::transaction_commands::{
-    create_transaction, update_transaction, delete_transaction, get_transaction, list_transactions,
+    create_transaction, update_transaction, delete_transaction, get_transaction, list_transactions, list_transactions_by_shop,
     update_transaction_status, complete_sale_transaction, cancel_transaction,
 };
 use crate::features::setting::commands::setting_commands::{
@@ -69,7 +69,7 @@ use crate::features::transaction::commands::transaction_item_commands::{
 };
 use crate::features::inventory::commands::inventory_level_commands::{
     create_inventory_level, update_inventory_level, delete_inventory_level,
-    get_inventory_level, list_inventory_levels, adjust_stock, transfer_stock, get_available_quantity,
+    get_inventory_level, list_inventory_levels, list_inventory_levels_by_shop, adjust_stock, transfer_stock, get_available_quantity,
 };
 use crate::features::inventory::commands::inventory_movement_commands::{
     create_inventory_movement, list_inventory_movements,
@@ -146,6 +146,7 @@ pub fn run() {
             delete_order,
             get_order,
             list_orders,
+            list_orders_by_shop,
             update_order_payment_status,
             update_order_fulfillment_status,
             cancel_order,
@@ -170,6 +171,7 @@ pub fn run() {
             delete_customer,
             get_customer,
             list_customers,
+            list_customers_by_shop,
             // Customer Addresses
             create_customer_address,
             update_customer_address,
@@ -194,6 +196,7 @@ pub fn run() {
             delete_transaction,
             get_transaction,
             list_transactions,
+            list_transactions_by_shop,
             update_transaction_status,
             complete_sale_transaction,
             cancel_transaction,
@@ -215,6 +218,7 @@ pub fn run() {
             delete_inventory_level,
             get_inventory_level,
             list_inventory_levels,
+            list_inventory_levels_by_shop,
             adjust_stock,
             transfer_stock,
             get_available_quantity,

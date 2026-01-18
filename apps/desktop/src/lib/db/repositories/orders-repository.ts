@@ -99,6 +99,10 @@ export const OrdersRepository = {
     return invoke("list_orders")
   },
 
+  async listByShop(shopId: string): Promise<Order[]> {
+    return invoke("list_orders_by_shop", { shopId })
+  },
+
   async getById(id: string): Promise<Order | null> {
     return invoke("get_order", { id })
   },

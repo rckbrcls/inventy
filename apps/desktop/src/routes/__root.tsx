@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { useShop } from "@/hooks/use-shop"
-import React from 'react'
+import { useShopStore } from "@/stores/shop-store"
+import React, { useEffect } from 'react'
 
 
 export const Route = createRootRoute({
@@ -53,6 +54,19 @@ export const Route = createRootRoute({
 function RootComponent() {
   const location = useLocation()
   const { shop } = useShop()
+  const { setActiveShop } = useShopStore()
+
+  // Sync shop when shopId in URL changes
+  useEffect(() => {
+    const shopIdMatch = location.pathname.match(/\/shops\/([^/]+)/)
+    const shopId = shopIdMatch?.[1]
+    
+    if (shopId && shop?.id !== shopId) {
+      setActiveShop(shopId).catch((error) => {
+        console.error("Failed to sync shop:", error)
+      })
+    }
+  }, [location.pathname, shop?.id, setActiveShop])
   
   // Determine which sidebar to show based on route
   const getSidebar = () => {

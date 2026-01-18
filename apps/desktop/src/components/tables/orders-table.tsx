@@ -27,6 +27,7 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Order, OrdersRepository } from "@/lib/db/repositories/orders-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type OrderRow = Order
 
@@ -80,15 +81,18 @@ const getFulfillmentStatusBadgeVariant = (status: string | null) => {
 
 export function OrdersTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<OrderRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
   const [cancelId, setCancelId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
-      const orders = await OrdersRepository.list()
+      const orders = await OrdersRepository.listByShop(shopId)
       setData(orders)
     } catch (error) {
       console.error("Failed to load orders:", error)
@@ -96,7 +100,7 @@ export function OrdersTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

@@ -27,6 +27,7 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Transaction, TransactionsRepository } from "@/lib/db/repositories/transactions-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type TransactionRow = Transaction
 
@@ -64,15 +65,18 @@ const getStatusBadgeVariant = (status: string | null) => {
 
 export function TransactionsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<TransactionRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
   const [cancelId, setCancelId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
-      const transactions = await TransactionsRepository.list()
+      const transactions = await TransactionsRepository.listByShop(shopId)
       setData(transactions)
     } catch (error) {
       console.error("Failed to load transactions:", error)
@@ -80,7 +84,7 @@ export function TransactionsTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

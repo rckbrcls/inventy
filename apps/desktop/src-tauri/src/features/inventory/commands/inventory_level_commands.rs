@@ -67,6 +67,17 @@ pub async fn list_inventory_levels(
 }
 
 #[tauri::command]
+pub async fn list_inventory_levels_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<InventoryLevel>, String> {
+    let repo = InventoryLevelsRepository::new(pool.inner().clone());
+    repo.list_by_shop(&shop_id)
+        .await
+        .map_err(|e| format!("Failed to list inventory levels by shop: {}", e))
+}
+
+#[tauri::command]
 pub async fn adjust_stock(pool: State<'_, SqlitePool>, payload: AdjustStockDTO) -> Result<(), String> {
     let service = InventoryService::new(pool.inner().clone());
     service

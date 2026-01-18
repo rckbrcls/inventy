@@ -293,8 +293,30 @@ impl AnalyticsRepository {
     // ============================================================
 
     /// Query 1: Receita Acumulada por Dia (com Múltiplas Séries: Vendas vs Devoluções)
-    pub async fn get_cumulative_revenue(&self, days: i64) -> sqlx::Result<Vec<CumulativeRevenueRow>> {
-        let sql = r#"
+    pub async fn get_cumulative_revenue(
+        &self,
+        shop_id: Option<String>,
+        days: i64,
+    ) -> sqlx::Result<Vec<CumulativeRevenueRow>> {
+        let sql = if shop_id.is_some() {
+            r#"
+            SELECT 
+                DATE(created_at) AS date,
+                SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
+                    OVER (ORDER BY DATE(created_at)) AS cumulative_revenue,
+                SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
+                    OVER () AS total_revenue,
+                SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END) AS daily_revenue,
+                SUM(CASE WHEN status = 'cancelled' THEN total_price ELSE 0 END) AS daily_refunds
+            FROM orders
+            WHERE _status != 'deleted'
+              AND shop_id = $2
+              AND created_at >= date('now', '-' || $1 || ' days')
+            GROUP BY DATE(created_at)
+            ORDER BY date ASC
+        "#
+        } else {
+            r#"
             SELECT 
                 DATE(created_at) AS date,
                 SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
@@ -308,12 +330,14 @@ impl AnalyticsRepository {
               AND created_at >= date('now', '-' || $1 || ' days')
             GROUP BY DATE(created_at)
             ORDER BY date ASC
-        "#;
+        "#
+        };
 
-        sqlx::query_as::<_, CumulativeRevenueRow>(sql)
-            .bind(days)
-            .fetch_all(&self.pool)
-            .await
+        let mut query = sqlx::query_as::<_, CumulativeRevenueRow>(sql).bind(days);
+        if let Some(ref id) = shop_id {
+            query = query.bind(id);
+        }
+        query.fetch_all(&self.pool).await
     }
 
     /// Query 2: Vendas e Estoque Movimentado ao Longo do Tempo (Stacked Area)

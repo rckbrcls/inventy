@@ -113,6 +113,20 @@ impl TransactionsRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Transaction>> {
+        let sql = r#"
+            SELECT DISTINCT t.* FROM transactions t
+            INNER JOIN customers c ON c.id = t.customer_id
+            INNER JOIN orders o ON o.customer_id = c.id
+            WHERE o.shop_id = $1
+            ORDER BY t.created_at DESC
+        "#;
+        sqlx::query_as::<_, Transaction>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     // ============================================================
     // Transaction-aware methods for atomic operations
     // ============================================================

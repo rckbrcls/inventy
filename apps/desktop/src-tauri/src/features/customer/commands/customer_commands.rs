@@ -47,3 +47,12 @@ pub async fn list_customers(
     let service = CustomerService::new(pool.inner().clone());
     service.list_customers().await
 }
+
+#[tauri::command]
+pub async fn list_customers_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<Customer>, String> {
+    let service = CustomerService::new(pool.inner().clone());
+    service.list_customers_by_shop(&shop_id).await
+}

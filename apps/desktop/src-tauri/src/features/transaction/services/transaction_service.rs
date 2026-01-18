@@ -226,4 +226,11 @@ impl TransactionService {
             .await
             .map_err(|e| format!("Erro ao listar transações: {}", e))
     }
+
+    pub async fn list_transactions_by_shop(&self, shop_id: &str) -> Result<Vec<Transaction>, String> {
+        self.repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Erro ao listar transações por shop: {}", e))
+    }
 }

@@ -27,19 +27,23 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Customer, CustomersRepository } from "@/lib/db/repositories/customers-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type CustomerRow = Customer
 
 export function CustomersTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<CustomerRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
-      const customers = await CustomersRepository.list()
+      const customers = await CustomersRepository.listByShop(shopId)
       setData(customers)
     } catch (error) {
       console.error("Failed to load customers:", error)
@@ -47,7 +51,7 @@ export function CustomersTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

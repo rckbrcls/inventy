@@ -111,6 +111,21 @@ impl<'a> PaymentsRepository<'a> {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Payment>> {
+        let sql = r#"
+            SELECT DISTINCT p.* FROM payments p
+            INNER JOIN transactions t ON t.id = p.transaction_id
+            INNER JOIN customers c ON c.id = t.customer_id
+            INNER JOIN orders o ON o.customer_id = c.id
+            WHERE o.shop_id = $1
+            ORDER BY p.created_at DESC
+        "#;
+        sqlx::query_as::<_, Payment>(sql)
+            .bind(shop_id)
+            .fetch_all(self.pool)
+            .await
+    }
+
     pub async fn delete(&self, id: &str) -> Result<()> {
         let sql = "DELETE FROM payments WHERE id = $1";
         sqlx::query(sql).bind(id).execute(self.pool).await?;

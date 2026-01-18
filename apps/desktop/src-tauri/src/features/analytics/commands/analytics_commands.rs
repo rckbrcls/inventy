@@ -28,10 +28,11 @@ pub async fn get_stock_movements(
 #[tauri::command]
 pub async fn get_cumulative_revenue(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<Vec<CumulativeRevenueDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_cumulative_revenue(days).await
+    service.get_cumulative_revenue(shop_id, days).await
 }
 
 #[tauri::command]
@@ -47,38 +48,42 @@ pub async fn get_stock_movements_area(
 #[tauri::command]
 pub async fn get_revenue_by_payment_method(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<Vec<RevenueByPaymentMethodDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_revenue_by_payment_method(days).await
+    service.get_revenue_by_payment_method(shop_id, days).await
 }
 
 // Bar Chart Commands
 #[tauri::command]
 pub async fn get_top_products(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
     limit: Option<i64>,
 ) -> Result<Vec<TopProductDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_top_products(days, limit).await
+    service.get_top_products(shop_id, days, limit).await
 }
 
 #[tauri::command]
 pub async fn get_revenue_by_category(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
 ) -> Result<Vec<RevenueByCategoryDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_revenue_by_category().await
+    service.get_revenue_by_category(shop_id).await
 }
 
 #[tauri::command]
 pub async fn get_monthly_sales(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     months: Option<i64>,
 ) -> Result<Vec<MonthlySalesDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_monthly_sales(months).await
+    service.get_monthly_sales(shop_id, months).await
 }
 
 #[tauri::command]
@@ -94,55 +99,61 @@ pub async fn get_stock_status(
 #[tauri::command]
 pub async fn get_daily_sales_trend(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<Vec<DailySalesTrendDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_daily_sales_trend(days).await
+    service.get_daily_sales_trend(shop_id, days).await
 }
 
 #[tauri::command]
 pub async fn get_customer_growth(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     months: Option<i64>,
 ) -> Result<Vec<CustomerGrowthDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_customer_growth(months).await
+    service.get_customer_growth(shop_id, months).await
 }
 
 #[tauri::command]
 pub async fn get_average_order_value(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     months: Option<i64>,
 ) -> Result<Vec<AverageOrderValueDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_average_order_value(months).await
+    service.get_average_order_value(shop_id, months).await
 }
 
 // Pie Chart Commands
 #[tauri::command]
 pub async fn get_payment_method_distribution(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<Vec<PaymentMethodDistributionDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_payment_method_distribution(days).await
+    service.get_payment_method_distribution(shop_id, days).await
 }
 
 #[tauri::command]
 pub async fn get_category_distribution(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
 ) -> Result<Vec<CategoryDistributionDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_category_distribution().await
+    service.get_category_distribution(shop_id).await
 }
 
 #[tauri::command]
 pub async fn get_order_status_distribution(
     pool: State<'_, SqlitePool>,
+    shop_id: Option<String>,
     days: Option<i64>,
 ) -> Result<Vec<OrderStatusDistributionDto>, String> {
     let service = AnalyticsService::new(pool.inner().clone());
-    service.get_order_status_distribution(days).await
+    service.get_order_status_distribution(shop_id, days).await
 }
 
 #[tauri::command]

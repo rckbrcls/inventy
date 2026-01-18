@@ -195,50 +195,50 @@ export const AnalyticsRepository = {
   },
 
   // Area Chart Methods
-  async getCumulativeRevenue(days?: number): Promise<CumulativeRevenue[]> {
-    return invoke("get_cumulative_revenue", { days })
+  async getCumulativeRevenue(shopId?: string, days?: number): Promise<CumulativeRevenue[]> {
+    return invoke("get_cumulative_revenue", { shop_id: shopId || null, days })
   },
-  async getStockMovementsArea(days?: number): Promise<StockMovementsArea[]> {
-    return invoke("get_stock_movements_area", { days })
+  async getStockMovementsArea(shopId?: string, days?: number): Promise<StockMovementsArea[]> {
+    return invoke("get_stock_movements_area", { shop_id: shopId || null, days })
   },
-  async getRevenueByPaymentMethod(days?: number): Promise<RevenueByPaymentMethod[]> {
-    return invoke("get_revenue_by_payment_method", { days })
+  async getRevenueByPaymentMethod(shopId?: string, days?: number): Promise<RevenueByPaymentMethod[]> {
+    return invoke("get_revenue_by_payment_method", { shop_id: shopId || null, days })
   },
 
   // Bar Chart Methods
-  async getTopProducts(days?: number, limit?: number): Promise<TopProduct[]> {
-    return invoke("get_top_products", { days, limit })
+  async getTopProducts(shopId?: string, days?: number, limit?: number): Promise<TopProduct[]> {
+    return invoke("get_top_products", { shop_id: shopId || null, days, limit })
   },
-  async getRevenueByCategory(): Promise<RevenueByCategory[]> {
-    return invoke("get_revenue_by_category")
+  async getRevenueByCategory(shopId?: string): Promise<RevenueByCategory[]> {
+    return invoke("get_revenue_by_category", { shop_id: shopId || null })
   },
-  async getMonthlySales(months?: number): Promise<MonthlySales[]> {
-    return invoke("get_monthly_sales", { months })
+  async getMonthlySales(shopId?: string, months?: number): Promise<MonthlySales[]> {
+    return invoke("get_monthly_sales", { shop_id: shopId || null, months })
   },
-  async getStockStatus(): Promise<StockStatus[]> {
-    return invoke("get_stock_status")
+  async getStockStatus(shopId?: string): Promise<StockStatus[]> {
+    return invoke("get_stock_status", { shop_id: shopId || null })
   },
 
   // Line Chart Methods
-  async getDailySalesTrend(days?: number): Promise<DailySalesTrend[]> {
-    return invoke("get_daily_sales_trend", { days })
+  async getDailySalesTrend(shopId?: string, days?: number): Promise<DailySalesTrend[]> {
+    return invoke("get_daily_sales_trend", { shop_id: shopId || null, days })
   },
-  async getCustomerGrowth(months?: number): Promise<CustomerGrowth[]> {
-    return invoke("get_customer_growth", { months })
+  async getCustomerGrowth(shopId?: string, months?: number): Promise<CustomerGrowth[]> {
+    return invoke("get_customer_growth", { shop_id: shopId || null, months })
   },
-  async getAverageOrderValue(months?: number): Promise<AverageOrderValue[]> {
-    return invoke("get_average_order_value", { months })
+  async getAverageOrderValue(shopId?: string, months?: number): Promise<AverageOrderValue[]> {
+    return invoke("get_average_order_value", { shop_id: shopId || null, months })
   },
 
   // Pie Chart Methods
-  async getPaymentMethodDistribution(days?: number): Promise<PaymentMethodDistribution[]> {
-    return invoke("get_payment_method_distribution", { days })
+  async getPaymentMethodDistribution(shopId?: string, days?: number): Promise<PaymentMethodDistribution[]> {
+    return invoke("get_payment_method_distribution", { shop_id: shopId || null, days })
   },
-  async getCategoryDistribution(): Promise<CategoryDistribution[]> {
-    return invoke("get_category_distribution")
+  async getCategoryDistribution(shopId?: string): Promise<CategoryDistribution[]> {
+    return invoke("get_category_distribution", { shop_id: shopId || null })
   },
-  async getOrderStatusDistribution(days?: number): Promise<OrderStatusDistribution[]> {
-    return invoke("get_order_status_distribution", { days })
+  async getOrderStatusDistribution(shopId?: string, days?: number): Promise<OrderStatusDistribution[]> {
+    return invoke("get_order_status_distribution", { shop_id: shopId || null, days })
   },
   async getCustomerGroupDistribution(): Promise<CustomerGroupDistribution[]> {
     return invoke("get_customer_group_distribution")

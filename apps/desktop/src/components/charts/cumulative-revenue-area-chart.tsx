@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type CumulativeRevenue } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
+import { useShop } from "@/hooks/use-shop"
 
 const chartConfig = {
   cumulativeRevenue: {
@@ -40,15 +41,17 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function CumulativeRevenueAreaChart() {
+  const { shopId } = useShop()
   const [timeRange, setTimeRange] = React.useState<number>(90)
   const [data, setData] = React.useState<CumulativeRevenue[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
     async function loadData() {
+      if (!shopId) return
       try {
         setLoading(true)
-        const revenueData = await AnalyticsRepository.getCumulativeRevenue(timeRange)
+        const revenueData = await AnalyticsRepository.getCumulativeRevenue(shopId, timeRange)
         setData(revenueData)
       } catch (error) {
         console.error("Failed to load cumulative revenue data", error)
@@ -57,7 +60,7 @@ export function CumulativeRevenueAreaChart() {
       }
     }
     loadData()
-  }, [timeRange])
+  }, [shopId, timeRange])
 
   const chartData = React.useMemo(() => {
     return data.map((d) => ({

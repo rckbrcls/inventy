@@ -46,6 +46,10 @@ export const BrandsRepository = {
     return invoke("list_brands")
   },
 
+  async listByShop(shopId: string): Promise<Brand[]> {
+    return invoke("list_brands_by_shop", { shopId })
+  },
+
   async getById(id: string): Promise<Brand | null> {
     return invoke("get_brand", { id })
   },

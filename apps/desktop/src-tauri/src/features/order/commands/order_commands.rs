@@ -63,6 +63,15 @@ pub async fn list_orders(pool: State<'_, SqlitePool>) -> Result<Vec<Order>, Stri
 }
 
 #[tauri::command]
+pub async fn list_orders_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<Order>, String> {
+    let service = OrderService::new(pool.inner().clone());
+    service.list_orders_by_shop(&shop_id).await
+}
+
+#[tauri::command]
 pub async fn update_order_payment_status(
     pool: State<'_, SqlitePool>,
     payload: UpdatePaymentStatusDTO,

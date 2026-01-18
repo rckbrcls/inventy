@@ -29,6 +29,7 @@ import { Product, ProductsRepository } from "@/lib/db/repositories/products-repo
 import { Brand, BrandsRepository } from "@/lib/db/repositories/brands-repository"
 import { Category, CategoriesRepository } from "@/lib/db/repositories/categories-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type ProductRow = Product & {
   brand_name?: string
@@ -37,6 +38,7 @@ type ProductRow = Product & {
 
 export function ProductsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<ProductRow[]>([])
   const [brands, setBrands] = React.useState<Brand[]>([])
   const [categories, setCategories] = React.useState<Category[]>([])
@@ -44,12 +46,14 @@ export function ProductsTable() {
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
       const [products, brandsData, categoriesData] = await Promise.all([
-        ProductsRepository.list(),
-        BrandsRepository.list(),
-        CategoriesRepository.list(),
+        ProductsRepository.listFiltered({ shop_id: shopId }),
+        BrandsRepository.listByShop(shopId),
+        CategoriesRepository.listByShop(shopId),
       ])
       setBrands(brandsData)
       setCategories(categoriesData)
@@ -70,7 +74,7 @@ export function ProductsTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

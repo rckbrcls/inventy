@@ -32,6 +32,7 @@ import {
 import { LocationsRepository } from "@/lib/db/repositories/locations-repository"
 import { ProductsRepository } from "@/lib/db/repositories/products-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type InventoryLevelRow = InventoryLevel & {
   product_name?: string
@@ -55,16 +56,19 @@ const getStockStatusBadgeVariant = (status: string | null) => {
 
 export function InventoryTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<InventoryLevelRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
       const [inventoryLevels, products, locations] = await Promise.all([
-        InventoryLevelsRepository.list(),
-        ProductsRepository.list(),
+        InventoryLevelsRepository.listByShop(shopId),
+        ProductsRepository.listFiltered({ shop_id: shopId }),
         LocationsRepository.list(),
       ])
 
@@ -84,7 +88,7 @@ export function InventoryTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

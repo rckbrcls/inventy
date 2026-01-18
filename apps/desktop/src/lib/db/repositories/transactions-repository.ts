@@ -76,6 +76,10 @@ export const TransactionsRepository = {
     return invoke("list_transactions")
   },
 
+  async listByShop(shopId: string): Promise<Transaction[]> {
+    return invoke("list_transactions_by_shop", { shopId })
+  },
+
   async getById(id: string): Promise<Transaction | null> {
     return invoke("get_transaction", { id })
   },

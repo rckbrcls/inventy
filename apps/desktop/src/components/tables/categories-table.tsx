@@ -27,6 +27,7 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
 import { Category, CategoriesRepository } from "@/lib/db/repositories/categories-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type CategoryWithParentName = Category & {
   parent_name?: string | null
@@ -34,14 +35,17 @@ type CategoryWithParentName = Category & {
 
 export function CategoriesTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<CategoryWithParentName[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+    
     try {
       setIsLoading(true)
-      const categories = await CategoriesRepository.list()
+      const categories = await CategoriesRepository.listByShop(shopId)
 
       // Map parent_id to parent_name for display
       const categoriesWithParent = categories.map((cat) => {
@@ -59,7 +63,7 @@ export function CategoriesTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

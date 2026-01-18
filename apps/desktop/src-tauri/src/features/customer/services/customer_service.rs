@@ -84,4 +84,11 @@ impl CustomerService {
             .await
             .map_err(|e| format!("Failed to list customers: {}", e))
     }
+
+    pub async fn list_customers_by_shop(&self, shop_id: &str) -> Result<Vec<Customer>, String> {
+        self.repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Failed to list customers by shop: {}", e))
+    }
 }

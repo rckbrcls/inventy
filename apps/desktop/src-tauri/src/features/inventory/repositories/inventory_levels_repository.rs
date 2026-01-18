@@ -99,6 +99,21 @@ impl InventoryLevelsRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<InventoryLevel>> {
+        let sql = r#"
+            SELECT DISTINCT il.* FROM inventory_levels il
+            INNER JOIN products p ON p.id = il.product_id
+            LEFT JOIN categories c ON c.id = p.category_id
+            LEFT JOIN brands b ON b.id = p.brand_id
+            WHERE (c.shop_id = $1 OR b.shop_id = $1)
+            ORDER BY il.created_at DESC
+        "#;
+        sqlx::query_as::<_, InventoryLevel>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     // ============================================================
     // Transaction-aware methods for atomic operations
     // ============================================================

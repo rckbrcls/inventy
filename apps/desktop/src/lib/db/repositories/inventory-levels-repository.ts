@@ -62,6 +62,10 @@ export const InventoryLevelsRepository = {
     return invoke("list_inventory_levels")
   },
 
+  async listByShop(shopId: string): Promise<InventoryLevel[]> {
+    return invoke("list_inventory_levels_by_shop", { shopId })
+  },
+
   async getById(id: string): Promise<InventoryLevel | null> {
     return invoke("get_inventory_level", { id })
   },

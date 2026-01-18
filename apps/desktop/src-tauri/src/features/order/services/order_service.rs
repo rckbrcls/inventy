@@ -191,6 +191,14 @@ impl OrderService {
         Ok(orders)
     }
 
+    /// List orders by shop
+    pub async fn list_orders_by_shop(&self, shop_id: &str) -> Result<Vec<Order>, String> {
+        self.orders_repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Erro ao listar orders por shop: {}", e))
+    }
+
     // ============================================================
     // Helper methods
     // ============================================================

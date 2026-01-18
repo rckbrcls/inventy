@@ -226,4 +226,12 @@ impl PaymentService {
 
         Ok(amount)
     }
+
+    /// List payments by shop
+    pub async fn list_payments_by_shop(&self, shop_id: &str) -> Result<Vec<Payment>, String> {
+        let repo = PaymentsRepository::new(&self.pool);
+        repo.list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Erro ao listar pagamentos por shop: {}", e))
+    }
 }
