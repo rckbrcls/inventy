@@ -1,5 +1,4 @@
 use crate::features::module::dtos::module_dto::ModuleDto;
-use crate::features::module::models::module_model::Module;
 use crate::features::module::repositories::modules_repository::ModulesRepository;
 use sqlx::SqlitePool;
 

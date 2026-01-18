@@ -20,6 +20,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { useShop } from "@/hooks/use-shop"
 import React from 'react'
 
 
@@ -51,6 +52,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const location = useLocation()
+  const { shop } = useShop()
   
   // Determine which sidebar to show based on route
   const getSidebar = () => {
@@ -70,6 +72,53 @@ function RootComponent() {
     return <AppSidebar />
   }
 
+  // Build breadcrumb items
+  const getBreadcrumbItems = () => {
+    const isShopRoute = location.pathname.startsWith("/shops/") && !location.pathname.startsWith("/shops/new")
+    
+    if (!isShopRoute || location.pathname === "/") {
+      // Normal breadcrumb for non-shop routes
+      if (location.pathname === '/') return []
+      
+      return location.pathname.split('/').filter(Boolean).map((segment, index, array) => {
+        const isLast = index === array.length - 1
+        const path = '/' + array.slice(0, index + 1).join('/')
+
+        return {
+          label: segment.charAt(0).toUpperCase() + segment.slice(1),
+          path,
+          isLast,
+        }
+      })
+    }
+    
+    // Shop route breadcrumb: Shops > [Shop Name] > [rest of segments]
+    const pathSegments = location.pathname.split('/').filter(Boolean)
+    const shopIdIndex = pathSegments.indexOf('shops') + 1
+    const shopId = pathSegments[shopIdIndex]
+    const remainingSegments = pathSegments.slice(shopIdIndex + 1)
+    
+    const items = [
+      { label: shop?.name || 'Shop', path: `/shops/${shopId}/`, isLast: remainingSegments.length === 0 },
+    ]
+    
+    if (remainingSegments.length > 0) {
+      remainingSegments.forEach((segment, index) => {
+        const isLast = index === remainingSegments.length - 1
+        const path = `/shops/${shopId}/${remainingSegments.slice(0, index + 1).join('/')}`
+        items.push({
+          label: segment.charAt(0).toUpperCase() + segment.slice(1),
+          path,
+          isLast,
+        })
+      })
+    }
+    
+    return items
+  }
+
+  const breadcrumbItems = getBreadcrumbItems()
+
   return (
     <SidebarProvider>
       {getSidebar()}
@@ -85,32 +134,27 @@ function RootComponent() {
                     <Link to="/">Shops</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                {location.pathname !== '/' && (
+                {breadcrumbItems.length > 0 && (
                   <>
                     <BreadcrumbSeparator className="hidden md:block" />
-                    {location.pathname.split('/').filter(Boolean).map((segment, index, array) => {
-                      const isLast = index === array.length - 1
-                      const path = '/' + array.slice(0, index + 1).join('/')
-
-                      return (
-                        <React.Fragment key={path}>
-                          <BreadcrumbItem>
-                            {isLast ? (
-                              <BreadcrumbPage>
-                                {segment.charAt(0).toUpperCase() + segment.slice(1)}
-                              </BreadcrumbPage>
-                            ) : (
-                              <BreadcrumbLink asChild>
-                                <Link to={path}>
-                                  {segment.charAt(0).toUpperCase() + segment.slice(1)}
-                                </Link>
-                              </BreadcrumbLink>
-                            )}
-                          </BreadcrumbItem>
-                          {!isLast && <BreadcrumbSeparator className="hidden md:block" />}
-                        </React.Fragment>
-                      )
-                    })}
+                    {breadcrumbItems.map((item, index) => (
+                      <React.Fragment key={item.path || index}>
+                        <BreadcrumbItem>
+                          {item.isLast ? (
+                            <BreadcrumbPage>
+                              {item.label}
+                            </BreadcrumbPage>
+                          ) : (
+                            <BreadcrumbLink asChild>
+                              <Link to={item.path}>
+                                {item.label}
+                              </Link>
+                            </BreadcrumbLink>
+                          )}
+                        </BreadcrumbItem>
+                        {!item.isLast && <BreadcrumbSeparator className="hidden md:block" />}
+                      </React.Fragment>
+                    ))}
                   </>
                 )}
               </BreadcrumbList>

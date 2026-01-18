@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Link } from "@tanstack/react-router"
-import { Building2, Edit, Trash2, MoreHorizontal, CheckCircle2 } from "lucide-react"
+import { Building2, Edit, Trash2, MoreHorizontal } from "lucide-react"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -35,11 +34,9 @@ import { useShops } from "@/hooks/use-shops"
 
 interface ShopCardProps {
   shop: Shop
-  isActive: boolean
-  onSelect: () => void
 }
 
-export function ShopCard({ shop, isActive, onSelect }: ShopCardProps) {
+export function ShopCard({ shop }: ShopCardProps) {
   const { deleteShop, setDefaultShop } = useShops()
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false)
   const [isDeleting, setIsDeleting] = React.useState(false)
@@ -80,86 +77,86 @@ export function ShopCard({ shop, isActive, onSelect }: ShopCardProps) {
 
   return (
     <>
-      <Card className={`relative ${isActive ? "ring-2 ring-primary" : ""}`}>
-        {isActive && (
-          <div className="absolute top-2 right-2">
-            <CheckCircle2 className="h-5 w-5 text-primary" />
-          </div>
-        )}
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-muted-foreground" />
-              <CardTitle>{shop.name}</CardTitle>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link to="/shops/$shopId/" params={{ shopId: shop.id }}>
-                    Open
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSetDefault}>
-                  Set as Default
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setDeleteDialogOpen(true)}
-                  className="text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <CardDescription>
-            {shop.slug} {shop.is_default && <Badge variant="secondary">Default</Badge>}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Status:</span>
-              <Badge variant={shop.status === "active" ? "default" : "secondary"}>
-                {shop.status}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Currency:</span>
-              <span>{shop.currency}</span>
-            </div>
-            {enabledModules.length > 0 && (
-              <div className="mt-2">
-                <span className="text-xs text-muted-foreground">Modules: </span>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {enabledModules.slice(0, 3).map((module) => (
-                    <Badge key={module} variant="outline" className="text-xs">
-                      {module}
-                    </Badge>
-                  ))}
-                  {enabledModules.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{enabledModules.length - 3}
-                    </Badge>
-                  )}
-                </div>
+      <Link
+        to="/shops/$shopId/"
+        params={{ shopId: shop.id }}
+        className="block cursor-pointer"
+      >
+        <Card className="relative hover:shadow-md transition-shadow">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-muted-foreground" />
+                <CardTitle>{shop.name}</CardTitle>
               </div>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={onSelect} className="w-full" variant={isActive ? "default" : "outline"}>
-            {isActive ? "Current Shop" : "Select Shop"}
-          </Button>
-        </CardFooter>
-      </Card>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuItem asChild>
+                    <Link to="/shops/$shopId/" params={{ shopId: shop.id }}>
+                      Open
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSetDefault}>
+                    Set as Default
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setDeleteDialogOpen(true)}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <CardDescription>
+              {shop.slug} {shop.is_default && <Badge variant="secondary">Default</Badge>}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Status:</span>
+                <Badge variant={shop.status === "active" ? "default" : "secondary"}>
+                  {shop.status}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Currency:</span>
+                <span>{shop.currency}</span>
+              </div>
+              {enabledModules.length > 0 && (
+                <div className="mt-2">
+                  <span className="text-xs text-muted-foreground">Modules: </span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {enabledModules.slice(0, 3).map((module) => (
+                      <Badge key={module} variant="outline" className="text-xs">
+                        {module}
+                      </Badge>
+                    ))}
+                    {enabledModules.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{enabledModules.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

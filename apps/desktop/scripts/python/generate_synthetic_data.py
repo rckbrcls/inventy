@@ -163,6 +163,8 @@ class SyntheticDataGenerator:
             self.generate_users(cursor)
             self.generate_roles(cursor)
             self.generate_locations(cursor)
+            self.generate_modules(cursor)
+            self.generate_shop_templates(cursor)
 
             # Level 1: First level dependencies
             print("\n[Level 1] Generating first level dependencies...")
@@ -248,6 +250,8 @@ class SyntheticDataGenerator:
             "inquiry_messages",
             "reviews",
             "product_metrics",
+            "modules",
+            "shop_templates",
         ]
 
         print("\n" + "=" * 50)
@@ -431,6 +435,273 @@ class SyntheticDataGenerator:
             )
 
         print(f"  ✓ Generated {count} locations")
+
+    def generate_modules(self, cursor: sqlite3.Cursor):
+        """Generate module records."""
+        # Módulos Core (sempre habilitados)
+        core_modules = [
+            ("mod-products", "products", "Produtos", "Catálogo de produtos e serviços", "core", 1, '["products", "brands", "categories", "product_categories"]'),
+            ("mod-customers", "customers", "Clientes", "Gerenciamento de clientes", "core", 1, '["customers", "customer_addresses", "customer_groups", "customer_group_memberships"]'),
+            ("mod-transactions", "transactions", "Transações", "Registro de transações financeiras", "core", 1, '["transactions", "transaction_items"]'),
+            ("mod-orders", "orders", "Pedidos", "Gerenciamento de pedidos", "core", 1, '["orders"]'),
+            ("mod-payments", "payments", "Pagamentos", "Processamento de pagamentos", "core", 1, '["payments", "refunds"]'),
+        ]
+
+        # Módulos Opcionais - Logística
+        logistics_modules = [
+            ("mod-shipping", "shipping", "Entrega", "Gerenciamento de entregas e frete", "logistics", '["orders"]', '["shipments", "shipment_items", "shipment_events"]'),
+            ("mod-inventory", "inventory", "Estoque", "Controle de estoque e inventário", "logistics", '["products"]', '["inventory_levels", "inventory_movements"]'),
+            ("mod-locations", "locations", "Locais", "Gerenciamento de locais e depósitos", "logistics", "[]", '["locations"]'),
+        ]
+
+        # Módulos Opcionais - Vendas
+        sales_modules = [
+            ("mod-checkout", "checkout", "Checkout", "Carrinho de compras e checkout", "sales", '["products", "customers"]', '["checkouts"]'),
+            ("mod-pos", "pos", "Ponto de Venda", "Sistema de ponto de venda (PDV)", "sales", '["transactions", "inventory"]', "[]"),
+        ]
+
+        # Módulos Opcionais - Marketing e Suporte
+        marketing_modules = [
+            ("mod-reviews", "reviews", "Avaliações", "Sistema de avaliações e reviews", "marketing", '["orders", "products", "customers"]', '["reviews"]'),
+            ("mod-inquiries", "inquiries", "Atendimento", "Sistema de atendimento ao cliente (SAC)", "marketing", '["customers"]', '["inquiries"]'),
+        ]
+
+        # Módulos Opcionais - Analytics
+        analytics_modules = [
+            ("mod-analytics", "analytics", "Analytics", "Analytics e relatórios (sempre disponível)", "analytics", "[]"),
+        ]
+
+        count = 0
+
+        # Insert core modules
+        for module_id, code, name, description, category, is_core, tables_used in core_modules:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO modules (id, code, name, description, category, is_core, tables_used,
+                    required_modules, conflicts_with, version, metadata, _status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    module_id,
+                    code,
+                    name,
+                    description,
+                    category,
+                    is_core,
+                    tables_used,
+                    "[]",
+                    "[]",
+                    "1.0.0",
+                    "{}",
+                    "created",
+                    self._timestamp(365),
+                    self._timestamp(30),
+                ),
+            )
+            count += 1
+
+        # Insert logistics modules
+        for module_id, code, name, description, category, required_modules, tables_used in logistics_modules:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used,
+                    conflicts_with, is_core, version, metadata, _status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    module_id,
+                    code,
+                    name,
+                    description,
+                    category,
+                    required_modules,
+                    tables_used,
+                    "[]",
+                    0,
+                    "1.0.0",
+                    "{}",
+                    "created",
+                    self._timestamp(365),
+                    self._timestamp(30),
+                ),
+            )
+            count += 1
+
+        # Insert sales modules
+        for module_id, code, name, description, category, required_modules, tables_used in sales_modules:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used,
+                    conflicts_with, is_core, version, metadata, _status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    module_id,
+                    code,
+                    name,
+                    description,
+                    category,
+                    required_modules,
+                    tables_used,
+                    "[]",
+                    0,
+                    "1.0.0",
+                    "{}",
+                    "created",
+                    self._timestamp(365),
+                    self._timestamp(30),
+                ),
+            )
+            count += 1
+
+        # Insert marketing modules
+        for module_id, code, name, description, category, required_modules, tables_used in marketing_modules:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used,
+                    conflicts_with, is_core, version, metadata, _status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    module_id,
+                    code,
+                    name,
+                    description,
+                    category,
+                    required_modules,
+                    tables_used,
+                    "[]",
+                    0,
+                    "1.0.0",
+                    "{}",
+                    "created",
+                    self._timestamp(365),
+                    self._timestamp(30),
+                ),
+            )
+            count += 1
+
+        # Insert analytics modules
+        for module_id, code, name, description, category, tables_used in analytics_modules:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO modules (id, code, name, description, category, tables_used,
+                    required_modules, conflicts_with, is_core, version, metadata, _status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    module_id,
+                    code,
+                    name,
+                    description,
+                    category,
+                    tables_used,
+                    "[]",
+                    "[]",
+                    0,
+                    "1.0.0",
+                    "{}",
+                    "created",
+                    self._timestamp(365),
+                    self._timestamp(30),
+                ),
+            )
+            count += 1
+
+        print(f"  ✓ Generated {count} modules")
+
+    def generate_shop_templates(self, cursor: sqlite3.Cursor):
+        """Generate shop template records."""
+        templates = [
+            (
+                "tpl-online-store",
+                "online_store",
+                "Loja Virtual",
+                "Loja online com checkout, estoque e entregas",
+                "ecommerce",
+                '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "inquiries": true, "reviews": true, "analytics": true, "pos": false, "locations": false}',
+                '{"allow_guest_checkout": true, "require_shipping": true}',
+                '["shipping", "checkout", "inventory", "reviews", "inquiries"]',
+            ),
+            (
+                "tpl-physical-store",
+                "physical_store",
+                "Loja Física",
+                "Loja física com PDV e controle de estoque",
+                "retail",
+                '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "pos": true, "inventory": true, "locations": true, "inquiries": true, "analytics": true, "shipping": false, "checkout": false, "reviews": false}',
+                '{"require_shipping": false, "allow_offline_sales": true}',
+                '["pos", "inventory", "locations"]',
+            ),
+            (
+                "tpl-marketplace",
+                "marketplace",
+                "Marketplace",
+                "Marketplace multi-vendedor completo",
+                "ecommerce",
+                '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "locations": true, "inquiries": true, "reviews": true, "analytics": true, "pos": false}',
+                '{"multi_vendor": true, "allow_guest_checkout": true, "require_shipping": true}',
+                '["shipping", "checkout", "inventory", "locations", "reviews", "inquiries"]',
+            ),
+            (
+                "tpl-hybrid-store",
+                "hybrid_store",
+                "Loja Híbrida",
+                "Loja física e virtual com todos os recursos",
+                "retail",
+                '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "pos": true, "locations": true, "inquiries": true, "reviews": true, "analytics": true}',
+                '{"allow_guest_checkout": true, "require_shipping": true, "allow_offline_sales": true}',
+                '["shipping", "checkout", "inventory", "pos", "locations", "reviews", "inquiries"]',
+            ),
+            (
+                "tpl-consulting",
+                "consulting",
+                "Consultoria",
+                "Serviços e consultoria sem necessidade de estoque ou entrega",
+                "services",
+                '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "inquiries": true, "analytics": true, "shipping": false, "inventory": false, "checkout": false, "pos": false, "reviews": false, "locations": false}',
+                '{"product_type_default": "service", "require_shipping": false}',
+                '["inquiries"]',
+            ),
+            (
+                "tpl-online-education",
+                "online_education",
+                "Aula Virtual",
+                "Plataforma de educação e cursos online",
+                "education",
+                '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "checkout": true, "inquiries": true, "reviews": true, "analytics": true, "shipping": false, "inventory": false, "pos": false, "locations": false}',
+                '{"product_type_default": "digital", "require_shipping": false, "allow_guest_checkout": false}',
+                '["checkout", "reviews", "inquiries"]',
+            ),
+        ]
+
+        count = 0
+
+        for template_id, code, name, description, category, features_config, default_settings, recommended_modules in templates:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, features_config,
+                    default_settings, recommended_modules, metadata, _status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+                (
+                    template_id,
+                    code,
+                    name,
+                    description,
+                    category,
+                    features_config,
+                    default_settings,
+                    recommended_modules,
+                    "{}",
+                    "created",
+                    self._timestamp(365),
+                    self._timestamp(30),
+                ),
+            )
+            count += 1
+
+        print(f"  ✓ Generated {count} shop templates")
 
     # ==========================================================================
     # LEVEL 1: FIRST LEVEL DEPENDENCIES

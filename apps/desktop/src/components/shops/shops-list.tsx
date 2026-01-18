@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -9,9 +9,7 @@ import { useShopStore } from "@/stores/shop-store"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function ShopsList() {
-  const navigate = useNavigate()
   const { shops } = useShops()
-  const { activeShopId, setActiveShop } = useShopStore()
   const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -22,11 +20,6 @@ export function ShopsList() {
     }
     load()
   }, [])
-
-  const handleSelectShop = async (shopId: string) => {
-    await setActiveShop(shopId)
-    navigate({ to: "/shops/$shopId/", params: { shopId } })
-  }
 
   if (isLoading) {
     return (
@@ -77,8 +70,6 @@ export function ShopsList() {
           <ShopCard
             key={shop.id}
             shop={shop}
-            isActive={activeShopId === shop.id}
-            onSelect={() => handleSelectShop(shop.id)}
           />
         ))}
       </div>
