@@ -1056,19 +1056,19 @@ INSERT OR IGNORE INTO modules (id, code, name, description, category, is_core, t
 
 -- Módulos Opcionais - Logística
 INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used) VALUES
-('mod-shipping', 'shipping', 'Entrega', 'Gerenciamento de entregas e frete', 'logistics', '["orders"]', '["shipments", "shipment_items", "shipment_events"]'),
-('mod-inventory', 'inventory', 'Estoque', 'Controle de estoque e inventário', 'logistics', '["products"]', '["inventory_levels", "inventory_movements"]'),
+('mod-shipping', 'shipping', 'Entrega', 'Gerenciamento de entregas e frete', 'logistics', '[]', '["shipments", "shipment_items", "shipment_events"]'),
+('mod-inventory', 'inventory', 'Estoque', 'Controle de estoque e inventário', 'logistics', '[]', '["inventory_levels", "inventory_movements"]'),
 ('mod-locations', 'locations', 'Locais', 'Gerenciamento de locais e depósitos', 'logistics', '[]', '["locations"]');
 
 -- Módulos Opcionais - Vendas
 INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used) VALUES
-('mod-checkout', 'checkout', 'Checkout', 'Carrinho de compras e checkout', 'sales', '["products", "customers"]', '["checkouts"]'),
-('mod-pos', 'pos', 'Ponto de Venda', 'Sistema de ponto de venda (PDV)', 'sales', '["transactions", "inventory"]', '[]');
+('mod-checkout', 'checkout', 'Checkout', 'Carrinho de compras e checkout', 'sales', '[]', '["checkouts"]'),
+('mod-pos', 'pos', 'Ponto de Venda', 'Sistema de ponto de venda (PDV)', 'sales', '[]', '[]');
 
 -- Módulos Opcionais - Marketing e Suporte
 INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used) VALUES
-('mod-reviews', 'reviews', 'Avaliações', 'Sistema de avaliações e reviews', 'marketing', '["orders", "products", "customers"]', '["reviews"]'),
-('mod-inquiries', 'inquiries', 'Atendimento', 'Sistema de atendimento ao cliente (SAC)', 'marketing', '["customers"]', '["inquiries"]');
+('mod-reviews', 'reviews', 'Avaliações', 'Sistema de avaliações e reviews', 'marketing', '[]', '["reviews", "product_metrics"]'),
+('mod-inquiries', 'inquiries', 'Atendimento', 'Sistema de atendimento ao cliente (SAC)', 'marketing', '[]', '["inquiries", "inquiry_messages"]');
 
 -- Módulos Opcionais - Analytics
 INSERT OR IGNORE INTO modules (id, code, name, description, category, tables_used) VALUES

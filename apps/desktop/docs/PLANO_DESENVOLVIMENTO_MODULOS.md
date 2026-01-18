@@ -425,20 +425,49 @@ graph TB
 ### Módulos Opcionais
 
 #### Logística
-- **`shipping`** - Entrega/Shipping (depende de: `orders`)
-- **`inventory`** - Estoque (depende de: `products`)
+- **`shipping`** - Entrega/Shipping
+  - Tabelas: `shipments`, `shipment_items`, `shipment_events`
+- **`inventory`** - Estoque
+  - Tabelas: `inventory_levels`, `inventory_movements`
 - **`locations`** - Locais/Depósitos
+  - Tabelas: `locations`
 
 #### Vendas
-- **`checkout`** - Checkout/Carrinho (depende de: `products`, `customers`)
-- **`pos`** - Ponto de Venda (depende de: `transactions`, `inventory`)
+- **`checkout`** - Checkout/Carrinho
+  - Tabelas: `checkouts`
+- **`pos`** - Ponto de Venda
+  - Tabelas: (utiliza tabelas de outros módulos - não possui tabelas próprias)
 
 #### Marketing e Suporte
-- **`reviews`** - Avaliações (depende de: `orders`, `products`, `customers`)
-- **`inquiries`** - Atendimento/SAC (depende de: `customers`)
+- **`reviews`** - Avaliações
+  - Tabelas: `reviews`, `product_metrics`
+- **`inquiries`** - Atendimento/SAC
+  - Tabelas: `inquiries`, `inquiry_messages`
 
 #### Analytics
 - **`analytics`** - Analytics/Relatórios (sempre disponível, filtra por módulos)
+  - Tabelas: (utiliza tabelas de outros módulos - não possui tabelas próprias)
+
+### Mapeamento Completo de Tabelas por Módulo
+
+| Módulo | Tabelas | Total |
+|-------|---------|-------|
+| **products** (core) | `products`, `brands`, `categories`, `product_categories` | 4 |
+| **customers** (core) | `customers`, `customer_addresses`, `customer_groups`, `customer_group_memberships` | 4 |
+| **transactions** (core) | `transactions`, `transaction_items` | 2 |
+| **orders** (core) | `orders` | 1 |
+| **payments** (core) | `payments`, `refunds` | 2 |
+| **shipping** (opcional) | `shipments`, `shipment_items`, `shipment_events` | 3 |
+| **inventory** (opcional) | `inventory_levels`, `inventory_movements` | 2 |
+| **locations** (opcional) | `locations` | 1 |
+| **checkout** (opcional) | `checkouts` | 1 |
+| **pos** (opcional) | - | 0 |
+| **reviews** (opcional) | `reviews`, `product_metrics` | 2 |
+| **inquiries** (opcional) | `inquiries`, `inquiry_messages` | 2 |
+| **analytics** (opcional) | - | 0 |
+| **TOTAL** | **24 tabelas operacionais** | **24** |
+
+**Nota**: Todas as tabelas operacionais estão cobertas e não há repetição entre módulos.
 
 ### Diagrama de Categorias
 
@@ -472,16 +501,7 @@ graph TB
         AN[analytics]
     end
 
-    SH -->|depende| OR
-    IV -->|depende| PR
-    CK -->|depende| PR
-    CK -->|depende| CU
-    PO -->|depende| TR
-    PO -->|depende| IV
-    RE -->|depende| OR
-    RE -->|depende| PR
-    RE -->|depende| CU
-    IN -->|depende| CU
+    PO -->|usa| IV
     AN -->|usa| TR
     AN -->|usa| OR
 
@@ -868,12 +888,13 @@ Para melhor performance, cachear `features_config` parseado em memória:
 - Invalidar cache quando shop é atualizado
 - Considerar usar Redis ou cache em memória (se escalar)
 
-### 3. Validação de Dependências
+### 3. Validação de Dependências (Opcional)
 
-Ao habilitar módulo, validar se dependências estão habilitadas:
-- `shipping` requer `orders`
-- `inventory` requer `products`
-- `checkout` requer `products` e `customers`
+Caso necessário no futuro, implementar validação de dependências entre módulos opcionais:
+- `pos` poderia requerer `inventory` (se ambos forem opcionais)
+- Outras dependências podem ser adicionadas conforme necessário
+
+**Nota**: Dependências de módulos core não precisam ser validadas, pois sempre estão habilitados.
 
 ---
 

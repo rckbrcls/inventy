@@ -17,9 +17,6 @@ import {
   Undo2,
   Users,
   UsersRound,
-  BarChart3,
-  MessageSquare,
-  HelpCircle,
 } from "lucide-react"
 
 import {
@@ -43,29 +40,86 @@ import { useShop } from "@/hooks/use-shop"
 import { ShopSwitcher } from "@/components/shops/shop-switcher"
 import { useLocation } from "@tanstack/react-router"
 
-const menuStructure = {
+type MenuItem = {
+  title: string
+  url: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+type ModuleConfig = {
+  code: string
+  title: string
+  icon: React.ComponentType<{ className?: string }>
+  items: MenuItem[]
+}
+
+const menuStructure: Record<string, ModuleConfig[]> = {
   core: [
-    { code: "products", title: "Products", url: "/shops/$shopId/products", icon: Package },
-    { code: "customers", title: "Customers", url: "/shops/$shopId/customers", icon: Users },
-    { code: "orders", title: "Orders", url: "/shops/$shopId/orders", icon: ShoppingCart },
-    { code: "transactions", title: "Transactions", url: "/shops/$shopId/transactions", icon: ArrowRightLeft },
-    { code: "payments", title: "Payments", url: "/shops/$shopId/payments", icon: CreditCard },
+    {
+      code: "products",
+      title: "Products",
+      icon: Package,
+      items: [
+        { title: "Products", url: "/shops/$shopId/products", icon: Package },
+        { title: "Brands", url: "/shops/$shopId/brands", icon: Tag },
+        { title: "Categories", url: "/shops/$shopId/categories", icon: Layers },
+      ],
+    },
+    {
+      code: "customers",
+      title: "Customers",
+      icon: Users,
+      items: [
+        { title: "Customers", url: "/shops/$shopId/customers", icon: Users },
+        { title: "Addresses", url: "/shops/$shopId/customers/addresses", icon: MapPin },
+        { title: "Groups", url: "/shops/$shopId/customers/groups", icon: UsersRound },
+      ],
+    },
+    {
+      code: "orders",
+      title: "Orders",
+      icon: ShoppingCart,
+      items: [
+        { title: "Orders", url: "/shops/$shopId/orders", icon: ShoppingCart },
+      ],
+    },
+    {
+      code: "transactions",
+      title: "Transactions",
+      icon: ArrowRightLeft,
+      items: [
+        { title: "Transactions", url: "/shops/$shopId/transactions", icon: ArrowRightLeft },
+      ],
+    },
+    {
+      code: "payments",
+      title: "Payments",
+      icon: CreditCard,
+      items: [
+        { title: "Payments", url: "/shops/$shopId/payments", icon: CreditCard },
+        { title: "Refunds", url: "/shops/$shopId/refunds", icon: Undo2 },
+      ],
+    },
   ],
   logistics: [
-    { code: "inventory", title: "Inventory", url: "/shops/$shopId/inventory", icon: Inbox },
-    { code: "shipping", title: "Shipping", url: "/shops/$shopId/shipping", icon: MapPin },
-    { code: "locations", title: "Locations", url: "/shops/$shopId/locations", icon: MapPin },
+    {
+      code: "inventory",
+      title: "Inventory",
+      icon: Inbox,
+      items: [
+        { title: "Inventory", url: "/shops/$shopId/inventory", icon: Inbox },
+      ],
+    },
   ],
   sales: [
-    { code: "checkout", title: "Checkout", url: "/shops/$shopId/checkout", icon: Receipt },
-    { code: "pos", title: "POS", url: "/shops/$shopId/pos", icon: Activity },
-  ],
-  marketing: [
-    { code: "reviews", title: "Reviews", url: "/shops/$shopId/reviews", icon: Tag },
-    { code: "inquiries", title: "Inquiries", url: "/shops/$shopId/inquiries", icon: MessageSquare },
-  ],
-  analytics: [
-    { code: "analytics", title: "Analytics", url: "/shops/$shopId/analytics", icon: BarChart3 },
+    {
+      code: "checkout",
+      title: "Checkout",
+      icon: Receipt,
+      items: [
+        { title: "Checkouts", url: "/shops/$shopId/checkouts", icon: Receipt },
+      ],
+    },
   ],
 }
 
@@ -77,18 +131,52 @@ export function ShopSidebar() {
   const shopIdMatch = location.pathname.match(/\/shops\/([^/]+)/)
   const shopId = shopIdMatch?.[1] || shop?.id || ""
 
-  const getEnabledItems = (category: keyof typeof menuStructure) => {
-    return menuStructure[category].filter((item) => isModuleEnabled(item.code))
+  const getEnabledModules = (category: string) => {
+    return menuStructure[category]?.filter((module) => isModuleEnabled(module.code)) || []
   }
 
-  const enabledCore = getEnabledItems("core")
-  const enabledLogistics = getEnabledItems("logistics")
-  const enabledSales = getEnabledItems("sales")
-  const enabledMarketing = getEnabledItems("marketing")
-  const enabledAnalytics = getEnabledItems("analytics")
+  const enabledCore = getEnabledModules("core")
+  const enabledLogistics = getEnabledModules("logistics")
+  const enabledSales = getEnabledModules("sales")
 
   const buildUrl = (url: string) => {
     return url.replace("$shopId", shopId)
+  }
+
+  const renderModule = (module: ModuleConfig) => {
+    const ModuleIcon = module.icon
+    
+    return (
+      <SidebarMenuItem key={module.code}>
+        <Collapsible defaultOpen className="group/collapsible">
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton>
+              <ModuleIcon className="size-4" />
+              <span>{module.title}</span>
+              <ChevronRight className="ml-auto size-4 group-data-[state=open]/collapsible:hidden" />
+              <ChevronDown className="ml-auto size-4 hidden group-data-[state=open]/collapsible:block" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarMenuSub>
+              {module.items.map((item) => {
+                const ItemIcon = item.icon
+                return (
+                  <SidebarMenuSubItem key={item.url}>
+                    <SidebarMenuSubButton asChild>
+                      <Link to={buildUrl(item.url)}>
+                        <ItemIcon className="size-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                )
+              })}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarMenuItem>
+    )
   }
 
   return (
@@ -113,137 +201,14 @@ export function ShopSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            {/* Core Section */}
-            {enabledCore.length > 0 && (
-              <SidebarMenuItem>
-                <Collapsible defaultOpen className="group/collapsible">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <Package className="size-4" />
-                      <span>Core</span>
-                      <ChevronRight className="ml-auto size-4 group-data-[state=open]/collapsible:hidden" />
-                      <ChevronDown className="ml-auto size-4 hidden group-data-[state=open]/collapsible:block" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {enabledCore.map((item) => (
-                        <SidebarMenuSubItem key={item.code}>
-                          <SidebarMenuSubButton asChild>
-                            <Link to={buildUrl(item.url)}>
-                              <item.icon />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              </SidebarMenuItem>
-            )}
+            {/* Core Modules */}
+            {enabledCore.map((module) => renderModule(module))}
 
-            {/* Logistics Section */}
-            {enabledLogistics.length > 0 && (
-              <SidebarMenuItem>
-                <Collapsible defaultOpen className="group/collapsible">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <Inbox className="size-4" />
-                      <span>Logistics</span>
-                      <ChevronRight className="ml-auto size-4 group-data-[state=open]/collapsible:hidden" />
-                      <ChevronDown className="ml-auto size-4 hidden group-data-[state=open]/collapsible:block" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {enabledLogistics.map((item) => (
-                        <SidebarMenuSubItem key={item.code}>
-                          <SidebarMenuSubButton asChild>
-                            <Link to={buildUrl(item.url)}>
-                              <item.icon />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              </SidebarMenuItem>
-            )}
+            {/* Logistics Modules */}
+            {enabledLogistics.map((module) => renderModule(module))}
 
-            {/* Sales Section */}
-            {enabledSales.length > 0 && (
-              <SidebarMenuItem>
-                <Collapsible defaultOpen className="group/collapsible">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <ShoppingCart className="size-4" />
-                      <span>Sales</span>
-                      <ChevronRight className="ml-auto size-4 group-data-[state=open]/collapsible:hidden" />
-                      <ChevronDown className="ml-auto size-4 hidden group-data-[state=open]/collapsible:block" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {enabledSales.map((item) => (
-                        <SidebarMenuSubItem key={item.code}>
-                          <SidebarMenuSubButton asChild>
-                            <Link to={buildUrl(item.url)}>
-                              <item.icon />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              </SidebarMenuItem>
-            )}
-
-            {/* Marketing Section */}
-            {enabledMarketing.length > 0 && (
-              <SidebarMenuItem>
-                <Collapsible defaultOpen className="group/collapsible">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <Tag className="size-4" />
-                      <span>Marketing</span>
-                      <ChevronRight className="ml-auto size-4 group-data-[state=open]/collapsible:hidden" />
-                      <ChevronDown className="ml-auto size-4 hidden group-data-[state=open]/collapsible:block" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {enabledMarketing.map((item) => (
-                        <SidebarMenuSubItem key={item.code}>
-                          <SidebarMenuSubButton asChild>
-                            <Link to={buildUrl(item.url)}>
-                              <item.icon />
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              </SidebarMenuItem>
-            )}
-
-            {/* Analytics - Always available */}
-            {enabledAnalytics.length > 0 && (
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to={buildUrl("/shops/$shopId/analytics")}>
-                    <BarChart3 className="size-4" />
-                    <span>Analytics</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )}
+            {/* Sales Modules */}
+            {enabledSales.map((module) => renderModule(module))}
 
             {/* Shop Settings */}
             <SidebarMenuItem>

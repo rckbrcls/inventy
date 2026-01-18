@@ -13,43 +13,43 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PairingRouteImport } from './routes/pairing'
 import { Route as MovementsRouteImport } from './routes/movements'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TransactionsIndexRouteImport } from './routes/transactions/index'
 import { Route as ShopsIndexRouteImport } from './routes/shops/index'
-import { Route as RefundsIndexRouteImport } from './routes/refunds/index'
-import { Route as ProductsIndexRouteImport } from './routes/products/index'
-import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
-import { Route as OrdersIndexRouteImport } from './routes/orders/index'
-import { Route as InventoryIndexRouteImport } from './routes/inventory/index'
-import { Route as CustomersIndexRouteImport } from './routes/customers/index'
-import { Route as CheckoutsIndexRouteImport } from './routes/checkouts/index'
-import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
-import { Route as BrandsIndexRouteImport } from './routes/brands/index'
-import { Route as TransactionsNewRouteImport } from './routes/transactions/new'
 import { Route as ShopsNewRouteImport } from './routes/shops/new'
-import { Route as RefundsNewRouteImport } from './routes/refunds/new'
-import { Route as ProductsNewRouteImport } from './routes/products/new'
-import { Route as PaymentsNewRouteImport } from './routes/payments/new'
-import { Route as OrdersNewRouteImport } from './routes/orders/new'
-import { Route as InventoryNewRouteImport } from './routes/inventory/new'
-import { Route as CustomersNewRouteImport } from './routes/customers/new'
-import { Route as CheckoutsNewRouteImport } from './routes/checkouts/new'
-import { Route as CategoriesNewRouteImport } from './routes/categories/new'
-import { Route as BrandsNewRouteImport } from './routes/brands/new'
 import { Route as ShopsShopIdIndexRouteImport } from './routes/shops/$shopId/index'
-import { Route as CustomersGroupsIndexRouteImport } from './routes/customers/groups/index'
-import { Route as CustomersAddressesIndexRouteImport } from './routes/customers/addresses/index'
-import { Route as TransactionsTransactionIdEditRouteImport } from './routes/transactions/$transactionId/edit'
-import { Route as RefundsRefundIdEditRouteImport } from './routes/refunds/$refundId/edit'
-import { Route as ProductsProductIdEditRouteImport } from './routes/products/$productId/edit'
-import { Route as PaymentsPaymentIdEditRouteImport } from './routes/payments/$paymentId/edit'
-import { Route as OrdersOrderIdEditRouteImport } from './routes/orders/$orderId/edit'
-import { Route as InventoryInventoryLevelIdEditRouteImport } from './routes/inventory/$inventoryLevelId/edit'
-import { Route as CustomersAddressesNewRouteImport } from './routes/customers/addresses/new'
-import { Route as CustomersCustomerIdEditRouteImport } from './routes/customers/$customerId/edit'
-import { Route as CheckoutsCheckoutIdEditRouteImport } from './routes/checkouts/$checkoutId/edit'
-import { Route as CategoriesCategoryIdEditRouteImport } from './routes/categories/$categoryId/edit'
-import { Route as BrandsBrandIdEditRouteImport } from './routes/brands/$brandId/edit'
-import { Route as CustomersAddressesAddressIdEditRouteImport } from './routes/customers/addresses/$addressId/edit'
+import { Route as ShopsShopIdTransactionsIndexRouteImport } from './routes/shops/$shopId/transactions/index'
+import { Route as ShopsShopIdRefundsIndexRouteImport } from './routes/shops/$shopId/refunds/index'
+import { Route as ShopsShopIdProductsIndexRouteImport } from './routes/shops/$shopId/products/index'
+import { Route as ShopsShopIdPaymentsIndexRouteImport } from './routes/shops/$shopId/payments/index'
+import { Route as ShopsShopIdOrdersIndexRouteImport } from './routes/shops/$shopId/orders/index'
+import { Route as ShopsShopIdInventoryIndexRouteImport } from './routes/shops/$shopId/inventory/index'
+import { Route as ShopsShopIdCustomersIndexRouteImport } from './routes/shops/$shopId/customers/index'
+import { Route as ShopsShopIdCheckoutsIndexRouteImport } from './routes/shops/$shopId/checkouts/index'
+import { Route as ShopsShopIdCategoriesIndexRouteImport } from './routes/shops/$shopId/categories/index'
+import { Route as ShopsShopIdBrandsIndexRouteImport } from './routes/shops/$shopId/brands/index'
+import { Route as ShopsShopIdTransactionsNewRouteImport } from './routes/shops/$shopId/transactions/new'
+import { Route as ShopsShopIdRefundsNewRouteImport } from './routes/shops/$shopId/refunds/new'
+import { Route as ShopsShopIdProductsNewRouteImport } from './routes/shops/$shopId/products/new'
+import { Route as ShopsShopIdPaymentsNewRouteImport } from './routes/shops/$shopId/payments/new'
+import { Route as ShopsShopIdOrdersNewRouteImport } from './routes/shops/$shopId/orders/new'
+import { Route as ShopsShopIdInventoryNewRouteImport } from './routes/shops/$shopId/inventory/new'
+import { Route as ShopsShopIdCustomersNewRouteImport } from './routes/shops/$shopId/customers/new'
+import { Route as ShopsShopIdCheckoutsNewRouteImport } from './routes/shops/$shopId/checkouts/new'
+import { Route as ShopsShopIdCategoriesNewRouteImport } from './routes/shops/$shopId/categories/new'
+import { Route as ShopsShopIdBrandsNewRouteImport } from './routes/shops/$shopId/brands/new'
+import { Route as ShopsShopIdCustomersGroupsIndexRouteImport } from './routes/shops/$shopId/customers/groups/index'
+import { Route as ShopsShopIdCustomersAddressesIndexRouteImport } from './routes/shops/$shopId/customers/addresses/index'
+import { Route as ShopsShopIdTransactionsTransactionIdEditRouteImport } from './routes/shops/$shopId/transactions/$transactionId/edit'
+import { Route as ShopsShopIdRefundsRefundIdEditRouteImport } from './routes/shops/$shopId/refunds/$refundId/edit'
+import { Route as ShopsShopIdProductsProductIdEditRouteImport } from './routes/shops/$shopId/products/$productId/edit'
+import { Route as ShopsShopIdPaymentsPaymentIdEditRouteImport } from './routes/shops/$shopId/payments/$paymentId/edit'
+import { Route as ShopsShopIdOrdersOrderIdEditRouteImport } from './routes/shops/$shopId/orders/$orderId/edit'
+import { Route as ShopsShopIdInventoryInventoryLevelIdEditRouteImport } from './routes/shops/$shopId/inventory/$inventoryLevelId/edit'
+import { Route as ShopsShopIdCustomersAddressesNewRouteImport } from './routes/shops/$shopId/customers/addresses/new'
+import { Route as ShopsShopIdCustomersCustomerIdEditRouteImport } from './routes/shops/$shopId/customers/$customerId/edit'
+import { Route as ShopsShopIdCheckoutsCheckoutIdEditRouteImport } from './routes/shops/$shopId/checkouts/$checkoutId/edit'
+import { Route as ShopsShopIdCategoriesCategoryIdEditRouteImport } from './routes/shops/$shopId/categories/$categoryId/edit'
+import { Route as ShopsShopIdBrandsBrandIdEditRouteImport } from './routes/shops/$shopId/brands/$brandId/edit'
+import { Route as ShopsShopIdCustomersAddressesAddressIdEditRouteImport } from './routes/shops/$shopId/customers/addresses/$addressId/edit'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -71,64 +71,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TransactionsIndexRoute = TransactionsIndexRouteImport.update({
-  id: '/transactions/',
-  path: '/transactions/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ShopsIndexRoute = ShopsIndexRouteImport.update({
   id: '/shops/',
   path: '/shops/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RefundsIndexRoute = RefundsIndexRouteImport.update({
-  id: '/refunds/',
-  path: '/refunds/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsIndexRoute = ProductsIndexRouteImport.update({
-  id: '/products/',
-  path: '/products/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentsIndexRoute = PaymentsIndexRouteImport.update({
-  id: '/payments/',
-  path: '/payments/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersIndexRoute = OrdersIndexRouteImport.update({
-  id: '/orders/',
-  path: '/orders/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryIndexRoute = InventoryIndexRouteImport.update({
-  id: '/inventory/',
-  path: '/inventory/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomersIndexRoute = CustomersIndexRouteImport.update({
-  id: '/customers/',
-  path: '/customers/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutsIndexRoute = CheckoutsIndexRouteImport.update({
-  id: '/checkouts/',
-  path: '/checkouts/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
-  id: '/categories/',
-  path: '/categories/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BrandsIndexRoute = BrandsIndexRouteImport.update({
-  id: '/brands/',
-  path: '/brands/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TransactionsNewRoute = TransactionsNewRouteImport.update({
-  id: '/transactions/new',
-  path: '/transactions/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopsNewRoute = ShopsNewRouteImport.update({
@@ -136,128 +81,202 @@ const ShopsNewRoute = ShopsNewRouteImport.update({
   path: '/shops/new',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RefundsNewRoute = RefundsNewRouteImport.update({
-  id: '/refunds/new',
-  path: '/refunds/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsNewRoute = ProductsNewRouteImport.update({
-  id: '/products/new',
-  path: '/products/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentsNewRoute = PaymentsNewRouteImport.update({
-  id: '/payments/new',
-  path: '/payments/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersNewRoute = OrdersNewRouteImport.update({
-  id: '/orders/new',
-  path: '/orders/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryNewRoute = InventoryNewRouteImport.update({
-  id: '/inventory/new',
-  path: '/inventory/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomersNewRoute = CustomersNewRouteImport.update({
-  id: '/customers/new',
-  path: '/customers/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutsNewRoute = CheckoutsNewRouteImport.update({
-  id: '/checkouts/new',
-  path: '/checkouts/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategoriesNewRoute = CategoriesNewRouteImport.update({
-  id: '/categories/new',
-  path: '/categories/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BrandsNewRoute = BrandsNewRouteImport.update({
-  id: '/brands/new',
-  path: '/brands/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ShopsShopIdIndexRoute = ShopsShopIdIndexRouteImport.update({
   id: '/shops/$shopId/',
   path: '/shops/$shopId/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CustomersGroupsIndexRoute = CustomersGroupsIndexRouteImport.update({
-  id: '/customers/groups/',
-  path: '/customers/groups/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomersAddressesIndexRoute = CustomersAddressesIndexRouteImport.update({
-  id: '/customers/addresses/',
-  path: '/customers/addresses/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TransactionsTransactionIdEditRoute =
-  TransactionsTransactionIdEditRouteImport.update({
-    id: '/transactions/$transactionId/edit',
-    path: '/transactions/$transactionId/edit',
+const ShopsShopIdTransactionsIndexRoute =
+  ShopsShopIdTransactionsIndexRouteImport.update({
+    id: '/shops/$shopId/transactions/',
+    path: '/shops/$shopId/transactions/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const RefundsRefundIdEditRoute = RefundsRefundIdEditRouteImport.update({
-  id: '/refunds/$refundId/edit',
-  path: '/refunds/$refundId/edit',
+const ShopsShopIdRefundsIndexRoute = ShopsShopIdRefundsIndexRouteImport.update({
+  id: '/shops/$shopId/refunds/',
+  path: '/shops/$shopId/refunds/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductsProductIdEditRoute = ProductsProductIdEditRouteImport.update({
-  id: '/products/$productId/edit',
-  path: '/products/$productId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentsPaymentIdEditRoute = PaymentsPaymentIdEditRouteImport.update({
-  id: '/payments/$paymentId/edit',
-  path: '/payments/$paymentId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrdersOrderIdEditRoute = OrdersOrderIdEditRouteImport.update({
-  id: '/orders/$orderId/edit',
-  path: '/orders/$orderId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryInventoryLevelIdEditRoute =
-  InventoryInventoryLevelIdEditRouteImport.update({
-    id: '/inventory/$inventoryLevelId/edit',
-    path: '/inventory/$inventoryLevelId/edit',
+const ShopsShopIdProductsIndexRoute =
+  ShopsShopIdProductsIndexRouteImport.update({
+    id: '/shops/$shopId/products/',
+    path: '/shops/$shopId/products/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const CustomersAddressesNewRoute = CustomersAddressesNewRouteImport.update({
-  id: '/customers/addresses/new',
-  path: '/customers/addresses/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomersCustomerIdEditRoute = CustomersCustomerIdEditRouteImport.update({
-  id: '/customers/$customerId/edit',
-  path: '/customers/$customerId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutsCheckoutIdEditRoute = CheckoutsCheckoutIdEditRouteImport.update({
-  id: '/checkouts/$checkoutId/edit',
-  path: '/checkouts/$checkoutId/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategoriesCategoryIdEditRoute =
-  CategoriesCategoryIdEditRouteImport.update({
-    id: '/categories/$categoryId/edit',
-    path: '/categories/$categoryId/edit',
+const ShopsShopIdPaymentsIndexRoute =
+  ShopsShopIdPaymentsIndexRouteImport.update({
+    id: '/shops/$shopId/payments/',
+    path: '/shops/$shopId/payments/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const BrandsBrandIdEditRoute = BrandsBrandIdEditRouteImport.update({
-  id: '/brands/$brandId/edit',
-  path: '/brands/$brandId/edit',
+const ShopsShopIdOrdersIndexRoute = ShopsShopIdOrdersIndexRouteImport.update({
+  id: '/shops/$shopId/orders/',
+  path: '/shops/$shopId/orders/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CustomersAddressesAddressIdEditRoute =
-  CustomersAddressesAddressIdEditRouteImport.update({
-    id: '/customers/addresses/$addressId/edit',
-    path: '/customers/addresses/$addressId/edit',
+const ShopsShopIdInventoryIndexRoute =
+  ShopsShopIdInventoryIndexRouteImport.update({
+    id: '/shops/$shopId/inventory/',
+    path: '/shops/$shopId/inventory/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCustomersIndexRoute =
+  ShopsShopIdCustomersIndexRouteImport.update({
+    id: '/shops/$shopId/customers/',
+    path: '/shops/$shopId/customers/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCheckoutsIndexRoute =
+  ShopsShopIdCheckoutsIndexRouteImport.update({
+    id: '/shops/$shopId/checkouts/',
+    path: '/shops/$shopId/checkouts/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCategoriesIndexRoute =
+  ShopsShopIdCategoriesIndexRouteImport.update({
+    id: '/shops/$shopId/categories/',
+    path: '/shops/$shopId/categories/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdBrandsIndexRoute = ShopsShopIdBrandsIndexRouteImport.update({
+  id: '/shops/$shopId/brands/',
+  path: '/shops/$shopId/brands/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdTransactionsNewRoute =
+  ShopsShopIdTransactionsNewRouteImport.update({
+    id: '/shops/$shopId/transactions/new',
+    path: '/shops/$shopId/transactions/new',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdRefundsNewRoute = ShopsShopIdRefundsNewRouteImport.update({
+  id: '/shops/$shopId/refunds/new',
+  path: '/shops/$shopId/refunds/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdProductsNewRoute = ShopsShopIdProductsNewRouteImport.update({
+  id: '/shops/$shopId/products/new',
+  path: '/shops/$shopId/products/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdPaymentsNewRoute = ShopsShopIdPaymentsNewRouteImport.update({
+  id: '/shops/$shopId/payments/new',
+  path: '/shops/$shopId/payments/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdOrdersNewRoute = ShopsShopIdOrdersNewRouteImport.update({
+  id: '/shops/$shopId/orders/new',
+  path: '/shops/$shopId/orders/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdInventoryNewRoute = ShopsShopIdInventoryNewRouteImport.update({
+  id: '/shops/$shopId/inventory/new',
+  path: '/shops/$shopId/inventory/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdCustomersNewRoute = ShopsShopIdCustomersNewRouteImport.update({
+  id: '/shops/$shopId/customers/new',
+  path: '/shops/$shopId/customers/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdCheckoutsNewRoute = ShopsShopIdCheckoutsNewRouteImport.update({
+  id: '/shops/$shopId/checkouts/new',
+  path: '/shops/$shopId/checkouts/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdCategoriesNewRoute =
+  ShopsShopIdCategoriesNewRouteImport.update({
+    id: '/shops/$shopId/categories/new',
+    path: '/shops/$shopId/categories/new',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdBrandsNewRoute = ShopsShopIdBrandsNewRouteImport.update({
+  id: '/shops/$shopId/brands/new',
+  path: '/shops/$shopId/brands/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdCustomersGroupsIndexRoute =
+  ShopsShopIdCustomersGroupsIndexRouteImport.update({
+    id: '/shops/$shopId/customers/groups/',
+    path: '/shops/$shopId/customers/groups/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCustomersAddressesIndexRoute =
+  ShopsShopIdCustomersAddressesIndexRouteImport.update({
+    id: '/shops/$shopId/customers/addresses/',
+    path: '/shops/$shopId/customers/addresses/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdTransactionsTransactionIdEditRoute =
+  ShopsShopIdTransactionsTransactionIdEditRouteImport.update({
+    id: '/shops/$shopId/transactions/$transactionId/edit',
+    path: '/shops/$shopId/transactions/$transactionId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdRefundsRefundIdEditRoute =
+  ShopsShopIdRefundsRefundIdEditRouteImport.update({
+    id: '/shops/$shopId/refunds/$refundId/edit',
+    path: '/shops/$shopId/refunds/$refundId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdProductsProductIdEditRoute =
+  ShopsShopIdProductsProductIdEditRouteImport.update({
+    id: '/shops/$shopId/products/$productId/edit',
+    path: '/shops/$shopId/products/$productId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdPaymentsPaymentIdEditRoute =
+  ShopsShopIdPaymentsPaymentIdEditRouteImport.update({
+    id: '/shops/$shopId/payments/$paymentId/edit',
+    path: '/shops/$shopId/payments/$paymentId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdOrdersOrderIdEditRoute =
+  ShopsShopIdOrdersOrderIdEditRouteImport.update({
+    id: '/shops/$shopId/orders/$orderId/edit',
+    path: '/shops/$shopId/orders/$orderId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdInventoryInventoryLevelIdEditRoute =
+  ShopsShopIdInventoryInventoryLevelIdEditRouteImport.update({
+    id: '/shops/$shopId/inventory/$inventoryLevelId/edit',
+    path: '/shops/$shopId/inventory/$inventoryLevelId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCustomersAddressesNewRoute =
+  ShopsShopIdCustomersAddressesNewRouteImport.update({
+    id: '/shops/$shopId/customers/addresses/new',
+    path: '/shops/$shopId/customers/addresses/new',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCustomersCustomerIdEditRoute =
+  ShopsShopIdCustomersCustomerIdEditRouteImport.update({
+    id: '/shops/$shopId/customers/$customerId/edit',
+    path: '/shops/$shopId/customers/$customerId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCheckoutsCheckoutIdEditRoute =
+  ShopsShopIdCheckoutsCheckoutIdEditRouteImport.update({
+    id: '/shops/$shopId/checkouts/$checkoutId/edit',
+    path: '/shops/$shopId/checkouts/$checkoutId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCategoriesCategoryIdEditRoute =
+  ShopsShopIdCategoriesCategoryIdEditRouteImport.update({
+    id: '/shops/$shopId/categories/$categoryId/edit',
+    path: '/shops/$shopId/categories/$categoryId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdBrandsBrandIdEditRoute =
+  ShopsShopIdBrandsBrandIdEditRouteImport.update({
+    id: '/shops/$shopId/brands/$brandId/edit',
+    path: '/shops/$shopId/brands/$brandId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ShopsShopIdCustomersAddressesAddressIdEditRoute =
+  ShopsShopIdCustomersAddressesAddressIdEditRouteImport.update({
+    id: '/shops/$shopId/customers/addresses/$addressId/edit',
+    path: '/shops/$shopId/customers/addresses/$addressId/edit',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -266,86 +285,86 @@ export interface FileRoutesByFullPath {
   '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
-  '/brands/new': typeof BrandsNewRoute
-  '/categories/new': typeof CategoriesNewRoute
-  '/checkouts/new': typeof CheckoutsNewRoute
-  '/customers/new': typeof CustomersNewRoute
-  '/inventory/new': typeof InventoryNewRoute
-  '/orders/new': typeof OrdersNewRoute
-  '/payments/new': typeof PaymentsNewRoute
-  '/products/new': typeof ProductsNewRoute
-  '/refunds/new': typeof RefundsNewRoute
   '/shops/new': typeof ShopsNewRoute
-  '/transactions/new': typeof TransactionsNewRoute
-  '/brands': typeof BrandsIndexRoute
-  '/categories': typeof CategoriesIndexRoute
-  '/checkouts': typeof CheckoutsIndexRoute
-  '/customers': typeof CustomersIndexRoute
-  '/inventory': typeof InventoryIndexRoute
-  '/orders': typeof OrdersIndexRoute
-  '/payments': typeof PaymentsIndexRoute
-  '/products': typeof ProductsIndexRoute
-  '/refunds': typeof RefundsIndexRoute
   '/shops': typeof ShopsIndexRoute
-  '/transactions': typeof TransactionsIndexRoute
-  '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
-  '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
-  '/checkouts/$checkoutId/edit': typeof CheckoutsCheckoutIdEditRoute
-  '/customers/$customerId/edit': typeof CustomersCustomerIdEditRoute
-  '/customers/addresses/new': typeof CustomersAddressesNewRoute
-  '/inventory/$inventoryLevelId/edit': typeof InventoryInventoryLevelIdEditRoute
-  '/orders/$orderId/edit': typeof OrdersOrderIdEditRoute
-  '/payments/$paymentId/edit': typeof PaymentsPaymentIdEditRoute
-  '/products/$productId/edit': typeof ProductsProductIdEditRoute
-  '/refunds/$refundId/edit': typeof RefundsRefundIdEditRoute
-  '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
-  '/customers/addresses': typeof CustomersAddressesIndexRoute
-  '/customers/groups': typeof CustomersGroupsIndexRoute
   '/shops/$shopId': typeof ShopsShopIdIndexRoute
-  '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
+  '/shops/$shopId/brands/new': typeof ShopsShopIdBrandsNewRoute
+  '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
+  '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
+  '/shops/$shopId/customers/new': typeof ShopsShopIdCustomersNewRoute
+  '/shops/$shopId/inventory/new': typeof ShopsShopIdInventoryNewRoute
+  '/shops/$shopId/orders/new': typeof ShopsShopIdOrdersNewRoute
+  '/shops/$shopId/payments/new': typeof ShopsShopIdPaymentsNewRoute
+  '/shops/$shopId/products/new': typeof ShopsShopIdProductsNewRoute
+  '/shops/$shopId/refunds/new': typeof ShopsShopIdRefundsNewRoute
+  '/shops/$shopId/transactions/new': typeof ShopsShopIdTransactionsNewRoute
+  '/shops/$shopId/brands': typeof ShopsShopIdBrandsIndexRoute
+  '/shops/$shopId/categories': typeof ShopsShopIdCategoriesIndexRoute
+  '/shops/$shopId/checkouts': typeof ShopsShopIdCheckoutsIndexRoute
+  '/shops/$shopId/customers': typeof ShopsShopIdCustomersIndexRoute
+  '/shops/$shopId/inventory': typeof ShopsShopIdInventoryIndexRoute
+  '/shops/$shopId/orders': typeof ShopsShopIdOrdersIndexRoute
+  '/shops/$shopId/payments': typeof ShopsShopIdPaymentsIndexRoute
+  '/shops/$shopId/products': typeof ShopsShopIdProductsIndexRoute
+  '/shops/$shopId/refunds': typeof ShopsShopIdRefundsIndexRoute
+  '/shops/$shopId/transactions': typeof ShopsShopIdTransactionsIndexRoute
+  '/shops/$shopId/brands/$brandId/edit': typeof ShopsShopIdBrandsBrandIdEditRoute
+  '/shops/$shopId/categories/$categoryId/edit': typeof ShopsShopIdCategoriesCategoryIdEditRoute
+  '/shops/$shopId/checkouts/$checkoutId/edit': typeof ShopsShopIdCheckoutsCheckoutIdEditRoute
+  '/shops/$shopId/customers/$customerId/edit': typeof ShopsShopIdCustomersCustomerIdEditRoute
+  '/shops/$shopId/customers/addresses/new': typeof ShopsShopIdCustomersAddressesNewRoute
+  '/shops/$shopId/inventory/$inventoryLevelId/edit': typeof ShopsShopIdInventoryInventoryLevelIdEditRoute
+  '/shops/$shopId/orders/$orderId/edit': typeof ShopsShopIdOrdersOrderIdEditRoute
+  '/shops/$shopId/payments/$paymentId/edit': typeof ShopsShopIdPaymentsPaymentIdEditRoute
+  '/shops/$shopId/products/$productId/edit': typeof ShopsShopIdProductsProductIdEditRoute
+  '/shops/$shopId/refunds/$refundId/edit': typeof ShopsShopIdRefundsRefundIdEditRoute
+  '/shops/$shopId/transactions/$transactionId/edit': typeof ShopsShopIdTransactionsTransactionIdEditRoute
+  '/shops/$shopId/customers/addresses': typeof ShopsShopIdCustomersAddressesIndexRoute
+  '/shops/$shopId/customers/groups': typeof ShopsShopIdCustomersGroupsIndexRoute
+  '/shops/$shopId/customers/addresses/$addressId/edit': typeof ShopsShopIdCustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
-  '/brands/new': typeof BrandsNewRoute
-  '/categories/new': typeof CategoriesNewRoute
-  '/checkouts/new': typeof CheckoutsNewRoute
-  '/customers/new': typeof CustomersNewRoute
-  '/inventory/new': typeof InventoryNewRoute
-  '/orders/new': typeof OrdersNewRoute
-  '/payments/new': typeof PaymentsNewRoute
-  '/products/new': typeof ProductsNewRoute
-  '/refunds/new': typeof RefundsNewRoute
   '/shops/new': typeof ShopsNewRoute
-  '/transactions/new': typeof TransactionsNewRoute
-  '/brands': typeof BrandsIndexRoute
-  '/categories': typeof CategoriesIndexRoute
-  '/checkouts': typeof CheckoutsIndexRoute
-  '/customers': typeof CustomersIndexRoute
-  '/inventory': typeof InventoryIndexRoute
-  '/orders': typeof OrdersIndexRoute
-  '/payments': typeof PaymentsIndexRoute
-  '/products': typeof ProductsIndexRoute
-  '/refunds': typeof RefundsIndexRoute
   '/shops': typeof ShopsIndexRoute
-  '/transactions': typeof TransactionsIndexRoute
-  '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
-  '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
-  '/checkouts/$checkoutId/edit': typeof CheckoutsCheckoutIdEditRoute
-  '/customers/$customerId/edit': typeof CustomersCustomerIdEditRoute
-  '/customers/addresses/new': typeof CustomersAddressesNewRoute
-  '/inventory/$inventoryLevelId/edit': typeof InventoryInventoryLevelIdEditRoute
-  '/orders/$orderId/edit': typeof OrdersOrderIdEditRoute
-  '/payments/$paymentId/edit': typeof PaymentsPaymentIdEditRoute
-  '/products/$productId/edit': typeof ProductsProductIdEditRoute
-  '/refunds/$refundId/edit': typeof RefundsRefundIdEditRoute
-  '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
-  '/customers/addresses': typeof CustomersAddressesIndexRoute
-  '/customers/groups': typeof CustomersGroupsIndexRoute
   '/shops/$shopId': typeof ShopsShopIdIndexRoute
-  '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
+  '/shops/$shopId/brands/new': typeof ShopsShopIdBrandsNewRoute
+  '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
+  '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
+  '/shops/$shopId/customers/new': typeof ShopsShopIdCustomersNewRoute
+  '/shops/$shopId/inventory/new': typeof ShopsShopIdInventoryNewRoute
+  '/shops/$shopId/orders/new': typeof ShopsShopIdOrdersNewRoute
+  '/shops/$shopId/payments/new': typeof ShopsShopIdPaymentsNewRoute
+  '/shops/$shopId/products/new': typeof ShopsShopIdProductsNewRoute
+  '/shops/$shopId/refunds/new': typeof ShopsShopIdRefundsNewRoute
+  '/shops/$shopId/transactions/new': typeof ShopsShopIdTransactionsNewRoute
+  '/shops/$shopId/brands': typeof ShopsShopIdBrandsIndexRoute
+  '/shops/$shopId/categories': typeof ShopsShopIdCategoriesIndexRoute
+  '/shops/$shopId/checkouts': typeof ShopsShopIdCheckoutsIndexRoute
+  '/shops/$shopId/customers': typeof ShopsShopIdCustomersIndexRoute
+  '/shops/$shopId/inventory': typeof ShopsShopIdInventoryIndexRoute
+  '/shops/$shopId/orders': typeof ShopsShopIdOrdersIndexRoute
+  '/shops/$shopId/payments': typeof ShopsShopIdPaymentsIndexRoute
+  '/shops/$shopId/products': typeof ShopsShopIdProductsIndexRoute
+  '/shops/$shopId/refunds': typeof ShopsShopIdRefundsIndexRoute
+  '/shops/$shopId/transactions': typeof ShopsShopIdTransactionsIndexRoute
+  '/shops/$shopId/brands/$brandId/edit': typeof ShopsShopIdBrandsBrandIdEditRoute
+  '/shops/$shopId/categories/$categoryId/edit': typeof ShopsShopIdCategoriesCategoryIdEditRoute
+  '/shops/$shopId/checkouts/$checkoutId/edit': typeof ShopsShopIdCheckoutsCheckoutIdEditRoute
+  '/shops/$shopId/customers/$customerId/edit': typeof ShopsShopIdCustomersCustomerIdEditRoute
+  '/shops/$shopId/customers/addresses/new': typeof ShopsShopIdCustomersAddressesNewRoute
+  '/shops/$shopId/inventory/$inventoryLevelId/edit': typeof ShopsShopIdInventoryInventoryLevelIdEditRoute
+  '/shops/$shopId/orders/$orderId/edit': typeof ShopsShopIdOrdersOrderIdEditRoute
+  '/shops/$shopId/payments/$paymentId/edit': typeof ShopsShopIdPaymentsPaymentIdEditRoute
+  '/shops/$shopId/products/$productId/edit': typeof ShopsShopIdProductsProductIdEditRoute
+  '/shops/$shopId/refunds/$refundId/edit': typeof ShopsShopIdRefundsRefundIdEditRoute
+  '/shops/$shopId/transactions/$transactionId/edit': typeof ShopsShopIdTransactionsTransactionIdEditRoute
+  '/shops/$shopId/customers/addresses': typeof ShopsShopIdCustomersAddressesIndexRoute
+  '/shops/$shopId/customers/groups': typeof ShopsShopIdCustomersGroupsIndexRoute
+  '/shops/$shopId/customers/addresses/$addressId/edit': typeof ShopsShopIdCustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -353,43 +372,43 @@ export interface FileRoutesById {
   '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
-  '/brands/new': typeof BrandsNewRoute
-  '/categories/new': typeof CategoriesNewRoute
-  '/checkouts/new': typeof CheckoutsNewRoute
-  '/customers/new': typeof CustomersNewRoute
-  '/inventory/new': typeof InventoryNewRoute
-  '/orders/new': typeof OrdersNewRoute
-  '/payments/new': typeof PaymentsNewRoute
-  '/products/new': typeof ProductsNewRoute
-  '/refunds/new': typeof RefundsNewRoute
   '/shops/new': typeof ShopsNewRoute
-  '/transactions/new': typeof TransactionsNewRoute
-  '/brands/': typeof BrandsIndexRoute
-  '/categories/': typeof CategoriesIndexRoute
-  '/checkouts/': typeof CheckoutsIndexRoute
-  '/customers/': typeof CustomersIndexRoute
-  '/inventory/': typeof InventoryIndexRoute
-  '/orders/': typeof OrdersIndexRoute
-  '/payments/': typeof PaymentsIndexRoute
-  '/products/': typeof ProductsIndexRoute
-  '/refunds/': typeof RefundsIndexRoute
   '/shops/': typeof ShopsIndexRoute
-  '/transactions/': typeof TransactionsIndexRoute
-  '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
-  '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
-  '/checkouts/$checkoutId/edit': typeof CheckoutsCheckoutIdEditRoute
-  '/customers/$customerId/edit': typeof CustomersCustomerIdEditRoute
-  '/customers/addresses/new': typeof CustomersAddressesNewRoute
-  '/inventory/$inventoryLevelId/edit': typeof InventoryInventoryLevelIdEditRoute
-  '/orders/$orderId/edit': typeof OrdersOrderIdEditRoute
-  '/payments/$paymentId/edit': typeof PaymentsPaymentIdEditRoute
-  '/products/$productId/edit': typeof ProductsProductIdEditRoute
-  '/refunds/$refundId/edit': typeof RefundsRefundIdEditRoute
-  '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
-  '/customers/addresses/': typeof CustomersAddressesIndexRoute
-  '/customers/groups/': typeof CustomersGroupsIndexRoute
   '/shops/$shopId/': typeof ShopsShopIdIndexRoute
-  '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
+  '/shops/$shopId/brands/new': typeof ShopsShopIdBrandsNewRoute
+  '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
+  '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
+  '/shops/$shopId/customers/new': typeof ShopsShopIdCustomersNewRoute
+  '/shops/$shopId/inventory/new': typeof ShopsShopIdInventoryNewRoute
+  '/shops/$shopId/orders/new': typeof ShopsShopIdOrdersNewRoute
+  '/shops/$shopId/payments/new': typeof ShopsShopIdPaymentsNewRoute
+  '/shops/$shopId/products/new': typeof ShopsShopIdProductsNewRoute
+  '/shops/$shopId/refunds/new': typeof ShopsShopIdRefundsNewRoute
+  '/shops/$shopId/transactions/new': typeof ShopsShopIdTransactionsNewRoute
+  '/shops/$shopId/brands/': typeof ShopsShopIdBrandsIndexRoute
+  '/shops/$shopId/categories/': typeof ShopsShopIdCategoriesIndexRoute
+  '/shops/$shopId/checkouts/': typeof ShopsShopIdCheckoutsIndexRoute
+  '/shops/$shopId/customers/': typeof ShopsShopIdCustomersIndexRoute
+  '/shops/$shopId/inventory/': typeof ShopsShopIdInventoryIndexRoute
+  '/shops/$shopId/orders/': typeof ShopsShopIdOrdersIndexRoute
+  '/shops/$shopId/payments/': typeof ShopsShopIdPaymentsIndexRoute
+  '/shops/$shopId/products/': typeof ShopsShopIdProductsIndexRoute
+  '/shops/$shopId/refunds/': typeof ShopsShopIdRefundsIndexRoute
+  '/shops/$shopId/transactions/': typeof ShopsShopIdTransactionsIndexRoute
+  '/shops/$shopId/brands/$brandId/edit': typeof ShopsShopIdBrandsBrandIdEditRoute
+  '/shops/$shopId/categories/$categoryId/edit': typeof ShopsShopIdCategoriesCategoryIdEditRoute
+  '/shops/$shopId/checkouts/$checkoutId/edit': typeof ShopsShopIdCheckoutsCheckoutIdEditRoute
+  '/shops/$shopId/customers/$customerId/edit': typeof ShopsShopIdCustomersCustomerIdEditRoute
+  '/shops/$shopId/customers/addresses/new': typeof ShopsShopIdCustomersAddressesNewRoute
+  '/shops/$shopId/inventory/$inventoryLevelId/edit': typeof ShopsShopIdInventoryInventoryLevelIdEditRoute
+  '/shops/$shopId/orders/$orderId/edit': typeof ShopsShopIdOrdersOrderIdEditRoute
+  '/shops/$shopId/payments/$paymentId/edit': typeof ShopsShopIdPaymentsPaymentIdEditRoute
+  '/shops/$shopId/products/$productId/edit': typeof ShopsShopIdProductsProductIdEditRoute
+  '/shops/$shopId/refunds/$refundId/edit': typeof ShopsShopIdRefundsRefundIdEditRoute
+  '/shops/$shopId/transactions/$transactionId/edit': typeof ShopsShopIdTransactionsTransactionIdEditRoute
+  '/shops/$shopId/customers/addresses/': typeof ShopsShopIdCustomersAddressesIndexRoute
+  '/shops/$shopId/customers/groups/': typeof ShopsShopIdCustomersGroupsIndexRoute
+  '/shops/$shopId/customers/addresses/$addressId/edit': typeof ShopsShopIdCustomersAddressesAddressIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -398,129 +417,129 @@ export interface FileRouteTypes {
     | '/movements'
     | '/pairing'
     | '/settings'
-    | '/brands/new'
-    | '/categories/new'
-    | '/checkouts/new'
-    | '/customers/new'
-    | '/inventory/new'
-    | '/orders/new'
-    | '/payments/new'
-    | '/products/new'
-    | '/refunds/new'
     | '/shops/new'
-    | '/transactions/new'
-    | '/brands'
-    | '/categories'
-    | '/checkouts'
-    | '/customers'
-    | '/inventory'
-    | '/orders'
-    | '/payments'
-    | '/products'
-    | '/refunds'
     | '/shops'
-    | '/transactions'
-    | '/brands/$brandId/edit'
-    | '/categories/$categoryId/edit'
-    | '/checkouts/$checkoutId/edit'
-    | '/customers/$customerId/edit'
-    | '/customers/addresses/new'
-    | '/inventory/$inventoryLevelId/edit'
-    | '/orders/$orderId/edit'
-    | '/payments/$paymentId/edit'
-    | '/products/$productId/edit'
-    | '/refunds/$refundId/edit'
-    | '/transactions/$transactionId/edit'
-    | '/customers/addresses'
-    | '/customers/groups'
     | '/shops/$shopId'
-    | '/customers/addresses/$addressId/edit'
+    | '/shops/$shopId/brands/new'
+    | '/shops/$shopId/categories/new'
+    | '/shops/$shopId/checkouts/new'
+    | '/shops/$shopId/customers/new'
+    | '/shops/$shopId/inventory/new'
+    | '/shops/$shopId/orders/new'
+    | '/shops/$shopId/payments/new'
+    | '/shops/$shopId/products/new'
+    | '/shops/$shopId/refunds/new'
+    | '/shops/$shopId/transactions/new'
+    | '/shops/$shopId/brands'
+    | '/shops/$shopId/categories'
+    | '/shops/$shopId/checkouts'
+    | '/shops/$shopId/customers'
+    | '/shops/$shopId/inventory'
+    | '/shops/$shopId/orders'
+    | '/shops/$shopId/payments'
+    | '/shops/$shopId/products'
+    | '/shops/$shopId/refunds'
+    | '/shops/$shopId/transactions'
+    | '/shops/$shopId/brands/$brandId/edit'
+    | '/shops/$shopId/categories/$categoryId/edit'
+    | '/shops/$shopId/checkouts/$checkoutId/edit'
+    | '/shops/$shopId/customers/$customerId/edit'
+    | '/shops/$shopId/customers/addresses/new'
+    | '/shops/$shopId/inventory/$inventoryLevelId/edit'
+    | '/shops/$shopId/orders/$orderId/edit'
+    | '/shops/$shopId/payments/$paymentId/edit'
+    | '/shops/$shopId/products/$productId/edit'
+    | '/shops/$shopId/refunds/$refundId/edit'
+    | '/shops/$shopId/transactions/$transactionId/edit'
+    | '/shops/$shopId/customers/addresses'
+    | '/shops/$shopId/customers/groups'
+    | '/shops/$shopId/customers/addresses/$addressId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/movements'
     | '/pairing'
     | '/settings'
-    | '/brands/new'
-    | '/categories/new'
-    | '/checkouts/new'
-    | '/customers/new'
-    | '/inventory/new'
-    | '/orders/new'
-    | '/payments/new'
-    | '/products/new'
-    | '/refunds/new'
     | '/shops/new'
-    | '/transactions/new'
-    | '/brands'
-    | '/categories'
-    | '/checkouts'
-    | '/customers'
-    | '/inventory'
-    | '/orders'
-    | '/payments'
-    | '/products'
-    | '/refunds'
     | '/shops'
-    | '/transactions'
-    | '/brands/$brandId/edit'
-    | '/categories/$categoryId/edit'
-    | '/checkouts/$checkoutId/edit'
-    | '/customers/$customerId/edit'
-    | '/customers/addresses/new'
-    | '/inventory/$inventoryLevelId/edit'
-    | '/orders/$orderId/edit'
-    | '/payments/$paymentId/edit'
-    | '/products/$productId/edit'
-    | '/refunds/$refundId/edit'
-    | '/transactions/$transactionId/edit'
-    | '/customers/addresses'
-    | '/customers/groups'
     | '/shops/$shopId'
-    | '/customers/addresses/$addressId/edit'
+    | '/shops/$shopId/brands/new'
+    | '/shops/$shopId/categories/new'
+    | '/shops/$shopId/checkouts/new'
+    | '/shops/$shopId/customers/new'
+    | '/shops/$shopId/inventory/new'
+    | '/shops/$shopId/orders/new'
+    | '/shops/$shopId/payments/new'
+    | '/shops/$shopId/products/new'
+    | '/shops/$shopId/refunds/new'
+    | '/shops/$shopId/transactions/new'
+    | '/shops/$shopId/brands'
+    | '/shops/$shopId/categories'
+    | '/shops/$shopId/checkouts'
+    | '/shops/$shopId/customers'
+    | '/shops/$shopId/inventory'
+    | '/shops/$shopId/orders'
+    | '/shops/$shopId/payments'
+    | '/shops/$shopId/products'
+    | '/shops/$shopId/refunds'
+    | '/shops/$shopId/transactions'
+    | '/shops/$shopId/brands/$brandId/edit'
+    | '/shops/$shopId/categories/$categoryId/edit'
+    | '/shops/$shopId/checkouts/$checkoutId/edit'
+    | '/shops/$shopId/customers/$customerId/edit'
+    | '/shops/$shopId/customers/addresses/new'
+    | '/shops/$shopId/inventory/$inventoryLevelId/edit'
+    | '/shops/$shopId/orders/$orderId/edit'
+    | '/shops/$shopId/payments/$paymentId/edit'
+    | '/shops/$shopId/products/$productId/edit'
+    | '/shops/$shopId/refunds/$refundId/edit'
+    | '/shops/$shopId/transactions/$transactionId/edit'
+    | '/shops/$shopId/customers/addresses'
+    | '/shops/$shopId/customers/groups'
+    | '/shops/$shopId/customers/addresses/$addressId/edit'
   id:
     | '__root__'
     | '/'
     | '/movements'
     | '/pairing'
     | '/settings'
-    | '/brands/new'
-    | '/categories/new'
-    | '/checkouts/new'
-    | '/customers/new'
-    | '/inventory/new'
-    | '/orders/new'
-    | '/payments/new'
-    | '/products/new'
-    | '/refunds/new'
     | '/shops/new'
-    | '/transactions/new'
-    | '/brands/'
-    | '/categories/'
-    | '/checkouts/'
-    | '/customers/'
-    | '/inventory/'
-    | '/orders/'
-    | '/payments/'
-    | '/products/'
-    | '/refunds/'
     | '/shops/'
-    | '/transactions/'
-    | '/brands/$brandId/edit'
-    | '/categories/$categoryId/edit'
-    | '/checkouts/$checkoutId/edit'
-    | '/customers/$customerId/edit'
-    | '/customers/addresses/new'
-    | '/inventory/$inventoryLevelId/edit'
-    | '/orders/$orderId/edit'
-    | '/payments/$paymentId/edit'
-    | '/products/$productId/edit'
-    | '/refunds/$refundId/edit'
-    | '/transactions/$transactionId/edit'
-    | '/customers/addresses/'
-    | '/customers/groups/'
     | '/shops/$shopId/'
-    | '/customers/addresses/$addressId/edit'
+    | '/shops/$shopId/brands/new'
+    | '/shops/$shopId/categories/new'
+    | '/shops/$shopId/checkouts/new'
+    | '/shops/$shopId/customers/new'
+    | '/shops/$shopId/inventory/new'
+    | '/shops/$shopId/orders/new'
+    | '/shops/$shopId/payments/new'
+    | '/shops/$shopId/products/new'
+    | '/shops/$shopId/refunds/new'
+    | '/shops/$shopId/transactions/new'
+    | '/shops/$shopId/brands/'
+    | '/shops/$shopId/categories/'
+    | '/shops/$shopId/checkouts/'
+    | '/shops/$shopId/customers/'
+    | '/shops/$shopId/inventory/'
+    | '/shops/$shopId/orders/'
+    | '/shops/$shopId/payments/'
+    | '/shops/$shopId/products/'
+    | '/shops/$shopId/refunds/'
+    | '/shops/$shopId/transactions/'
+    | '/shops/$shopId/brands/$brandId/edit'
+    | '/shops/$shopId/categories/$categoryId/edit'
+    | '/shops/$shopId/checkouts/$checkoutId/edit'
+    | '/shops/$shopId/customers/$customerId/edit'
+    | '/shops/$shopId/customers/addresses/new'
+    | '/shops/$shopId/inventory/$inventoryLevelId/edit'
+    | '/shops/$shopId/orders/$orderId/edit'
+    | '/shops/$shopId/payments/$paymentId/edit'
+    | '/shops/$shopId/products/$productId/edit'
+    | '/shops/$shopId/refunds/$refundId/edit'
+    | '/shops/$shopId/transactions/$transactionId/edit'
+    | '/shops/$shopId/customers/addresses/'
+    | '/shops/$shopId/customers/groups/'
+    | '/shops/$shopId/customers/addresses/$addressId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -528,43 +547,43 @@ export interface RootRouteChildren {
   MovementsRoute: typeof MovementsRoute
   PairingRoute: typeof PairingRoute
   SettingsRoute: typeof SettingsRoute
-  BrandsNewRoute: typeof BrandsNewRoute
-  CategoriesNewRoute: typeof CategoriesNewRoute
-  CheckoutsNewRoute: typeof CheckoutsNewRoute
-  CustomersNewRoute: typeof CustomersNewRoute
-  InventoryNewRoute: typeof InventoryNewRoute
-  OrdersNewRoute: typeof OrdersNewRoute
-  PaymentsNewRoute: typeof PaymentsNewRoute
-  ProductsNewRoute: typeof ProductsNewRoute
-  RefundsNewRoute: typeof RefundsNewRoute
   ShopsNewRoute: typeof ShopsNewRoute
-  TransactionsNewRoute: typeof TransactionsNewRoute
-  BrandsIndexRoute: typeof BrandsIndexRoute
-  CategoriesIndexRoute: typeof CategoriesIndexRoute
-  CheckoutsIndexRoute: typeof CheckoutsIndexRoute
-  CustomersIndexRoute: typeof CustomersIndexRoute
-  InventoryIndexRoute: typeof InventoryIndexRoute
-  OrdersIndexRoute: typeof OrdersIndexRoute
-  PaymentsIndexRoute: typeof PaymentsIndexRoute
-  ProductsIndexRoute: typeof ProductsIndexRoute
-  RefundsIndexRoute: typeof RefundsIndexRoute
   ShopsIndexRoute: typeof ShopsIndexRoute
-  TransactionsIndexRoute: typeof TransactionsIndexRoute
-  BrandsBrandIdEditRoute: typeof BrandsBrandIdEditRoute
-  CategoriesCategoryIdEditRoute: typeof CategoriesCategoryIdEditRoute
-  CheckoutsCheckoutIdEditRoute: typeof CheckoutsCheckoutIdEditRoute
-  CustomersCustomerIdEditRoute: typeof CustomersCustomerIdEditRoute
-  CustomersAddressesNewRoute: typeof CustomersAddressesNewRoute
-  InventoryInventoryLevelIdEditRoute: typeof InventoryInventoryLevelIdEditRoute
-  OrdersOrderIdEditRoute: typeof OrdersOrderIdEditRoute
-  PaymentsPaymentIdEditRoute: typeof PaymentsPaymentIdEditRoute
-  ProductsProductIdEditRoute: typeof ProductsProductIdEditRoute
-  RefundsRefundIdEditRoute: typeof RefundsRefundIdEditRoute
-  TransactionsTransactionIdEditRoute: typeof TransactionsTransactionIdEditRoute
-  CustomersAddressesIndexRoute: typeof CustomersAddressesIndexRoute
-  CustomersGroupsIndexRoute: typeof CustomersGroupsIndexRoute
   ShopsShopIdIndexRoute: typeof ShopsShopIdIndexRoute
-  CustomersAddressesAddressIdEditRoute: typeof CustomersAddressesAddressIdEditRoute
+  ShopsShopIdBrandsNewRoute: typeof ShopsShopIdBrandsNewRoute
+  ShopsShopIdCategoriesNewRoute: typeof ShopsShopIdCategoriesNewRoute
+  ShopsShopIdCheckoutsNewRoute: typeof ShopsShopIdCheckoutsNewRoute
+  ShopsShopIdCustomersNewRoute: typeof ShopsShopIdCustomersNewRoute
+  ShopsShopIdInventoryNewRoute: typeof ShopsShopIdInventoryNewRoute
+  ShopsShopIdOrdersNewRoute: typeof ShopsShopIdOrdersNewRoute
+  ShopsShopIdPaymentsNewRoute: typeof ShopsShopIdPaymentsNewRoute
+  ShopsShopIdProductsNewRoute: typeof ShopsShopIdProductsNewRoute
+  ShopsShopIdRefundsNewRoute: typeof ShopsShopIdRefundsNewRoute
+  ShopsShopIdTransactionsNewRoute: typeof ShopsShopIdTransactionsNewRoute
+  ShopsShopIdBrandsIndexRoute: typeof ShopsShopIdBrandsIndexRoute
+  ShopsShopIdCategoriesIndexRoute: typeof ShopsShopIdCategoriesIndexRoute
+  ShopsShopIdCheckoutsIndexRoute: typeof ShopsShopIdCheckoutsIndexRoute
+  ShopsShopIdCustomersIndexRoute: typeof ShopsShopIdCustomersIndexRoute
+  ShopsShopIdInventoryIndexRoute: typeof ShopsShopIdInventoryIndexRoute
+  ShopsShopIdOrdersIndexRoute: typeof ShopsShopIdOrdersIndexRoute
+  ShopsShopIdPaymentsIndexRoute: typeof ShopsShopIdPaymentsIndexRoute
+  ShopsShopIdProductsIndexRoute: typeof ShopsShopIdProductsIndexRoute
+  ShopsShopIdRefundsIndexRoute: typeof ShopsShopIdRefundsIndexRoute
+  ShopsShopIdTransactionsIndexRoute: typeof ShopsShopIdTransactionsIndexRoute
+  ShopsShopIdBrandsBrandIdEditRoute: typeof ShopsShopIdBrandsBrandIdEditRoute
+  ShopsShopIdCategoriesCategoryIdEditRoute: typeof ShopsShopIdCategoriesCategoryIdEditRoute
+  ShopsShopIdCheckoutsCheckoutIdEditRoute: typeof ShopsShopIdCheckoutsCheckoutIdEditRoute
+  ShopsShopIdCustomersCustomerIdEditRoute: typeof ShopsShopIdCustomersCustomerIdEditRoute
+  ShopsShopIdCustomersAddressesNewRoute: typeof ShopsShopIdCustomersAddressesNewRoute
+  ShopsShopIdInventoryInventoryLevelIdEditRoute: typeof ShopsShopIdInventoryInventoryLevelIdEditRoute
+  ShopsShopIdOrdersOrderIdEditRoute: typeof ShopsShopIdOrdersOrderIdEditRoute
+  ShopsShopIdPaymentsPaymentIdEditRoute: typeof ShopsShopIdPaymentsPaymentIdEditRoute
+  ShopsShopIdProductsProductIdEditRoute: typeof ShopsShopIdProductsProductIdEditRoute
+  ShopsShopIdRefundsRefundIdEditRoute: typeof ShopsShopIdRefundsRefundIdEditRoute
+  ShopsShopIdTransactionsTransactionIdEditRoute: typeof ShopsShopIdTransactionsTransactionIdEditRoute
+  ShopsShopIdCustomersAddressesIndexRoute: typeof ShopsShopIdCustomersAddressesIndexRoute
+  ShopsShopIdCustomersGroupsIndexRoute: typeof ShopsShopIdCustomersGroupsIndexRoute
+  ShopsShopIdCustomersAddressesAddressIdEditRoute: typeof ShopsShopIdCustomersAddressesAddressIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -597,88 +616,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/transactions/': {
-      id: '/transactions/'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof TransactionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/shops/': {
       id: '/shops/'
       path: '/shops'
       fullPath: '/shops'
       preLoaderRoute: typeof ShopsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/refunds/': {
-      id: '/refunds/'
-      path: '/refunds'
-      fullPath: '/refunds'
-      preLoaderRoute: typeof RefundsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products/': {
-      id: '/products/'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payments/': {
-      id: '/payments/'
-      path: '/payments'
-      fullPath: '/payments'
-      preLoaderRoute: typeof PaymentsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders/': {
-      id: '/orders/'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventory/': {
-      id: '/inventory/'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof InventoryIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customers/': {
-      id: '/customers/'
-      path: '/customers'
-      fullPath: '/customers'
-      preLoaderRoute: typeof CustomersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkouts/': {
-      id: '/checkouts/'
-      path: '/checkouts'
-      fullPath: '/checkouts'
-      preLoaderRoute: typeof CheckoutsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/categories/': {
-      id: '/categories/'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof CategoriesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/brands/': {
-      id: '/brands/'
-      path: '/brands'
-      fullPath: '/brands'
-      preLoaderRoute: typeof BrandsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/transactions/new': {
-      id: '/transactions/new'
-      path: '/transactions/new'
-      fullPath: '/transactions/new'
-      preLoaderRoute: typeof TransactionsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/new': {
@@ -688,69 +630,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/refunds/new': {
-      id: '/refunds/new'
-      path: '/refunds/new'
-      fullPath: '/refunds/new'
-      preLoaderRoute: typeof RefundsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products/new': {
-      id: '/products/new'
-      path: '/products/new'
-      fullPath: '/products/new'
-      preLoaderRoute: typeof ProductsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payments/new': {
-      id: '/payments/new'
-      path: '/payments/new'
-      fullPath: '/payments/new'
-      preLoaderRoute: typeof PaymentsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/orders/new': {
-      id: '/orders/new'
-      path: '/orders/new'
-      fullPath: '/orders/new'
-      preLoaderRoute: typeof OrdersNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventory/new': {
-      id: '/inventory/new'
-      path: '/inventory/new'
-      fullPath: '/inventory/new'
-      preLoaderRoute: typeof InventoryNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customers/new': {
-      id: '/customers/new'
-      path: '/customers/new'
-      fullPath: '/customers/new'
-      preLoaderRoute: typeof CustomersNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkouts/new': {
-      id: '/checkouts/new'
-      path: '/checkouts/new'
-      fullPath: '/checkouts/new'
-      preLoaderRoute: typeof CheckoutsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/categories/new': {
-      id: '/categories/new'
-      path: '/categories/new'
-      fullPath: '/categories/new'
-      preLoaderRoute: typeof CategoriesNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/brands/new': {
-      id: '/brands/new'
-      path: '/brands/new'
-      fullPath: '/brands/new'
-      preLoaderRoute: typeof BrandsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/shops/$shopId/': {
       id: '/shops/$shopId/'
       path: '/shops/$shopId'
@@ -758,102 +637,242 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsShopIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/customers/groups/': {
-      id: '/customers/groups/'
-      path: '/customers/groups'
-      fullPath: '/customers/groups'
-      preLoaderRoute: typeof CustomersGroupsIndexRouteImport
+    '/shops/$shopId/transactions/': {
+      id: '/shops/$shopId/transactions/'
+      path: '/shops/$shopId/transactions'
+      fullPath: '/shops/$shopId/transactions'
+      preLoaderRoute: typeof ShopsShopIdTransactionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/customers/addresses/': {
-      id: '/customers/addresses/'
-      path: '/customers/addresses'
-      fullPath: '/customers/addresses'
-      preLoaderRoute: typeof CustomersAddressesIndexRouteImport
+    '/shops/$shopId/refunds/': {
+      id: '/shops/$shopId/refunds/'
+      path: '/shops/$shopId/refunds'
+      fullPath: '/shops/$shopId/refunds'
+      preLoaderRoute: typeof ShopsShopIdRefundsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/transactions/$transactionId/edit': {
-      id: '/transactions/$transactionId/edit'
-      path: '/transactions/$transactionId/edit'
-      fullPath: '/transactions/$transactionId/edit'
-      preLoaderRoute: typeof TransactionsTransactionIdEditRouteImport
+    '/shops/$shopId/products/': {
+      id: '/shops/$shopId/products/'
+      path: '/shops/$shopId/products'
+      fullPath: '/shops/$shopId/products'
+      preLoaderRoute: typeof ShopsShopIdProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/refunds/$refundId/edit': {
-      id: '/refunds/$refundId/edit'
-      path: '/refunds/$refundId/edit'
-      fullPath: '/refunds/$refundId/edit'
-      preLoaderRoute: typeof RefundsRefundIdEditRouteImport
+    '/shops/$shopId/payments/': {
+      id: '/shops/$shopId/payments/'
+      path: '/shops/$shopId/payments'
+      fullPath: '/shops/$shopId/payments'
+      preLoaderRoute: typeof ShopsShopIdPaymentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/products/$productId/edit': {
-      id: '/products/$productId/edit'
-      path: '/products/$productId/edit'
-      fullPath: '/products/$productId/edit'
-      preLoaderRoute: typeof ProductsProductIdEditRouteImport
+    '/shops/$shopId/orders/': {
+      id: '/shops/$shopId/orders/'
+      path: '/shops/$shopId/orders'
+      fullPath: '/shops/$shopId/orders'
+      preLoaderRoute: typeof ShopsShopIdOrdersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/payments/$paymentId/edit': {
-      id: '/payments/$paymentId/edit'
-      path: '/payments/$paymentId/edit'
-      fullPath: '/payments/$paymentId/edit'
-      preLoaderRoute: typeof PaymentsPaymentIdEditRouteImport
+    '/shops/$shopId/inventory/': {
+      id: '/shops/$shopId/inventory/'
+      path: '/shops/$shopId/inventory'
+      fullPath: '/shops/$shopId/inventory'
+      preLoaderRoute: typeof ShopsShopIdInventoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/orders/$orderId/edit': {
-      id: '/orders/$orderId/edit'
-      path: '/orders/$orderId/edit'
-      fullPath: '/orders/$orderId/edit'
-      preLoaderRoute: typeof OrdersOrderIdEditRouteImport
+    '/shops/$shopId/customers/': {
+      id: '/shops/$shopId/customers/'
+      path: '/shops/$shopId/customers'
+      fullPath: '/shops/$shopId/customers'
+      preLoaderRoute: typeof ShopsShopIdCustomersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/inventory/$inventoryLevelId/edit': {
-      id: '/inventory/$inventoryLevelId/edit'
-      path: '/inventory/$inventoryLevelId/edit'
-      fullPath: '/inventory/$inventoryLevelId/edit'
-      preLoaderRoute: typeof InventoryInventoryLevelIdEditRouteImport
+    '/shops/$shopId/checkouts/': {
+      id: '/shops/$shopId/checkouts/'
+      path: '/shops/$shopId/checkouts'
+      fullPath: '/shops/$shopId/checkouts'
+      preLoaderRoute: typeof ShopsShopIdCheckoutsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/customers/addresses/new': {
-      id: '/customers/addresses/new'
-      path: '/customers/addresses/new'
-      fullPath: '/customers/addresses/new'
-      preLoaderRoute: typeof CustomersAddressesNewRouteImport
+    '/shops/$shopId/categories/': {
+      id: '/shops/$shopId/categories/'
+      path: '/shops/$shopId/categories'
+      fullPath: '/shops/$shopId/categories'
+      preLoaderRoute: typeof ShopsShopIdCategoriesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/customers/$customerId/edit': {
-      id: '/customers/$customerId/edit'
-      path: '/customers/$customerId/edit'
-      fullPath: '/customers/$customerId/edit'
-      preLoaderRoute: typeof CustomersCustomerIdEditRouteImport
+    '/shops/$shopId/brands/': {
+      id: '/shops/$shopId/brands/'
+      path: '/shops/$shopId/brands'
+      fullPath: '/shops/$shopId/brands'
+      preLoaderRoute: typeof ShopsShopIdBrandsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/checkouts/$checkoutId/edit': {
-      id: '/checkouts/$checkoutId/edit'
-      path: '/checkouts/$checkoutId/edit'
-      fullPath: '/checkouts/$checkoutId/edit'
-      preLoaderRoute: typeof CheckoutsCheckoutIdEditRouteImport
+    '/shops/$shopId/transactions/new': {
+      id: '/shops/$shopId/transactions/new'
+      path: '/shops/$shopId/transactions/new'
+      fullPath: '/shops/$shopId/transactions/new'
+      preLoaderRoute: typeof ShopsShopIdTransactionsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/categories/$categoryId/edit': {
-      id: '/categories/$categoryId/edit'
-      path: '/categories/$categoryId/edit'
-      fullPath: '/categories/$categoryId/edit'
-      preLoaderRoute: typeof CategoriesCategoryIdEditRouteImport
+    '/shops/$shopId/refunds/new': {
+      id: '/shops/$shopId/refunds/new'
+      path: '/shops/$shopId/refunds/new'
+      fullPath: '/shops/$shopId/refunds/new'
+      preLoaderRoute: typeof ShopsShopIdRefundsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/brands/$brandId/edit': {
-      id: '/brands/$brandId/edit'
-      path: '/brands/$brandId/edit'
-      fullPath: '/brands/$brandId/edit'
-      preLoaderRoute: typeof BrandsBrandIdEditRouteImport
+    '/shops/$shopId/products/new': {
+      id: '/shops/$shopId/products/new'
+      path: '/shops/$shopId/products/new'
+      fullPath: '/shops/$shopId/products/new'
+      preLoaderRoute: typeof ShopsShopIdProductsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/customers/addresses/$addressId/edit': {
-      id: '/customers/addresses/$addressId/edit'
-      path: '/customers/addresses/$addressId/edit'
-      fullPath: '/customers/addresses/$addressId/edit'
-      preLoaderRoute: typeof CustomersAddressesAddressIdEditRouteImport
+    '/shops/$shopId/payments/new': {
+      id: '/shops/$shopId/payments/new'
+      path: '/shops/$shopId/payments/new'
+      fullPath: '/shops/$shopId/payments/new'
+      preLoaderRoute: typeof ShopsShopIdPaymentsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/orders/new': {
+      id: '/shops/$shopId/orders/new'
+      path: '/shops/$shopId/orders/new'
+      fullPath: '/shops/$shopId/orders/new'
+      preLoaderRoute: typeof ShopsShopIdOrdersNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/inventory/new': {
+      id: '/shops/$shopId/inventory/new'
+      path: '/shops/$shopId/inventory/new'
+      fullPath: '/shops/$shopId/inventory/new'
+      preLoaderRoute: typeof ShopsShopIdInventoryNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/customers/new': {
+      id: '/shops/$shopId/customers/new'
+      path: '/shops/$shopId/customers/new'
+      fullPath: '/shops/$shopId/customers/new'
+      preLoaderRoute: typeof ShopsShopIdCustomersNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/checkouts/new': {
+      id: '/shops/$shopId/checkouts/new'
+      path: '/shops/$shopId/checkouts/new'
+      fullPath: '/shops/$shopId/checkouts/new'
+      preLoaderRoute: typeof ShopsShopIdCheckoutsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/categories/new': {
+      id: '/shops/$shopId/categories/new'
+      path: '/shops/$shopId/categories/new'
+      fullPath: '/shops/$shopId/categories/new'
+      preLoaderRoute: typeof ShopsShopIdCategoriesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/brands/new': {
+      id: '/shops/$shopId/brands/new'
+      path: '/shops/$shopId/brands/new'
+      fullPath: '/shops/$shopId/brands/new'
+      preLoaderRoute: typeof ShopsShopIdBrandsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/customers/groups/': {
+      id: '/shops/$shopId/customers/groups/'
+      path: '/shops/$shopId/customers/groups'
+      fullPath: '/shops/$shopId/customers/groups'
+      preLoaderRoute: typeof ShopsShopIdCustomersGroupsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/customers/addresses/': {
+      id: '/shops/$shopId/customers/addresses/'
+      path: '/shops/$shopId/customers/addresses'
+      fullPath: '/shops/$shopId/customers/addresses'
+      preLoaderRoute: typeof ShopsShopIdCustomersAddressesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/transactions/$transactionId/edit': {
+      id: '/shops/$shopId/transactions/$transactionId/edit'
+      path: '/shops/$shopId/transactions/$transactionId/edit'
+      fullPath: '/shops/$shopId/transactions/$transactionId/edit'
+      preLoaderRoute: typeof ShopsShopIdTransactionsTransactionIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/refunds/$refundId/edit': {
+      id: '/shops/$shopId/refunds/$refundId/edit'
+      path: '/shops/$shopId/refunds/$refundId/edit'
+      fullPath: '/shops/$shopId/refunds/$refundId/edit'
+      preLoaderRoute: typeof ShopsShopIdRefundsRefundIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/products/$productId/edit': {
+      id: '/shops/$shopId/products/$productId/edit'
+      path: '/shops/$shopId/products/$productId/edit'
+      fullPath: '/shops/$shopId/products/$productId/edit'
+      preLoaderRoute: typeof ShopsShopIdProductsProductIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/payments/$paymentId/edit': {
+      id: '/shops/$shopId/payments/$paymentId/edit'
+      path: '/shops/$shopId/payments/$paymentId/edit'
+      fullPath: '/shops/$shopId/payments/$paymentId/edit'
+      preLoaderRoute: typeof ShopsShopIdPaymentsPaymentIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/orders/$orderId/edit': {
+      id: '/shops/$shopId/orders/$orderId/edit'
+      path: '/shops/$shopId/orders/$orderId/edit'
+      fullPath: '/shops/$shopId/orders/$orderId/edit'
+      preLoaderRoute: typeof ShopsShopIdOrdersOrderIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/inventory/$inventoryLevelId/edit': {
+      id: '/shops/$shopId/inventory/$inventoryLevelId/edit'
+      path: '/shops/$shopId/inventory/$inventoryLevelId/edit'
+      fullPath: '/shops/$shopId/inventory/$inventoryLevelId/edit'
+      preLoaderRoute: typeof ShopsShopIdInventoryInventoryLevelIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/customers/addresses/new': {
+      id: '/shops/$shopId/customers/addresses/new'
+      path: '/shops/$shopId/customers/addresses/new'
+      fullPath: '/shops/$shopId/customers/addresses/new'
+      preLoaderRoute: typeof ShopsShopIdCustomersAddressesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/customers/$customerId/edit': {
+      id: '/shops/$shopId/customers/$customerId/edit'
+      path: '/shops/$shopId/customers/$customerId/edit'
+      fullPath: '/shops/$shopId/customers/$customerId/edit'
+      preLoaderRoute: typeof ShopsShopIdCustomersCustomerIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/checkouts/$checkoutId/edit': {
+      id: '/shops/$shopId/checkouts/$checkoutId/edit'
+      path: '/shops/$shopId/checkouts/$checkoutId/edit'
+      fullPath: '/shops/$shopId/checkouts/$checkoutId/edit'
+      preLoaderRoute: typeof ShopsShopIdCheckoutsCheckoutIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/categories/$categoryId/edit': {
+      id: '/shops/$shopId/categories/$categoryId/edit'
+      path: '/shops/$shopId/categories/$categoryId/edit'
+      fullPath: '/shops/$shopId/categories/$categoryId/edit'
+      preLoaderRoute: typeof ShopsShopIdCategoriesCategoryIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/brands/$brandId/edit': {
+      id: '/shops/$shopId/brands/$brandId/edit'
+      path: '/shops/$shopId/brands/$brandId/edit'
+      fullPath: '/shops/$shopId/brands/$brandId/edit'
+      preLoaderRoute: typeof ShopsShopIdBrandsBrandIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/customers/addresses/$addressId/edit': {
+      id: '/shops/$shopId/customers/addresses/$addressId/edit'
+      path: '/shops/$shopId/customers/addresses/$addressId/edit'
+      fullPath: '/shops/$shopId/customers/addresses/$addressId/edit'
+      preLoaderRoute: typeof ShopsShopIdCustomersAddressesAddressIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -864,43 +883,50 @@ const rootRouteChildren: RootRouteChildren = {
   MovementsRoute: MovementsRoute,
   PairingRoute: PairingRoute,
   SettingsRoute: SettingsRoute,
-  BrandsNewRoute: BrandsNewRoute,
-  CategoriesNewRoute: CategoriesNewRoute,
-  CheckoutsNewRoute: CheckoutsNewRoute,
-  CustomersNewRoute: CustomersNewRoute,
-  InventoryNewRoute: InventoryNewRoute,
-  OrdersNewRoute: OrdersNewRoute,
-  PaymentsNewRoute: PaymentsNewRoute,
-  ProductsNewRoute: ProductsNewRoute,
-  RefundsNewRoute: RefundsNewRoute,
   ShopsNewRoute: ShopsNewRoute,
-  TransactionsNewRoute: TransactionsNewRoute,
-  BrandsIndexRoute: BrandsIndexRoute,
-  CategoriesIndexRoute: CategoriesIndexRoute,
-  CheckoutsIndexRoute: CheckoutsIndexRoute,
-  CustomersIndexRoute: CustomersIndexRoute,
-  InventoryIndexRoute: InventoryIndexRoute,
-  OrdersIndexRoute: OrdersIndexRoute,
-  PaymentsIndexRoute: PaymentsIndexRoute,
-  ProductsIndexRoute: ProductsIndexRoute,
-  RefundsIndexRoute: RefundsIndexRoute,
   ShopsIndexRoute: ShopsIndexRoute,
-  TransactionsIndexRoute: TransactionsIndexRoute,
-  BrandsBrandIdEditRoute: BrandsBrandIdEditRoute,
-  CategoriesCategoryIdEditRoute: CategoriesCategoryIdEditRoute,
-  CheckoutsCheckoutIdEditRoute: CheckoutsCheckoutIdEditRoute,
-  CustomersCustomerIdEditRoute: CustomersCustomerIdEditRoute,
-  CustomersAddressesNewRoute: CustomersAddressesNewRoute,
-  InventoryInventoryLevelIdEditRoute: InventoryInventoryLevelIdEditRoute,
-  OrdersOrderIdEditRoute: OrdersOrderIdEditRoute,
-  PaymentsPaymentIdEditRoute: PaymentsPaymentIdEditRoute,
-  ProductsProductIdEditRoute: ProductsProductIdEditRoute,
-  RefundsRefundIdEditRoute: RefundsRefundIdEditRoute,
-  TransactionsTransactionIdEditRoute: TransactionsTransactionIdEditRoute,
-  CustomersAddressesIndexRoute: CustomersAddressesIndexRoute,
-  CustomersGroupsIndexRoute: CustomersGroupsIndexRoute,
   ShopsShopIdIndexRoute: ShopsShopIdIndexRoute,
-  CustomersAddressesAddressIdEditRoute: CustomersAddressesAddressIdEditRoute,
+  ShopsShopIdBrandsNewRoute: ShopsShopIdBrandsNewRoute,
+  ShopsShopIdCategoriesNewRoute: ShopsShopIdCategoriesNewRoute,
+  ShopsShopIdCheckoutsNewRoute: ShopsShopIdCheckoutsNewRoute,
+  ShopsShopIdCustomersNewRoute: ShopsShopIdCustomersNewRoute,
+  ShopsShopIdInventoryNewRoute: ShopsShopIdInventoryNewRoute,
+  ShopsShopIdOrdersNewRoute: ShopsShopIdOrdersNewRoute,
+  ShopsShopIdPaymentsNewRoute: ShopsShopIdPaymentsNewRoute,
+  ShopsShopIdProductsNewRoute: ShopsShopIdProductsNewRoute,
+  ShopsShopIdRefundsNewRoute: ShopsShopIdRefundsNewRoute,
+  ShopsShopIdTransactionsNewRoute: ShopsShopIdTransactionsNewRoute,
+  ShopsShopIdBrandsIndexRoute: ShopsShopIdBrandsIndexRoute,
+  ShopsShopIdCategoriesIndexRoute: ShopsShopIdCategoriesIndexRoute,
+  ShopsShopIdCheckoutsIndexRoute: ShopsShopIdCheckoutsIndexRoute,
+  ShopsShopIdCustomersIndexRoute: ShopsShopIdCustomersIndexRoute,
+  ShopsShopIdInventoryIndexRoute: ShopsShopIdInventoryIndexRoute,
+  ShopsShopIdOrdersIndexRoute: ShopsShopIdOrdersIndexRoute,
+  ShopsShopIdPaymentsIndexRoute: ShopsShopIdPaymentsIndexRoute,
+  ShopsShopIdProductsIndexRoute: ShopsShopIdProductsIndexRoute,
+  ShopsShopIdRefundsIndexRoute: ShopsShopIdRefundsIndexRoute,
+  ShopsShopIdTransactionsIndexRoute: ShopsShopIdTransactionsIndexRoute,
+  ShopsShopIdBrandsBrandIdEditRoute: ShopsShopIdBrandsBrandIdEditRoute,
+  ShopsShopIdCategoriesCategoryIdEditRoute:
+    ShopsShopIdCategoriesCategoryIdEditRoute,
+  ShopsShopIdCheckoutsCheckoutIdEditRoute:
+    ShopsShopIdCheckoutsCheckoutIdEditRoute,
+  ShopsShopIdCustomersCustomerIdEditRoute:
+    ShopsShopIdCustomersCustomerIdEditRoute,
+  ShopsShopIdCustomersAddressesNewRoute: ShopsShopIdCustomersAddressesNewRoute,
+  ShopsShopIdInventoryInventoryLevelIdEditRoute:
+    ShopsShopIdInventoryInventoryLevelIdEditRoute,
+  ShopsShopIdOrdersOrderIdEditRoute: ShopsShopIdOrdersOrderIdEditRoute,
+  ShopsShopIdPaymentsPaymentIdEditRoute: ShopsShopIdPaymentsPaymentIdEditRoute,
+  ShopsShopIdProductsProductIdEditRoute: ShopsShopIdProductsProductIdEditRoute,
+  ShopsShopIdRefundsRefundIdEditRoute: ShopsShopIdRefundsRefundIdEditRoute,
+  ShopsShopIdTransactionsTransactionIdEditRoute:
+    ShopsShopIdTransactionsTransactionIdEditRoute,
+  ShopsShopIdCustomersAddressesIndexRoute:
+    ShopsShopIdCustomersAddressesIndexRoute,
+  ShopsShopIdCustomersGroupsIndexRoute: ShopsShopIdCustomersGroupsIndexRoute,
+  ShopsShopIdCustomersAddressesAddressIdEditRoute:
+    ShopsShopIdCustomersAddressesAddressIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
