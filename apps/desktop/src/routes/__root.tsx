@@ -5,10 +5,12 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import appCss from '../styles.css?url'
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
+import { ShopSidebar } from '@/components/sidebars/shop-sidebar'
+import { SystemSidebar } from '@/components/sidebars/system-sidebar'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from "@/components/ui/sonner"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Building2 } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -49,10 +51,28 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const location = useLocation()
+  
+  // Determine which sidebar to show based on route
+  const getSidebar = () => {
+    const path = location.pathname
+    
+    // System routes (no shop context) - root is now shops list
+    if (path === "/" || path.startsWith("/shops/new") || path === "/settings" || path.startsWith("/settings/")) {
+      return <SystemSidebar />
+    }
+    
+    // Shop routes (with shop context)
+    if (path.startsWith("/shops/") && !path.startsWith("/shops/new")) {
+      return <ShopSidebar />
+    }
+    
+    // Default to old sidebar for backward compatibility
+    return <AppSidebar />
+  }
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      {getSidebar()}
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4">
           <div className="flex items-center gap-2 h-full">
@@ -62,7 +82,7 @@ function RootComponent() {
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink asChild>
-                    <Link to="/">Dashboard</Link>
+                    <Link to="/">Shops</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {location.pathname !== '/' && (
@@ -97,15 +117,17 @@ function RootComponent() {
             </Breadcrumb>
           </div>
           <div>
-            <Button
-              asChild
-              className="p-4 rounded-full shadow-lg"
-            >
-              <Link to="/transactions/new">
-                <Plus className="h-5 w-5" />
-                <span>New Sale</span>
-              </Link>
-            </Button>
+            {location.pathname.startsWith("/shops/") && !location.pathname.startsWith("/shops/new") && (
+              <Button
+                asChild
+                className="p-4 rounded-full shadow-lg"
+              >
+                <Link to={`${location.pathname}/transactions/new`}>
+                  <Plus className="h-5 w-5" />
+                  <span>New Sale</span>
+                </Link>
+              </Button>
+            )}
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 min-w-0 overflow-hidden">

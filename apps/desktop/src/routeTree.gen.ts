@@ -14,6 +14,7 @@ import { Route as PairingRouteImport } from './routes/pairing'
 import { Route as MovementsRouteImport } from './routes/movements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsIndexRouteImport } from './routes/transactions/index'
+import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as RefundsIndexRouteImport } from './routes/refunds/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
@@ -24,6 +25,7 @@ import { Route as CheckoutsIndexRouteImport } from './routes/checkouts/index'
 import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
 import { Route as BrandsIndexRouteImport } from './routes/brands/index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions/new'
+import { Route as ShopsNewRouteImport } from './routes/shops/new'
 import { Route as RefundsNewRouteImport } from './routes/refunds/new'
 import { Route as ProductsNewRouteImport } from './routes/products/new'
 import { Route as PaymentsNewRouteImport } from './routes/payments/new'
@@ -33,6 +35,7 @@ import { Route as CustomersNewRouteImport } from './routes/customers/new'
 import { Route as CheckoutsNewRouteImport } from './routes/checkouts/new'
 import { Route as CategoriesNewRouteImport } from './routes/categories/new'
 import { Route as BrandsNewRouteImport } from './routes/brands/new'
+import { Route as ShopsShopIdIndexRouteImport } from './routes/shops/$shopId/index'
 import { Route as CustomersGroupsIndexRouteImport } from './routes/customers/groups/index'
 import { Route as CustomersAddressesIndexRouteImport } from './routes/customers/addresses/index'
 import { Route as TransactionsTransactionIdEditRouteImport } from './routes/transactions/$transactionId/edit'
@@ -71,6 +74,11 @@ const IndexRoute = IndexRouteImport.update({
 const TransactionsIndexRoute = TransactionsIndexRouteImport.update({
   id: '/transactions/',
   path: '/transactions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsIndexRoute = ShopsIndexRouteImport.update({
+  id: '/shops/',
+  path: '/shops/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundsIndexRoute = RefundsIndexRouteImport.update({
@@ -123,6 +131,11 @@ const TransactionsNewRoute = TransactionsNewRouteImport.update({
   path: '/transactions/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopsNewRoute = ShopsNewRouteImport.update({
+  id: '/shops/new',
+  path: '/shops/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RefundsNewRoute = RefundsNewRouteImport.update({
   id: '/refunds/new',
   path: '/refunds/new',
@@ -166,6 +179,11 @@ const CategoriesNewRoute = CategoriesNewRouteImport.update({
 const BrandsNewRoute = BrandsNewRouteImport.update({
   id: '/brands/new',
   path: '/brands/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopsShopIdIndexRoute = ShopsShopIdIndexRouteImport.update({
+  id: '/shops/$shopId/',
+  path: '/shops/$shopId/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CustomersGroupsIndexRoute = CustomersGroupsIndexRouteImport.update({
@@ -257,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/payments/new': typeof PaymentsNewRoute
   '/products/new': typeof ProductsNewRoute
   '/refunds/new': typeof RefundsNewRoute
+  '/shops/new': typeof ShopsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/brands': typeof BrandsIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -267,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/payments': typeof PaymentsIndexRoute
   '/products': typeof ProductsIndexRoute
   '/refunds': typeof RefundsIndexRoute
+  '/shops': typeof ShopsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
   '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
   '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
@@ -281,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
   '/customers/addresses': typeof CustomersAddressesIndexRoute
   '/customers/groups': typeof CustomersGroupsIndexRoute
+  '/shops/$shopId': typeof ShopsShopIdIndexRoute
   '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -297,6 +318,7 @@ export interface FileRoutesByTo {
   '/payments/new': typeof PaymentsNewRoute
   '/products/new': typeof ProductsNewRoute
   '/refunds/new': typeof RefundsNewRoute
+  '/shops/new': typeof ShopsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/brands': typeof BrandsIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -307,6 +329,7 @@ export interface FileRoutesByTo {
   '/payments': typeof PaymentsIndexRoute
   '/products': typeof ProductsIndexRoute
   '/refunds': typeof RefundsIndexRoute
+  '/shops': typeof ShopsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
   '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
   '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
@@ -321,6 +344,7 @@ export interface FileRoutesByTo {
   '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
   '/customers/addresses': typeof CustomersAddressesIndexRoute
   '/customers/groups': typeof CustomersGroupsIndexRoute
+  '/shops/$shopId': typeof ShopsShopIdIndexRoute
   '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesById {
@@ -338,6 +362,7 @@ export interface FileRoutesById {
   '/payments/new': typeof PaymentsNewRoute
   '/products/new': typeof ProductsNewRoute
   '/refunds/new': typeof RefundsNewRoute
+  '/shops/new': typeof ShopsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/brands/': typeof BrandsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -348,6 +373,7 @@ export interface FileRoutesById {
   '/payments/': typeof PaymentsIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/refunds/': typeof RefundsIndexRoute
+  '/shops/': typeof ShopsIndexRoute
   '/transactions/': typeof TransactionsIndexRoute
   '/brands/$brandId/edit': typeof BrandsBrandIdEditRoute
   '/categories/$categoryId/edit': typeof CategoriesCategoryIdEditRoute
@@ -362,6 +388,7 @@ export interface FileRoutesById {
   '/transactions/$transactionId/edit': typeof TransactionsTransactionIdEditRoute
   '/customers/addresses/': typeof CustomersAddressesIndexRoute
   '/customers/groups/': typeof CustomersGroupsIndexRoute
+  '/shops/$shopId/': typeof ShopsShopIdIndexRoute
   '/customers/addresses/$addressId/edit': typeof CustomersAddressesAddressIdEditRoute
 }
 export interface FileRouteTypes {
@@ -380,6 +407,7 @@ export interface FileRouteTypes {
     | '/payments/new'
     | '/products/new'
     | '/refunds/new'
+    | '/shops/new'
     | '/transactions/new'
     | '/brands'
     | '/categories'
@@ -390,6 +418,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/products'
     | '/refunds'
+    | '/shops'
     | '/transactions'
     | '/brands/$brandId/edit'
     | '/categories/$categoryId/edit'
@@ -404,6 +433,7 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId/edit'
     | '/customers/addresses'
     | '/customers/groups'
+    | '/shops/$shopId'
     | '/customers/addresses/$addressId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -420,6 +450,7 @@ export interface FileRouteTypes {
     | '/payments/new'
     | '/products/new'
     | '/refunds/new'
+    | '/shops/new'
     | '/transactions/new'
     | '/brands'
     | '/categories'
@@ -430,6 +461,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/products'
     | '/refunds'
+    | '/shops'
     | '/transactions'
     | '/brands/$brandId/edit'
     | '/categories/$categoryId/edit'
@@ -444,6 +476,7 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId/edit'
     | '/customers/addresses'
     | '/customers/groups'
+    | '/shops/$shopId'
     | '/customers/addresses/$addressId/edit'
   id:
     | '__root__'
@@ -460,6 +493,7 @@ export interface FileRouteTypes {
     | '/payments/new'
     | '/products/new'
     | '/refunds/new'
+    | '/shops/new'
     | '/transactions/new'
     | '/brands/'
     | '/categories/'
@@ -470,6 +504,7 @@ export interface FileRouteTypes {
     | '/payments/'
     | '/products/'
     | '/refunds/'
+    | '/shops/'
     | '/transactions/'
     | '/brands/$brandId/edit'
     | '/categories/$categoryId/edit'
@@ -484,6 +519,7 @@ export interface FileRouteTypes {
     | '/transactions/$transactionId/edit'
     | '/customers/addresses/'
     | '/customers/groups/'
+    | '/shops/$shopId/'
     | '/customers/addresses/$addressId/edit'
   fileRoutesById: FileRoutesById
 }
@@ -501,6 +537,7 @@ export interface RootRouteChildren {
   PaymentsNewRoute: typeof PaymentsNewRoute
   ProductsNewRoute: typeof ProductsNewRoute
   RefundsNewRoute: typeof RefundsNewRoute
+  ShopsNewRoute: typeof ShopsNewRoute
   TransactionsNewRoute: typeof TransactionsNewRoute
   BrandsIndexRoute: typeof BrandsIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
@@ -511,6 +548,7 @@ export interface RootRouteChildren {
   PaymentsIndexRoute: typeof PaymentsIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   RefundsIndexRoute: typeof RefundsIndexRoute
+  ShopsIndexRoute: typeof ShopsIndexRoute
   TransactionsIndexRoute: typeof TransactionsIndexRoute
   BrandsBrandIdEditRoute: typeof BrandsBrandIdEditRoute
   CategoriesCategoryIdEditRoute: typeof CategoriesCategoryIdEditRoute
@@ -525,6 +563,7 @@ export interface RootRouteChildren {
   TransactionsTransactionIdEditRoute: typeof TransactionsTransactionIdEditRoute
   CustomersAddressesIndexRoute: typeof CustomersAddressesIndexRoute
   CustomersGroupsIndexRoute: typeof CustomersGroupsIndexRoute
+  ShopsShopIdIndexRoute: typeof ShopsShopIdIndexRoute
   CustomersAddressesAddressIdEditRoute: typeof CustomersAddressesAddressIdEditRoute
 }
 
@@ -563,6 +602,13 @@ declare module '@tanstack/react-router' {
       path: '/transactions'
       fullPath: '/transactions'
       preLoaderRoute: typeof TransactionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/': {
+      id: '/shops/'
+      path: '/shops'
+      fullPath: '/shops'
+      preLoaderRoute: typeof ShopsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refunds/': {
@@ -635,6 +681,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shops/new': {
+      id: '/shops/new'
+      path: '/shops/new'
+      fullPath: '/shops/new'
+      preLoaderRoute: typeof ShopsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/refunds/new': {
       id: '/refunds/new'
       path: '/refunds/new'
@@ -696,6 +749,13 @@ declare module '@tanstack/react-router' {
       path: '/brands/new'
       fullPath: '/brands/new'
       preLoaderRoute: typeof BrandsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/$shopId/': {
+      id: '/shops/$shopId/'
+      path: '/shops/$shopId'
+      fullPath: '/shops/$shopId'
+      preLoaderRoute: typeof ShopsShopIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/customers/groups/': {
@@ -813,6 +873,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentsNewRoute: PaymentsNewRoute,
   ProductsNewRoute: ProductsNewRoute,
   RefundsNewRoute: RefundsNewRoute,
+  ShopsNewRoute: ShopsNewRoute,
   TransactionsNewRoute: TransactionsNewRoute,
   BrandsIndexRoute: BrandsIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
@@ -823,6 +884,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentsIndexRoute: PaymentsIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   RefundsIndexRoute: RefundsIndexRoute,
+  ShopsIndexRoute: ShopsIndexRoute,
   TransactionsIndexRoute: TransactionsIndexRoute,
   BrandsBrandIdEditRoute: BrandsBrandIdEditRoute,
   CategoriesCategoryIdEditRoute: CategoriesCategoryIdEditRoute,
@@ -837,6 +899,7 @@ const rootRouteChildren: RootRouteChildren = {
   TransactionsTransactionIdEditRoute: TransactionsTransactionIdEditRoute,
   CustomersAddressesIndexRoute: CustomersAddressesIndexRoute,
   CustomersGroupsIndexRoute: CustomersGroupsIndexRoute,
+  ShopsShopIdIndexRoute: ShopsShopIdIndexRoute,
   CustomersAddressesAddressIdEditRoute: CustomersAddressesAddressIdEditRoute,
 }
 export const routeTree = rootRouteImport

@@ -186,8 +186,8 @@ export type YearToDateSales = {
 
 export const AnalyticsRepository = {
   // Existing methods
-  async getDashboardStats(): Promise<DashboardStats> {
-    return invoke("get_dashboard_stats")
+  async getDashboardStats(shopId?: string): Promise<DashboardStats> {
+    return invoke("get_dashboard_stats", { shop_id: shopId || null })
   },
   async getStockMovements(timeRange: string): Promise<DailyMovementStat[]> {
     const payload: StockMovementsFilter = { timeRange }

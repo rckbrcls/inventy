@@ -15,6 +15,10 @@ use crate::features::analytics::commands::analytics_commands::{
 use crate::features::module::commands::modules_commands::{
     get_module, get_module_by_code, list_modules, list_modules_by_category, list_core_modules,
 };
+use crate::features::shop::commands::shop_commands::{
+    create_shop, create_shop_from_template, update_shop, delete_shop, get_shop, list_shops,
+    get_default_shop, set_default_shop,
+};
 use crate::features::shop_template::commands::shop_templates_commands::{
     get_shop_template, get_shop_template_by_code, list_shop_templates, list_shop_templates_by_category,
 };
@@ -235,7 +239,16 @@ pub fn run() {
             get_shop_template,
             get_shop_template_by_code,
             list_shop_templates,
-            list_shop_templates_by_category
+            list_shop_templates_by_category,
+            // Shops
+            create_shop,
+            create_shop_from_template,
+            update_shop,
+            delete_shop,
+            get_shop,
+            list_shops,
+            get_default_shop,
+            set_default_shop
         ])
         .setup(|app| {
             let app_data_dir = app.path().app_data_dir()?;
