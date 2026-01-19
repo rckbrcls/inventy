@@ -49,7 +49,13 @@ export function ShopCard({ shop }: ShopCardProps) {
       setDeleteDialogOpen(false)
     } catch (error) {
       console.error("Failed to delete shop:", error)
-      toast.error("Failed to delete shop")
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : "Failed to delete shop"
+      toast.error(errorMessage)
     } finally {
       setIsDeleting(false)
     }
