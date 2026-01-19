@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AnalyticsRepository, type ConversionRate } from "@/lib/db/repositories/analytics-repository"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   conversionRate: {
@@ -39,7 +39,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ConversionRateRadialChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [days, setDays] = React.useState<number>(30)
   const [data, setData] = React.useState<ConversionRate | null>(null)
   const [loading, setLoading] = React.useState(true)

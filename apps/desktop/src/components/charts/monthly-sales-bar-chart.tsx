@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type MonthlySales } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency, formatMonth } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   monthlyRevenue: {
@@ -35,20 +35,29 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function MonthlySalesBarChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [months, setMonths] = React.useState<number>(12)
   const [data, setData] = React.useState<MonthlySales[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
+    console.log("[MonthlySalesBarChart] useEffect triggered - shopId:", shopId, "months:", months)
     async function loadData() {
-      if (!shopId) return
+      console.log("[MonthlySalesBarChart.loadData] Called with shopId:", shopId)
+      if (!shopId) {
+        console.warn("[MonthlySalesBarChart] WARNING: No shopId available - skipping data load")
+        setLoading(false)
+        return
+      }
       try {
         setLoading(true)
+        console.log("[MonthlySalesBarChart] Calling AnalyticsRepository.getMonthlySales with shopId:", shopId)
         const salesData = await AnalyticsRepository.getMonthlySales(shopId, months)
+        console.log("[MonthlySalesBarChart] Data loaded successfully:", salesData.length, "records")
         setData(salesData)
       } catch (error) {
-        console.error("Failed to load monthly sales data", error)
+        console.error("[MonthlySalesBarChart] ERROR: Failed to load monthly sales data:", error)
+        setData([])
       } finally {
         setLoading(false)
       }

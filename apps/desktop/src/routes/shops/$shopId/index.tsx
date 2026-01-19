@@ -42,35 +42,45 @@ function ShopDashboardRoute() {
   const [stats, setStats] = React.useState<DashboardStats | null>(null)
   const [timeRange] = useLocalStorage("dashboard_timeRange", "30d")
   const [loading, setLoading] = React.useState(true)
+  const [shopReady, setShopReady] = React.useState(false)
 
   useEffect(() => {
     const loadShop = async () => {
+      console.log("[ShopDashboardRoute] Setting active shop:", shopId)
       await setActiveShop(shopId)
+      setShopReady(true)
+      console.log("[ShopDashboardRoute] Active shop set")
     }
-    loadShop()
+    if (shopId) {
+      loadShop()
+    }
   }, [shopId, setActiveShop])
 
   React.useEffect(() => {
+    console.log("[ShopDashboardRoute] useEffect triggered - shopId:", shopId, "type:", typeof shopId, "timeRange:", timeRange)
     async function loadData() {
-      console.log("[ShopDashboardRoute] Loading dashboard data for shopId:", shopId)
+      console.log("[ShopDashboardRoute.loadData] Called with shopId:", shopId)
+      if (!shopId) {
+        console.warn("[ShopDashboardRoute] WARNING: No shopId available - skipping data load")
+        setLoading(false)
+        return
+      }
       try {
+        console.log("[ShopDashboardRoute] Calling AnalyticsRepository.getDashboardStats with shopId:", shopId)
         const dashboardStats = await AnalyticsRepository.getDashboardStats(shopId)
-        console.log("[ShopDashboardRoute] Dashboard stats loaded:", dashboardStats)
+        console.log("[ShopDashboardRoute] Dashboard stats loaded successfully:", dashboardStats)
         setStats(dashboardStats)
       } catch (error) {
-        console.error("Failed to load dashboard data", error)
+        console.error("[ShopDashboardRoute] ERROR: Failed to load dashboard data:", error)
+        setStats(null)
       } finally {
         setLoading(false)
       }
     }
-    if (shopId) {
-      loadData()
-    } else {
-      console.log("[ShopDashboardRoute] No shopId available")
-    }
+    loadData()
   }, [timeRange, shopId])
 
-  if (!shop || loading) {
+  if (!shop || !shopReady || loading || !shopId) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-64" />

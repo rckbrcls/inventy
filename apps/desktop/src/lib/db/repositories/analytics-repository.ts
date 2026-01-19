@@ -187,90 +187,130 @@ export type YearToDateSales = {
 export const AnalyticsRepository = {
   // Existing methods
   async getDashboardStats(shopId: string): Promise<DashboardStats> {
-    return invoke("get_dashboard_stats", { shop_id: shopId })
+    console.log("[AnalyticsRepository.getDashboardStats] Called with shopId:", shopId, "type:", typeof shopId)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getDashboardStats] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getDashboardStats")
+    }
+    return invoke("get_dashboard_stats", { shopId })
   },
   async getStockMovements(shopId: string, timeRange: string): Promise<DailyMovementStat[]> {
+    console.log("[AnalyticsRepository.getStockMovements] Called with shopId:", shopId, "timeRange:", timeRange)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getStockMovements] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getStockMovements")
+    }
     const payload: StockMovementsFilter = { timeRange }
-    return invoke("get_stock_movements", { shop_id: shopId, payload })
+    return invoke("get_stock_movements", { shopId, payload })
   },
 
   // Area Chart Methods
   async getCumulativeRevenue(shopId: string, days?: number): Promise<CumulativeRevenue[]> {
-    return invoke("get_cumulative_revenue", { shop_id: shopId, days })
+    console.log("[AnalyticsRepository.getCumulativeRevenue] Called with shopId:", shopId, "days:", days, "type:", typeof shopId)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getCumulativeRevenue] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getCumulativeRevenue")
+    }
+    return invoke("get_cumulative_revenue", { shopId, days })
   },
   async getStockMovementsArea(shopId: string, days?: number): Promise<StockMovementsArea[]> {
-    return invoke("get_stock_movements_area", { shop_id: shopId, days })
+    console.log("[AnalyticsRepository.getStockMovementsArea] Called with shopId:", shopId, "days:", days)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getStockMovementsArea] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getStockMovementsArea")
+    }
+    return invoke("get_stock_movements_area", { shopId, days })
   },
   async getRevenueByPaymentMethod(shopId: string, days?: number): Promise<RevenueByPaymentMethod[]> {
-    return invoke("get_revenue_by_payment_method", { shop_id: shopId, days })
+    console.log("[AnalyticsRepository.getRevenueByPaymentMethod] Called with shopId:", shopId, "days:", days)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getRevenueByPaymentMethod] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getRevenueByPaymentMethod")
+    }
+    return invoke("get_revenue_by_payment_method", { shopId, days })
   },
 
   // Bar Chart Methods
   async getTopProducts(shopId: string, days?: number, limit?: number): Promise<TopProduct[]> {
-    return invoke("get_top_products", { shop_id: shopId, days, limit })
+    console.log("[AnalyticsRepository.getTopProducts] Called with shopId:", shopId, "days:", days, "limit:", limit)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getTopProducts] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getTopProducts")
+    }
+    return invoke("get_top_products", { shopId, days, limit })
   },
   async getRevenueByCategory(shopId: string): Promise<RevenueByCategory[]> {
-    return invoke("get_revenue_by_category", { shop_id: shopId })
+    console.log("[AnalyticsRepository.getRevenueByCategory] Called with shopId:", shopId)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getRevenueByCategory] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getRevenueByCategory")
+    }
+    return invoke("get_revenue_by_category", { shopId })
   },
   async getMonthlySales(shopId: string, months?: number): Promise<MonthlySales[]> {
-    return invoke("get_monthly_sales", { shop_id: shopId, months })
+    console.log("[AnalyticsRepository.getMonthlySales] Called with shopId:", shopId, "months:", months)
+    if (!shopId) {
+      console.error("[AnalyticsRepository.getMonthlySales] ERROR: shopId is empty or undefined!")
+      throw new Error("shopId is required for getMonthlySales")
+    }
+    return invoke("get_monthly_sales", { shopId, months })
   },
   async getStockStatus(shopId: string): Promise<StockStatus[]> {
-    return invoke("get_stock_status", { shop_id: shopId })
+    return invoke("get_stock_status", { shopId })
   },
 
   // Line Chart Methods
   async getDailySalesTrend(shopId: string, days?: number): Promise<DailySalesTrend[]> {
-    return invoke("get_daily_sales_trend", { shop_id: shopId, days })
+    return invoke("get_daily_sales_trend", { shopId, days })
   },
   async getCustomerGrowth(shopId: string, months?: number): Promise<CustomerGrowth[]> {
-    return invoke("get_customer_growth", { shop_id: shopId, months })
+    return invoke("get_customer_growth", { shopId, months })
   },
   async getAverageOrderValue(shopId: string, months?: number): Promise<AverageOrderValue[]> {
-    return invoke("get_average_order_value", { shop_id: shopId, months })
+    return invoke("get_average_order_value", { shopId, months })
   },
 
   // Pie Chart Methods
   async getPaymentMethodDistribution(shopId: string, days?: number): Promise<PaymentMethodDistribution[]> {
-    return invoke("get_payment_method_distribution", { shop_id: shopId, days })
+    return invoke("get_payment_method_distribution", { shopId, days })
   },
   async getCategoryDistribution(shopId: string): Promise<CategoryDistribution[]> {
-    return invoke("get_category_distribution", { shop_id: shopId })
+    return invoke("get_category_distribution", { shopId })
   },
   async getOrderStatusDistribution(shopId: string, days?: number): Promise<OrderStatusDistribution[]> {
-    return invoke("get_order_status_distribution", { shop_id: shopId, days })
+    return invoke("get_order_status_distribution", { shopId, days })
   },
   async getCustomerGroupDistribution(shopId: string): Promise<CustomerGroupDistribution[]> {
-    return invoke("get_customer_group_distribution", { shop_id: shopId })
+    return invoke("get_customer_group_distribution", { shopId })
   },
 
   // Radar Chart Methods
   async getMonthlyPerformanceMetrics(shopId: string, months?: number): Promise<MonthlyPerformanceMetrics[]> {
-    return invoke("get_monthly_performance_metrics", { shop_id: shopId, months })
+    return invoke("get_monthly_performance_metrics", { shopId, months })
   },
   async getProductMetrics(shopId: string, days?: number, limit?: number): Promise<ProductMetrics[]> {
-    return invoke("get_product_metrics", { shop_id: shopId, days, limit })
+    return invoke("get_product_metrics", { shopId, days, limit })
   },
 
   // Radial Chart Methods
   async getMonthlySalesProgress(shopId: string, targetRevenue?: number): Promise<MonthlySalesProgress> {
-    return invoke("get_monthly_sales_progress", { shop_id: shopId, targetRevenue })
+    return invoke("get_monthly_sales_progress", { shopId, targetRevenue })
   },
   async getConversionRate(shopId: string, days?: number): Promise<ConversionRate> {
-    return invoke("get_conversion_rate", { shop_id: shopId, days })
+    return invoke("get_conversion_rate", { shopId, days })
   },
   async getInventoryCapacity(shopId: string, capacityLimit?: number): Promise<InventoryCapacity> {
-    return invoke("get_inventory_capacity", { shop_id: shopId, capacityLimit })
+    return invoke("get_inventory_capacity", { shopId, capacityLimit })
   },
 
   // Advanced Queries Methods
   async getProductRanking(shopId: string, days?: number, limit?: number): Promise<ProductRanking[]> {
-    return invoke("get_product_ranking", { shop_id: shopId, days, limit })
+    return invoke("get_product_ranking", { shopId, days, limit })
   },
   async getMonthOverMonthGrowth(shopId: string, months?: number): Promise<MonthOverMonthGrowth[]> {
-    return invoke("get_month_over_month_growth", { shop_id: shopId, months })
+    return invoke("get_month_over_month_growth", { shopId, months })
   },
   async getYearToDateSales(shopId: string): Promise<YearToDateSales[]> {
-    return invoke("get_year_to_date_sales", { shop_id: shopId })
+    return invoke("get_year_to_date_sales", { shopId })
   },
 }

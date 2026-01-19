@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type CumulativeRevenue } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   cumulativeRevenue: {
@@ -41,25 +41,29 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function CumulativeRevenueAreaChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [timeRange, setTimeRange] = React.useState<number>(90)
   const [data, setData] = React.useState<CumulativeRevenue[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
+    console.log("[CumulativeRevenueAreaChart] useEffect triggered - shopId:", shopId, "type:", typeof shopId, "timeRange:", timeRange)
     async function loadData() {
+      console.log("[CumulativeRevenueAreaChart.loadData] Called with shopId:", shopId)
       if (!shopId) {
-        console.log("[CumulativeRevenueAreaChart] No shopId available")
+        console.warn("[CumulativeRevenueAreaChart] WARNING: No shopId available - skipping data load")
+        setLoading(false)
         return
       }
       console.log("[CumulativeRevenueAreaChart] Loading data for shopId:", shopId)
       try {
         setLoading(true)
+        console.log("[CumulativeRevenueAreaChart] Calling AnalyticsRepository.getCumulativeRevenue with shopId:", shopId)
         const revenueData = await AnalyticsRepository.getCumulativeRevenue(shopId, timeRange)
-        console.log("[CumulativeRevenueAreaChart] Data loaded:", revenueData.length, "records")
+        console.log("[CumulativeRevenueAreaChart] Data loaded successfully:", revenueData.length, "records")
         setData(revenueData || [])
       } catch (error) {
-        console.error("Failed to load cumulative revenue data", error)
+        console.error("[CumulativeRevenueAreaChart] ERROR: Failed to load cumulative revenue data:", error)
         setData([])
       } finally {
         setLoading(false)

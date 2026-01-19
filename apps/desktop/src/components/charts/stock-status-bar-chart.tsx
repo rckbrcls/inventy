@@ -17,7 +17,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { AnalyticsRepository, type StockStatus } from "@/lib/db/repositories/analytics-repository"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const stockStatusColors: Record<string, string> = {
   "Out of Stock": "var(--chart-2)",
@@ -41,7 +41,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function StockStatusBarChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [data, setData] = React.useState<StockStatus[]>([])
   const [loading, setLoading] = React.useState(true)
 

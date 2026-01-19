@@ -17,7 +17,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import { AnalyticsRepository, type CategoryDistribution } from "@/lib/db/repositories/analytics-repository"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   productCount: {
@@ -27,7 +27,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function CategoryDistributionPieChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [data, setData] = React.useState<CategoryDistribution[]>([])
   const [loading, setLoading] = React.useState(true)
   const [limit, setLimit] = React.useState<number>(20)

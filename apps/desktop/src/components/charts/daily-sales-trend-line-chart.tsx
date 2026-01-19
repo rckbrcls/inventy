@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type DailySalesTrend } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   dailyRevenue: {
@@ -39,7 +39,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function DailySalesTrendLineChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [days, setDays] = React.useState<number>(90)
   const [data, setData] = React.useState<DailySalesTrend[]>([])
   const [loading, setLoading] = React.useState(true)

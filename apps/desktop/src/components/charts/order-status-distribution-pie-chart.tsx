@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type OrderStatusDistribution } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const paymentStatusColors: Record<string, string> = {
   paid: "var(--chart-1)",
@@ -42,7 +42,7 @@ const paymentStatusLabels: Record<string, string> = {
 }
 
 export function OrderStatusDistributionPieChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [days, setDays] = React.useState<number>(30)
   const [data, setData] = React.useState<OrderStatusDistribution[]>([])
   const [loading, setLoading] = React.useState(true)

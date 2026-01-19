@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type PaymentMethodDistribution } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const paymentMethodColors: Record<string, string> = {
   pix: "var(--chart-1)",
@@ -36,7 +36,7 @@ const paymentMethodColors: Record<string, string> = {
 }
 
 export function PaymentMethodDistributionPieChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [days, setDays] = React.useState<number>(30)
   const [data, setData] = React.useState<PaymentMethodDistribution[]>([])
   const [loading, setLoading] = React.useState(true)

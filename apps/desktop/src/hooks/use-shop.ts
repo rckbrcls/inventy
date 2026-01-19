@@ -28,16 +28,17 @@ export function useShop() {
     return location.pathname.startsWith("/shops/") && !location.pathname.startsWith("/shops/new")
   }, [location.pathname])
   
-  // CRITICAL: If we're in a shop route, ONLY use URL shopId, never fallback to store
+  // CRITICAL: If we're in a shop route, prefer URL shopId, but allow store fallback
   // If we're NOT in a shop route, then use store as fallback
   const shopId = useMemo(() => {
-    if (isShopRoute) {
-      // In shop route: ONLY use URL, even if it's undefined (will cause components to wait)
-      return urlShopId || undefined
-    } else {
-      // Not in shop route: use store as fallback
-      return urlShopId || activeShopId
-    }
+    // Always prefer URL/params shopId if available (most reliable)
+    if (urlShopId) return urlShopId
+    
+    // Fallback to store if not in shop route
+    if (!isShopRoute && activeShopId) return activeShopId
+    
+    // Return undefined if nothing available (components should wait)
+    return undefined
   }, [isShopRoute, urlShopId, activeShopId])
   
   const isModuleEnabled = (moduleCode: string) => 
@@ -49,4 +50,20 @@ export function useShop() {
     setActiveShop,
     isModuleEnabled,
   }
+}
+
+// Helper hook to get shopId from route params with fallback to useShop
+export function useShopIdFromRoute() {
+  const params = useParams({ strict: false })
+  const { shopId: shopIdFromHook } = useShop()
+  const routeShopId = params?.shopId as string | undefined
+  const finalShopId = routeShopId || shopIdFromHook
+  
+  // Log for debugging
+  if (typeof window !== 'undefined') {
+    console.log('[useShopIdFromRoute] routeShopId:', routeShopId, 'hookShopId:', shopIdFromHook, 'final:', finalShopId)
+  }
+  
+  // Prefer shopId from route params (most reliable), fallback to hook
+  return finalShopId
 }

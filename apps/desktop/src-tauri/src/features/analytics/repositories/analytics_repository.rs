@@ -227,6 +227,7 @@ impl AnalyticsRepository {
         shop_id: &str,
         low_stock_threshold: f64,
     ) -> sqlx::Result<DashboardStatsRow> {
+        eprintln!("[AnalyticsRepository::get_dashboard_stats] shop_id: {}, low_stock_threshold: {}", shop_id, low_stock_threshold);
         self.check_module_required(features_config, "inventory")?;
         let sql = r#"
             SELECT
@@ -243,17 +244,33 @@ impl AnalyticsRepository {
                       WHERE pc.product_id = products.id AND c.shop_id = $2
                   )
                   OR EXISTS (
+                      SELECT 1 FROM categories c
+                      WHERE c.id = products.category_id AND c._status != 'deleted' AND c.shop_id = $2
+                  )
+                  OR EXISTS (
                       SELECT 1 FROM brands b
                       WHERE b.id = products.brand_id AND b._status != 'deleted' AND b.shop_id = $2
                   )
               )
         "#;
 
-        sqlx::query_as::<_, DashboardStatsRow>(sql)
+        let result = sqlx::query_as::<_, DashboardStatsRow>(sql)
             .bind(low_stock_threshold)
             .bind(shop_id)
             .fetch_one(&self.pool)
-            .await
+            .await;
+        
+        match &result {
+            Ok(stats) => {
+                eprintln!("[AnalyticsRepository::get_dashboard_stats] Success - total_items: {}, low_stock_items: {}, total_inventory_value: {}", 
+                    stats.total_items, stats.low_stock_items, stats.total_inventory_value);
+            }
+            Err(e) => {
+                eprintln!("[AnalyticsRepository::get_dashboard_stats] Query error: {} (shop_id: {})", e, shop_id);
+            }
+        }
+        
+        result
     }
 
     pub async fn get_stock_movements(
@@ -341,6 +358,7 @@ impl AnalyticsRepository {
         shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<CumulativeRevenueRow>> {
+        eprintln!("[AnalyticsRepository::get_cumulative_revenue] shop_id: {}, days: {}", shop_id, days);
         let sql = r#"
             WITH payments_revenue AS (
                 SELECT 
@@ -348,11 +366,26 @@ impl AnalyticsRepository {
                     SUM(p.amount) AS daily_revenue
                 FROM payments p
                 INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
-                INNER JOIN customers c ON c.id = t.customer_id
-                INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
+                INNER JOIN transaction_items ti ON ti.transaction_id = t.id
+                INNER JOIN products pr ON pr.id = ti.product_id
                 WHERE p.status = 'captured'
                   AND p._status != 'deleted'
                   AND p.created_at >= date('now', '-' || $1 || ' days')
+                  AND (
+                      EXISTS (
+                          SELECT 1 FROM product_categories pc
+                          INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                          WHERE pc.product_id = pr.id AND c.shop_id = $2
+                      )
+                      OR EXISTS (
+                          SELECT 1 FROM categories c
+                          WHERE c.id = pr.category_id AND c._status != 'deleted' AND c.shop_id = $2
+                      )
+                      OR EXISTS (
+                          SELECT 1 FROM brands b
+                          WHERE b.id = pr.brand_id AND b._status != 'deleted' AND b.shop_id = $2
+                      )
+                  )
                 GROUP BY DATE(p.created_at)
             ),
             orders_revenue AS (
@@ -366,11 +399,18 @@ impl AnalyticsRepository {
                   AND o.created_at >= date('now', '-' || $1 || ' days')
                   AND NOT EXISTS (
                       SELECT 1 FROM payments p
-                      INNER JOIN transactions t ON t.id = p.transaction_id
+                      INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
                       INNER JOIN customers c ON c.id = t.customer_id
                       WHERE o.customer_id = c.id
                         AND DATE(p.created_at) = DATE(o.created_at)
                         AND p.status = 'captured'
+                        AND EXISTS (
+                            SELECT 1 FROM orders o2
+                            WHERE o2.customer_id = c.id 
+                              AND o2._status != 'deleted' 
+                              AND o2.shop_id = $2
+                              AND DATE(o2.created_at) = DATE(p.created_at)
+                        )
                   )
                 GROUP BY DATE(o.created_at)
             ),
@@ -390,11 +430,26 @@ impl AnalyticsRepository {
                 FROM refunds r
                 INNER JOIN payments p ON p.id = r.payment_id AND p._status != 'deleted'
                 INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
-                INNER JOIN customers c ON c.id = t.customer_id
-                INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
+                INNER JOIN transaction_items ti ON ti.transaction_id = t.id
+                INNER JOIN products pr ON pr.id = ti.product_id
                 WHERE r._status != 'deleted'
                   AND r.status = 'completed'
                   AND r.created_at >= date('now', '-' || $1 || ' days')
+                  AND (
+                      EXISTS (
+                          SELECT 1 FROM product_categories pc
+                          INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                          WHERE pc.product_id = pr.id AND c.shop_id = $2
+                      )
+                      OR EXISTS (
+                          SELECT 1 FROM categories c
+                          WHERE c.id = pr.category_id AND c._status != 'deleted' AND c.shop_id = $2
+                      )
+                      OR EXISTS (
+                          SELECT 1 FROM brands b
+                          WHERE b.id = pr.brand_id AND b._status != 'deleted' AND b.shop_id = $2
+                      )
+                  )
                 GROUP BY DATE(r.created_at)
             )
             SELECT 
@@ -408,11 +463,23 @@ impl AnalyticsRepository {
             ORDER BY dd.date ASC
         "#;
 
-        sqlx::query_as::<_, CumulativeRevenueRow>(sql)
+        let result = sqlx::query_as::<_, CumulativeRevenueRow>(sql)
             .bind(days)
             .bind(shop_id)
             .fetch_all(&self.pool)
-            .await
+            .await;
+        
+        match &result {
+            Ok(rows) => {
+                eprintln!("[AnalyticsRepository::get_cumulative_revenue] Success - {} rows returned (shop_id: {}, days: {})", 
+                    rows.len(), shop_id, days);
+            }
+            Err(e) => {
+                eprintln!("[AnalyticsRepository::get_cumulative_revenue] Query error: {} (shop_id: {}, days: {})", e, shop_id, days);
+            }
+        }
+        
+        result
     }
 
     /// Query 2: Vendas e Estoque Movimentado ao Longo do Tempo (Stacked Area)
@@ -475,12 +542,23 @@ impl AnalyticsRepository {
                     ORDER BY DATE(p.created_at)
                 ) AS cumulative_amount_by_method
             FROM payments p
-            INNER JOIN transactions t ON t.id = p.transaction_id
-            INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
+            INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
+            INNER JOIN transaction_items ti ON ti.transaction_id = t.id
+            INNER JOIN products pr ON pr.id = ti.product_id
             WHERE p.status = 'captured'
               AND p._status != 'deleted'
               AND p.created_at >= date('now', '-' || $1 || ' days')
+              AND (
+                  EXISTS (
+                      SELECT 1 FROM product_categories pc
+                      INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                      WHERE pc.product_id = pr.id AND c.shop_id = $2
+                  )
+                  OR EXISTS (
+                      SELECT 1 FROM brands b
+                      WHERE b.id = pr.brand_id AND b._status != 'deleted' AND b.shop_id = $2
+                  )
+              )
             GROUP BY DATE(p.created_at), p.method
             ORDER BY date ASC, payment_method
         "#;
@@ -503,6 +581,7 @@ impl AnalyticsRepository {
         days: i64,
         limit: i64,
     ) -> sqlx::Result<Vec<TopProductRow>> {
+        eprintln!("[AnalyticsRepository::get_top_products] shop_id: {}, days: {}, limit: {}", shop_id, days, limit);
         let sql = r#"
             SELECT 
                 ti.product_id,
@@ -512,24 +591,51 @@ impl AnalyticsRepository {
                 COUNT(DISTINCT t.id) AS order_count
             FROM transaction_items ti
             LEFT JOIN products p ON p.id = ti.product_id
-            INNER JOIN transactions t ON t.id = ti.transaction_id
-            INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $3
+            INNER JOIN transactions t ON t.id = ti.transaction_id AND t._status != 'deleted'
             WHERE t.type = 'sale'
               AND t.status = 'completed'
-              AND t._status != 'deleted'
               AND t.created_at >= date('now', '-' || $1 || ' days')
+              AND (
+                  EXISTS (
+                      SELECT 1 FROM product_categories pc
+                      INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                      WHERE pc.product_id = p.id AND c.shop_id = $3
+                  )
+                  OR EXISTS (
+                      SELECT 1 FROM categories c
+                      WHERE c.id = p.category_id AND c._status != 'deleted' AND c.shop_id = $3
+                  )
+                  OR EXISTS (
+                      SELECT 1 FROM brands b
+                      WHERE b.id = p.brand_id AND b._status != 'deleted' AND b.shop_id = $3
+                  )
+              )
             GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
             ORDER BY total_quantity DESC
             LIMIT $2
         "#;
 
-        sqlx::query_as::<_, TopProductRow>(sql)
+        let result = sqlx::query_as::<_, TopProductRow>(sql)
             .bind(days)
             .bind(limit)
             .bind(shop_id)
             .fetch_all(&self.pool)
-            .await
+            .await;
+        
+        match &result {
+            Ok(rows) => {
+                eprintln!("[AnalyticsRepository::get_top_products] Success - {} rows returned (shop_id: {}, days: {}, limit: {})", 
+                    rows.len(), shop_id, days, limit);
+                if rows.is_empty() {
+                    eprintln!("[AnalyticsRepository::get_top_products] WARNING: Query returned empty result");
+                }
+            }
+            Err(e) => {
+                eprintln!("[AnalyticsRepository::get_top_products] Query error: {} (shop_id: {}, days: {}, limit: {})", e, shop_id, days, limit);
+            }
+        }
+        
+        result
     }
 
     /// Query 5: Receita por Categoria
@@ -537,6 +643,7 @@ impl AnalyticsRepository {
         &self,
         shop_id: &str,
     ) -> sqlx::Result<Vec<RevenueByCategoryRow>> {
+        eprintln!("[AnalyticsRepository::get_revenue_by_category] shop_id: {}", shop_id);
         let sql = r#"
             SELECT 
                 c.name AS category_name,
@@ -544,23 +651,32 @@ impl AnalyticsRepository {
                 COUNT(DISTINCT ti.product_id) AS product_count,
                 COUNT(DISTINCT t.id) AS order_count
             FROM transaction_items ti
-            INNER JOIN transactions t ON t.id = ti.transaction_id
+            INNER JOIN transactions t ON t.id = ti.transaction_id AND t._status != 'deleted'
             INNER JOIN products p ON p.id = ti.product_id
             INNER JOIN product_categories pc ON pc.product_id = p.id
-            INNER JOIN categories c ON c.id = pc.category_id
-            INNER JOIN customers cu ON cu.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = cu.id AND o._status != 'deleted' AND o.shop_id = $1
+            INNER JOIN categories c ON c.id = pc.category_id AND c.shop_id = $1 AND c._status != 'deleted'
             WHERE t.type = 'sale'
               AND t.status = 'completed'
-              AND t._status != 'deleted'
             GROUP BY c.id, c.name
             ORDER BY total_revenue DESC
         "#;
 
-        sqlx::query_as::<_, RevenueByCategoryRow>(sql)
+        let result = sqlx::query_as::<_, RevenueByCategoryRow>(sql)
             .bind(shop_id)
             .fetch_all(&self.pool)
-            .await
+            .await;
+        
+        match &result {
+            Ok(rows) => {
+                eprintln!("[AnalyticsRepository::get_revenue_by_category] Success - {} rows returned (shop_id: {})", 
+                    rows.len(), shop_id);
+            }
+            Err(e) => {
+                eprintln!("[AnalyticsRepository::get_revenue_by_category] Query error: {} (shop_id: {})", e, shop_id);
+            }
+        }
+        
+        result
     }
 
     /// Query 6: Vendas Mensais (Últimos 12 Meses)
@@ -569,6 +685,7 @@ impl AnalyticsRepository {
         shop_id: &str,
         months: i64,
     ) -> sqlx::Result<Vec<MonthlySalesRow>> {
+        eprintln!("[AnalyticsRepository::get_monthly_sales] shop_id: {}, months: {}", shop_id, months);
         let sql = r#"
             SELECT 
                 strftime('%Y-%m', created_at) AS month,
@@ -584,11 +701,23 @@ impl AnalyticsRepository {
             ORDER BY month ASC
         "#;
 
-        sqlx::query_as::<_, MonthlySalesRow>(sql)
+        let result = sqlx::query_as::<_, MonthlySalesRow>(sql)
             .bind(months)
             .bind(shop_id)
             .fetch_all(&self.pool)
-            .await
+            .await;
+        
+        match &result {
+            Ok(rows) => {
+                eprintln!("[AnalyticsRepository::get_monthly_sales] Success - {} rows returned (shop_id: {}, months: {})", 
+                    rows.len(), shop_id, months);
+            }
+            Err(e) => {
+                eprintln!("[AnalyticsRepository::get_monthly_sales] Query error: {} (shop_id: {}, months: {})", e, shop_id, months);
+            }
+        }
+        
+        result
     }
 
     /// Query 7: Produtos por Status de Estoque (Baixo, Médio, Alto)
@@ -709,10 +838,14 @@ impl AnalyticsRepository {
                     2
                 ) AS growth_percentage
             FROM customers c
-            INNER JOIN orders o ON o.customer_id = c.id
             WHERE c._status != 'deleted'
-              AND o.shop_id = $2
               AND c.created_at >= date('now', '-' || $1 || ' months')
+              AND EXISTS (
+                  SELECT 1 FROM orders o
+                  WHERE o.customer_id = c.id 
+                    AND o._status != 'deleted' 
+                    AND o.shop_id = $2
+              )
             GROUP BY strftime('%Y-%m', c.created_at)
             ORDER BY month ASC
         "#;
@@ -777,12 +910,23 @@ impl AnalyticsRepository {
                     2
                 ) AS percentage
             FROM payments p
-            INNER JOIN transactions t ON t.id = p.transaction_id
-            INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
+            INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
+            INNER JOIN transaction_items ti ON ti.transaction_id = t.id
+            INNER JOIN products pr ON pr.id = ti.product_id
             WHERE p.status = 'captured'
               AND p._status != 'deleted'
               AND p.created_at >= date('now', '-' || $1 || ' days')
+              AND (
+                  EXISTS (
+                      SELECT 1 FROM product_categories pc
+                      INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                      WHERE pc.product_id = pr.id AND c.shop_id = $2
+                  )
+                  OR EXISTS (
+                      SELECT 1 FROM brands b
+                      WHERE b.id = pr.brand_id AND b._status != 'deleted' AND b.shop_id = $2
+                  )
+              )
             GROUP BY p.method
             ORDER BY total_amount DESC
         "#;
@@ -898,14 +1042,28 @@ impl AnalyticsRepository {
                     COALESCE((
                         SELECT SUM(im.quantity)
                         FROM transactions t
-                        INNER JOIN inventory_movements im ON im.transaction_id = t.id
-                        INNER JOIN customers cu ON cu.id = t.customer_id
-                        INNER JOIN orders ord ON ord.customer_id = cu.id AND ord._status != 'deleted' AND ord.shop_id = $2
+                        INNER JOIN inventory_movements im ON im.transaction_id = t.id AND im.type = 'out'
+                        INNER JOIN inventory_levels il ON il.id = im.inventory_level_id
+                        INNER JOIN products pr ON pr.id = il.product_id
                         WHERE t.type = 'sale'
                           AND t.status = 'completed'
                           AND t._status != 'deleted'
                           AND strftime('%Y-%m', t.created_at) = strftime('%Y-%m', o.created_at)
-                          AND im.type = 'out'
+                          AND (
+                              EXISTS (
+                                  SELECT 1 FROM product_categories pc
+                                  INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                                  WHERE pc.product_id = pr.id AND c.shop_id = $2
+                              )
+                              OR EXISTS (
+                                  SELECT 1 FROM categories c
+                                  WHERE c.id = pr.category_id AND c._status != 'deleted' AND c.shop_id = $2
+                              )
+                              OR EXISTS (
+                                  SELECT 1 FROM brands b
+                                  WHERE b.id = pr.brand_id AND b._status != 'deleted' AND b.shop_id = $2
+                              )
+                          )
                     ), 0) AS stock_sold
                 FROM orders o
                 WHERE o._status != 'deleted'
@@ -957,9 +1115,8 @@ impl AnalyticsRepository {
                     COALESCE(SUM(il.quantity_on_hand), 0) AS current_stock
                 FROM products p
                 LEFT JOIN transaction_items ti ON ti.product_id = p.id
-                LEFT JOIN transactions t ON t.id = ti.transaction_id AND t.type = 'sale'
+                LEFT JOIN transactions t ON t.id = ti.transaction_id AND t.type = 'sale' AND t._status != 'deleted'
                 LEFT JOIN customers cu ON cu.id = t.customer_id
-                LEFT JOIN orders o ON o.customer_id = cu.id AND o._status != 'deleted' AND o.shop_id = $3
                 LEFT JOIN inventory_levels il ON il.product_id = p.id AND il._status != 'deleted'
                 WHERE p._status != 'deleted'
                   AND (
@@ -969,11 +1126,15 @@ impl AnalyticsRepository {
                           WHERE pc.product_id = p.id AND c.shop_id = $3
                       )
                       OR EXISTS (
+                          SELECT 1 FROM categories c
+                          WHERE c.id = p.category_id AND c._status != 'deleted' AND c.shop_id = $3
+                      )
+                      OR EXISTS (
                           SELECT 1 FROM brands b
                           WHERE b.id = p.brand_id AND b._status != 'deleted' AND b.shop_id = $3
                       )
                   )
-                  AND (t.created_at >= date('now', '-' || $1 || ' days') OR t.created_at IS NULL)
+                  AND (t.created_at IS NULL OR t.created_at >= date('now', '-' || $1 || ' days'))
                 GROUP BY p.id, COALESCE(ti.name_snapshot, p.name)
                 HAVING total_quantity_sold > 0
                 LIMIT $2
@@ -1049,8 +1210,16 @@ impl AnalyticsRepository {
                     AND o.created_at <= datetime(c.created_at, '+1 day')
                     AND o._status != 'deleted'
                     AND o.shop_id = $2
+                    AND o.payment_status = 'paid'
                 WHERE c._status != 'deleted'
                   AND c.created_at >= date('now', '-' || $1 || ' days')
+                  AND EXISTS (
+                      SELECT 1 FROM orders o2
+                      WHERE o2.created_at >= c.created_at 
+                        AND o2.created_at <= datetime(c.created_at, '+1 day')
+                        AND o2._status != 'deleted'
+                        AND o2.shop_id = $2
+                  )
             )
             SELECT 
                 total_checkouts,
@@ -1132,13 +1301,25 @@ impl AnalyticsRepository {
                 ) AS revenue_percentile
             FROM transaction_items ti
             LEFT JOIN products p ON p.id = ti.product_id
-            INNER JOIN transactions t ON t.id = ti.transaction_id
-            INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $3
+            INNER JOIN transactions t ON t.id = ti.transaction_id AND t._status != 'deleted'
             WHERE t.type = 'sale'
               AND t.status = 'completed'
-              AND t._status != 'deleted'
               AND t.created_at >= date('now', '-' || $1 || ' days')
+              AND (
+                  EXISTS (
+                      SELECT 1 FROM product_categories pc
+                      INNER JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                      WHERE pc.product_id = p.id AND c.shop_id = $3
+                  )
+                  OR EXISTS (
+                      SELECT 1 FROM categories c
+                      WHERE c.id = p.category_id AND c._status != 'deleted' AND c.shop_id = $3
+                  )
+                  OR EXISTS (
+                      SELECT 1 FROM brands b
+                      WHERE b.id = p.brand_id AND b._status != 'deleted' AND b.shop_id = $3
+                  )
+              )
             GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
             ORDER BY total_revenue DESC
             LIMIT $2

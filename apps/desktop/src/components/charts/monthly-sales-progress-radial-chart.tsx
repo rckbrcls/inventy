@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type MonthlySalesProgress } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   progress: {
@@ -40,7 +40,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function MonthlySalesProgressRadialChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [targetRevenue, setTargetRevenue] = React.useState<number>(100000)
   const [data, setData] = React.useState<MonthlySalesProgress | null>(null)
   const [loading, setLoading] = React.useState(true)

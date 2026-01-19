@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type TopProduct } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   totalQuantity: {
@@ -39,7 +39,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function TopProductsBarChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [days, setDays] = React.useState<number>(30)
   const [limit, setLimit] = React.useState<number>(10)
   const [data, setData] = React.useState<TopProduct[]>([])
@@ -47,14 +47,23 @@ export function TopProductsBarChart() {
   const [activeMetric, setActiveMetric] = React.useState<"totalQuantity" | "totalRevenue">("totalQuantity")
 
   React.useEffect(() => {
+    console.log("[TopProductsBarChart] useEffect triggered - shopId:", shopId, "days:", days, "limit:", limit)
     async function loadData() {
-      if (!shopId) return
+      console.log("[TopProductsBarChart.loadData] Called with shopId:", shopId)
+      if (!shopId) {
+        console.warn("[TopProductsBarChart] WARNING: No shopId available - skipping data load")
+        setLoading(false)
+        return
+      }
       try {
         setLoading(true)
+        console.log("[TopProductsBarChart] Calling AnalyticsRepository.getTopProducts with shopId:", shopId)
         const productsData = await AnalyticsRepository.getTopProducts(shopId, days, limit)
+        console.log("[TopProductsBarChart] Data loaded successfully:", productsData.length, "records")
         setData(productsData)
       } catch (error) {
-        console.error("Failed to load top products data", error)
+        console.error("[TopProductsBarChart] ERROR: Failed to load top products data:", error)
+        setData([])
       } finally {
         setLoading(false)
       }

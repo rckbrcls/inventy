@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { AnalyticsRepository, type CustomerGrowth } from "@/lib/db/repositories/analytics-repository"
 import { formatMonth } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   cumulativeCustomers: {
@@ -39,7 +39,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function CustomerGrowthLineChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [months, setMonths] = React.useState<number>(12)
   const [data, setData] = React.useState<CustomerGrowth[]>([])
   const [loading, setLoading] = React.useState(true)

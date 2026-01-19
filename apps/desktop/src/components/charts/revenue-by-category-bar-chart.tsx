@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/chart"
 import { AnalyticsRepository, type RevenueByCategory } from "@/lib/db/repositories/analytics-repository"
 import { formatCurrency } from "@/lib/formatters"
-import { useShop } from "@/hooks/use-shop"
+import { useShopIdFromRoute } from "@/hooks/use-shop"
 
 const chartConfig = {
   totalRevenue: {
@@ -28,7 +28,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function RevenueByCategoryBarChart() {
-  const { shopId } = useShop()
+  const shopId = useShopIdFromRoute()
   const [data, setData] = React.useState<RevenueByCategory[]>([])
   const [loading, setLoading] = React.useState(true)
 
