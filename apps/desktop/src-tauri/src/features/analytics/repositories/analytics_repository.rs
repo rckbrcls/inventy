@@ -445,10 +445,9 @@ impl AnalyticsRepository {
             FROM payments p
             INNER JOIN transactions t ON t.id = p.transaction_id
             INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o.id = t.order_id
+            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
             WHERE p.status = 'captured'
               AND p._status != 'deleted'
-              AND o.shop_id = $2
               AND p.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY DATE(p.created_at), p.method
             ORDER BY date ASC, payment_method
@@ -483,11 +482,10 @@ impl AnalyticsRepository {
             LEFT JOIN products p ON p.id = ti.product_id
             INNER JOIN transactions t ON t.id = ti.transaction_id
             INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o.id = t.order_id
+            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $3
             WHERE t.type = 'sale'
               AND t.status = 'completed'
               AND t._status != 'deleted'
-              AND o.shop_id = $3
               AND t.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
             ORDER BY total_quantity DESC
@@ -519,11 +517,10 @@ impl AnalyticsRepository {
             INNER JOIN product_categories pc ON pc.product_id = p.id
             INNER JOIN categories c ON c.id = pc.category_id
             INNER JOIN customers cu ON cu.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = cu.id AND o.id = t.order_id
+            INNER JOIN orders o ON o.customer_id = cu.id AND o._status != 'deleted' AND o.shop_id = $1
             WHERE t.type = 'sale'
               AND t.status = 'completed'
               AND t._status != 'deleted'
-              AND o.shop_id = $1
             GROUP BY c.id, c.name
             ORDER BY total_revenue DESC
         "#;
@@ -742,10 +739,9 @@ impl AnalyticsRepository {
             FROM payments p
             INNER JOIN transactions t ON t.id = p.transaction_id
             INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o.id = t.order_id
+            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
             WHERE p.status = 'captured'
               AND p._status != 'deleted'
-              AND o.shop_id = $2
               AND p.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY p.method
             ORDER BY total_amount DESC
@@ -864,11 +860,10 @@ impl AnalyticsRepository {
                         FROM transactions t
                         INNER JOIN inventory_movements im ON im.transaction_id = t.id
                         INNER JOIN customers cu ON cu.id = t.customer_id
-                        INNER JOIN orders ord ON ord.customer_id = cu.id AND ord.id = t.order_id
+                        INNER JOIN orders ord ON ord.customer_id = cu.id AND ord._status != 'deleted' AND ord.shop_id = $2
                         WHERE t.type = 'sale'
                           AND t.status = 'completed'
                           AND t._status != 'deleted'
-                          AND ord.shop_id = $2
                           AND strftime('%Y-%m', t.created_at) = strftime('%Y-%m', o.created_at)
                           AND im.type = 'out'
                     ), 0) AS stock_sold
@@ -924,7 +919,7 @@ impl AnalyticsRepository {
                 LEFT JOIN transaction_items ti ON ti.product_id = p.id
                 LEFT JOIN transactions t ON t.id = ti.transaction_id AND t.type = 'sale'
                 LEFT JOIN customers cu ON cu.id = t.customer_id
-                LEFT JOIN orders o ON o.customer_id = cu.id AND o.id = t.order_id
+                LEFT JOIN orders o ON o.customer_id = cu.id AND o._status != 'deleted' AND o.shop_id = $3
                 LEFT JOIN product_categories pc ON pc.product_id = p.id
                 LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
                 LEFT JOIN inventory_levels il ON il.product_id = p.id AND il._status != 'deleted'
@@ -1083,11 +1078,10 @@ impl AnalyticsRepository {
             LEFT JOIN products p ON p.id = ti.product_id
             INNER JOIN transactions t ON t.id = ti.transaction_id
             INNER JOIN customers c ON c.id = t.customer_id
-            INNER JOIN orders o ON o.customer_id = c.id AND o.id = t.order_id
+            INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $3
             WHERE t.type = 'sale'
               AND t.status = 'completed'
               AND t._status != 'deleted'
-              AND o.shop_id = $3
               AND t.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
             ORDER BY total_revenue DESC
