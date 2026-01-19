@@ -224,6 +224,7 @@ impl AnalyticsRepository {
     pub async fn get_dashboard_stats(
         &self,
         features_config: Option<&str>,
+        shop_id: &str,
         low_stock_threshold: f64,
     ) -> sqlx::Result<DashboardStatsRow> {
         self.check_module_required(features_config, "inventory")?;
@@ -234,11 +235,15 @@ impl AnalyticsRepository {
                 COALESCE(SUM(inventory_levels.quantity_on_hand * COALESCE(products.cost_price, products.price, 0)), 0) AS total_inventory_value
             FROM inventory_levels
             LEFT JOIN products ON products.id = inventory_levels.product_id
+            LEFT JOIN product_categories pc ON pc.product_id = products.id
+            LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
             WHERE inventory_levels._status != 'deleted'
+              AND c.shop_id = $2
         "#;
 
         sqlx::query_as::<_, DashboardStatsRow>(sql)
             .bind(low_stock_threshold)
+            .bind(shop_id)
             .fetch_one(&self.pool)
             .await
     }
@@ -246,6 +251,7 @@ impl AnalyticsRepository {
     pub async fn get_stock_movements(
         &self,
         features_config: Option<&str>,
+        shop_id: &str,
         bucket_format: &str,
         start_at: Option<String>,
     ) -> sqlx::Result<Vec<StockMovementRow>> {
@@ -257,10 +263,16 @@ impl AnalyticsRepository {
                 r#"
                 SELECT
                     {bucket_expr} AS bucket,
-                    COALESCE(SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END), 0) AS stock_in,
-                    COALESCE(SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END), 0) AS stock_out
-                FROM inventory_movements
-                WHERE _status != 'deleted' AND created_at >= $1
+                    COALESCE(SUM(CASE WHEN im.type = 'in' THEN im.quantity ELSE 0 END), 0) AS stock_in,
+                    COALESCE(SUM(CASE WHEN im.type = 'out' THEN im.quantity ELSE 0 END), 0) AS stock_out
+                FROM inventory_movements im
+                INNER JOIN inventory_levels il ON il.id = im.inventory_level_id
+                INNER JOIN products p ON p.id = il.product_id
+                LEFT JOIN product_categories pc ON pc.product_id = p.id
+                LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                WHERE im._status != 'deleted'
+                  AND c.shop_id = $2
+                  AND im.created_at >= $1
                 GROUP BY bucket
                 ORDER BY bucket ASC
                 "#
@@ -270,10 +282,15 @@ impl AnalyticsRepository {
                 r#"
                 SELECT
                     {bucket_expr} AS bucket,
-                    COALESCE(SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END), 0) AS stock_in,
-                    COALESCE(SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END), 0) AS stock_out
-                FROM inventory_movements
-                WHERE _status != 'deleted'
+                    COALESCE(SUM(CASE WHEN im.type = 'in' THEN im.quantity ELSE 0 END), 0) AS stock_in,
+                    COALESCE(SUM(CASE WHEN im.type = 'out' THEN im.quantity ELSE 0 END), 0) AS stock_out
+                FROM inventory_movements im
+                INNER JOIN inventory_levels il ON il.id = im.inventory_level_id
+                INNER JOIN products p ON p.id = il.product_id
+                LEFT JOIN product_categories pc ON pc.product_id = p.id
+                LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+                WHERE im._status != 'deleted'
+                  AND c.shop_id = $1
                 GROUP BY bucket
                 ORDER BY bucket ASC
                 "#
@@ -282,7 +299,9 @@ impl AnalyticsRepository {
 
         let mut query = sqlx::query_as::<_, StockMovementRow>(&sql);
         if let Some(start_at) = start_at {
-            query = query.bind(start_at);
+            query = query.bind(start_at).bind(shop_id);
+        } else {
+            query = query.bind(shop_id);
         }
 
         query.fetch_all(&self.pool).await
@@ -295,76 +314,115 @@ impl AnalyticsRepository {
     /// Query 1: Receita Acumulada por Dia (com Múltiplas Séries: Vendas vs Devoluções)
     pub async fn get_cumulative_revenue(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<CumulativeRevenueRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
+            WITH payments_revenue AS (
+                SELECT 
+                    DATE(p.created_at) AS date,
+                    SUM(p.amount) AS daily_revenue
+                FROM payments p
+                INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
+                INNER JOIN customers c ON c.id = t.customer_id
+                INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
+                WHERE p.status = 'captured'
+                  AND p._status != 'deleted'
+                  AND p.created_at >= date('now', '-' || $1 || ' days')
+                GROUP BY DATE(p.created_at)
+            ),
+            orders_revenue AS (
+                SELECT 
+                    DATE(o.created_at) AS date,
+                    SUM(o.total_price) AS daily_revenue
+                FROM orders o
+                WHERE o.payment_status = 'paid'
+                  AND o._status != 'deleted'
+                  AND o.shop_id = $2
+                  AND o.created_at >= date('now', '-' || $1 || ' days')
+                  AND NOT EXISTS (
+                      SELECT 1 FROM payments p
+                      INNER JOIN transactions t ON t.id = p.transaction_id
+                      INNER JOIN customers c ON c.id = t.customer_id
+                      WHERE o.customer_id = c.id
+                        AND DATE(p.created_at) = DATE(o.created_at)
+                        AND p.status = 'captured'
+                  )
+                GROUP BY DATE(o.created_at)
+            ),
+            daily_data AS (
+                SELECT date, SUM(daily_revenue) AS daily_revenue
+                FROM (
+                    SELECT date, daily_revenue FROM payments_revenue
+                    UNION ALL
+                    SELECT date, daily_revenue FROM orders_revenue
+                )
+                GROUP BY date
+            ),
+            refunds_data AS (
+                SELECT 
+                    DATE(r.created_at) AS date,
+                    SUM(r.amount) AS daily_refunds
+                FROM refunds r
+                INNER JOIN payments p ON p.id = r.payment_id AND p._status != 'deleted'
+                INNER JOIN transactions t ON t.id = p.transaction_id AND t._status != 'deleted'
+                INNER JOIN customers c ON c.id = t.customer_id
+                INNER JOIN orders o ON o.customer_id = c.id AND o._status != 'deleted' AND o.shop_id = $2
+                WHERE r._status != 'deleted'
+                  AND r.status = 'completed'
+                  AND r.created_at >= date('now', '-' || $1 || ' days')
+                GROUP BY DATE(r.created_at)
+            )
             SELECT 
-                DATE(created_at) AS date,
-                SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
-                    OVER (ORDER BY DATE(created_at)) AS cumulative_revenue,
-                SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
-                    OVER () AS total_revenue,
-                SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END) AS daily_revenue,
-                SUM(CASE WHEN status = 'cancelled' THEN total_price ELSE 0 END) AS daily_refunds
-            FROM orders
-            WHERE _status != 'deleted'
-              AND shop_id = $2
-              AND created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY DATE(created_at)
-            ORDER BY date ASC
-        "#
-        } else {
-            r#"
-            SELECT 
-                DATE(created_at) AS date,
-                SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
-                    OVER (ORDER BY DATE(created_at)) AS cumulative_revenue,
-                SUM(SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END)) 
-                    OVER () AS total_revenue,
-                SUM(CASE WHEN payment_status = 'paid' THEN total_price ELSE 0 END) AS daily_revenue,
-                SUM(CASE WHEN status = 'cancelled' THEN total_price ELSE 0 END) AS daily_refunds
-            FROM orders
-            WHERE _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY DATE(created_at)
-            ORDER BY date ASC
-        "#
-        };
+                dd.date,
+                SUM(dd.daily_revenue) OVER (ORDER BY dd.date) AS cumulative_revenue,
+                SUM(dd.daily_revenue) OVER () AS total_revenue,
+                dd.daily_revenue,
+                COALESCE(rd.daily_refunds, 0.0) AS daily_refunds
+            FROM daily_data dd
+            LEFT JOIN refunds_data rd ON dd.date = rd.date
+            ORDER BY dd.date ASC
+        "#;
 
-        let mut query = sqlx::query_as::<_, CumulativeRevenueRow>(sql).bind(days);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, CumulativeRevenueRow>(sql)
+            .bind(days)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 2: Vendas e Estoque Movimentado ao Longo do Tempo (Stacked Area)
     pub async fn get_stock_movements_area(
         &self,
         features_config: Option<&str>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<StockMovementsAreaRow>> {
         self.check_module_required(features_config, "inventory")?;
         let sql = r#"
             SELECT 
-                DATE(created_at) AS date,
-                SUM(SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END)) 
-                    OVER (ORDER BY DATE(created_at)) AS cumulative_stock_in,
-                SUM(SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END)) 
-                    OVER (ORDER BY DATE(created_at)) AS cumulative_stock_out,
-                SUM(CASE WHEN type = 'in' THEN quantity ELSE 0 END) AS daily_stock_in,
-                SUM(CASE WHEN type = 'out' THEN quantity ELSE 0 END) AS daily_stock_out
-            FROM inventory_movements
-            WHERE _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY DATE(created_at)
+                DATE(im.created_at) AS date,
+                SUM(SUM(CASE WHEN im.type = 'in' THEN im.quantity ELSE 0 END)) 
+                    OVER (ORDER BY DATE(im.created_at)) AS cumulative_stock_in,
+                SUM(SUM(CASE WHEN im.type = 'out' THEN im.quantity ELSE 0 END)) 
+                    OVER (ORDER BY DATE(im.created_at)) AS cumulative_stock_out,
+                SUM(CASE WHEN im.type = 'in' THEN im.quantity ELSE 0 END) AS daily_stock_in,
+                SUM(CASE WHEN im.type = 'out' THEN im.quantity ELSE 0 END) AS daily_stock_out
+            FROM inventory_movements im
+            INNER JOIN inventory_levels il ON il.id = im.inventory_level_id
+            INNER JOIN products p ON p.id = il.product_id
+            LEFT JOIN product_categories pc ON pc.product_id = p.id
+            LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
+            WHERE im._status != 'deleted'
+              AND c.shop_id = $2
+              AND im.created_at >= date('now', '-' || $1 || ' days')
+            GROUP BY DATE(im.created_at)
             ORDER BY date ASC
         "#;
 
         sqlx::query_as::<_, StockMovementsAreaRow>(sql)
             .bind(days)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }
@@ -372,11 +430,10 @@ impl AnalyticsRepository {
     /// Query 3: Receita por Método de Pagamento ao Longo do Tempo
     pub async fn get_revenue_by_payment_method(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<RevenueByPaymentMethodRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 DATE(p.created_at) AS date,
                 p.method AS payment_method,
@@ -395,32 +452,13 @@ impl AnalyticsRepository {
               AND p.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY DATE(p.created_at), p.method
             ORDER BY date ASC, payment_method
-        "#
-        } else {
-            r#"
-            SELECT 
-                DATE(p.created_at) AS date,
-                p.method AS payment_method,
-                SUM(p.amount) AS daily_amount,
-                SUM(SUM(p.amount)) OVER (
-                    PARTITION BY p.method 
-                    ORDER BY DATE(p.created_at)
-                ) AS cumulative_amount_by_method
-            FROM payments p
-            INNER JOIN transactions t ON t.id = p.transaction_id
-            WHERE p.status = 'captured'
-              AND p._status != 'deleted'
-              AND p.created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY DATE(p.created_at), p.method
-            ORDER BY date ASC, payment_method
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, RevenueByPaymentMethodRow>(sql).bind(days);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, RevenueByPaymentMethodRow>(sql)
+            .bind(days)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     // ============================================================
@@ -430,12 +468,11 @@ impl AnalyticsRepository {
     /// Query 4: Top 10 Produtos Mais Vendidos (por Quantidade)
     pub async fn get_top_products(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         days: i64,
         limit: i64,
     ) -> sqlx::Result<Vec<TopProductRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 ti.product_id,
                 COALESCE(ti.name_snapshot, p.name) AS product_name,
@@ -455,42 +492,22 @@ impl AnalyticsRepository {
             GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
             ORDER BY total_quantity DESC
             LIMIT $2
-        "#
-        } else {
-            r#"
-            SELECT 
-                ti.product_id,
-                COALESCE(ti.name_snapshot, p.name) AS product_name,
-                SUM(ti.quantity) AS total_quantity,
-                SUM(ti.total_line) AS total_revenue,
-                COUNT(DISTINCT t.id) AS order_count
-            FROM transaction_items ti
-            LEFT JOIN products p ON p.id = ti.product_id
-            INNER JOIN transactions t ON t.id = ti.transaction_id
-            WHERE t.type = 'sale'
-              AND t.status = 'completed'
-              AND t._status != 'deleted'
-              AND t.created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
-            ORDER BY total_quantity DESC
-            LIMIT $2
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, TopProductRow>(sql).bind(days).bind(limit);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, TopProductRow>(sql)
+            .bind(days)
+            .bind(limit)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 5: Receita por Categoria
     pub async fn get_revenue_by_category(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
     ) -> sqlx::Result<Vec<RevenueByCategoryRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 c.name AS category_name,
                 SUM(ti.total_line) AS total_revenue,
@@ -509,42 +526,21 @@ impl AnalyticsRepository {
               AND o.shop_id = $1
             GROUP BY c.id, c.name
             ORDER BY total_revenue DESC
-        "#
-        } else {
-            r#"
-            SELECT 
-                c.name AS category_name,
-                SUM(ti.total_line) AS total_revenue,
-                COUNT(DISTINCT ti.product_id) AS product_count,
-                COUNT(DISTINCT t.id) AS order_count
-            FROM transaction_items ti
-            INNER JOIN transactions t ON t.id = ti.transaction_id
-            INNER JOIN products p ON p.id = ti.product_id
-            INNER JOIN product_categories pc ON pc.product_id = p.id
-            INNER JOIN categories c ON c.id = pc.category_id
-            WHERE t.type = 'sale'
-              AND t.status = 'completed'
-              AND t._status != 'deleted'
-            GROUP BY c.id, c.name
-            ORDER BY total_revenue DESC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, RevenueByCategoryRow>(sql);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, RevenueByCategoryRow>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 6: Vendas Mensais (Últimos 12 Meses)
     pub async fn get_monthly_sales(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         months: i64,
     ) -> sqlx::Result<Vec<MonthlySalesRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 strftime('%Y-%m', created_at) AS month,
                 SUM(total_price) AS monthly_revenue,
@@ -557,39 +553,23 @@ impl AnalyticsRepository {
               AND created_at >= date('now', '-' || $1 || ' months')
             GROUP BY strftime('%Y-%m', created_at)
             ORDER BY month ASC
-        "#
-        } else {
-            r#"
-            SELECT 
-                strftime('%Y-%m', created_at) AS month,
-                SUM(total_price) AS monthly_revenue,
-                COUNT(*) AS order_count,
-                AVG(total_price) AS avg_order_value
-            FROM orders
-            WHERE payment_status = 'paid'
-              AND _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' months')
-            GROUP BY strftime('%Y-%m', created_at)
-            ORDER BY month ASC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, MonthlySalesRow>(sql).bind(months);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, MonthlySalesRow>(sql)
+            .bind(months)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 7: Produtos por Status de Estoque (Baixo, Médio, Alto)
     pub async fn get_stock_status(
         &self,
         features_config: Option<&str>,
-        shop_id: Option<String>,
+        shop_id: &str,
     ) -> sqlx::Result<Vec<StockStatusRow>> {
         self.check_module_required(features_config, "inventory")?;
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             WITH product_stock AS (
                 SELECT 
                     il.product_id,
@@ -627,51 +607,12 @@ impl AnalyticsRepository {
                     WHEN 'Medium Stock' THEN 3
                     ELSE 4
                 END
-        "#
-        } else {
-            r#"
-            WITH product_stock AS (
-                SELECT 
-                    il.product_id,
-                    SUM(il.quantity_on_hand) AS total_quantity
-                FROM inventory_levels il
-                INNER JOIN products p ON p.id = il.product_id
-                WHERE il._status != 'deleted'
-                  AND il.stock_status = 'sellable'
-                GROUP BY il.product_id
-            )
-            SELECT 
-                CASE 
-                    WHEN ps.total_quantity = 0 THEN 'Out of Stock'
-                    WHEN ps.total_quantity < 10 THEN 'Low Stock'
-                    WHEN ps.total_quantity < 50 THEN 'Medium Stock'
-                    ELSE 'High Stock'
-                END AS stock_status,
-                COUNT(*) AS product_count,
-                SUM(ps.total_quantity) AS total_quantity
-            FROM product_stock ps
-            GROUP BY 
-                CASE 
-                    WHEN ps.total_quantity = 0 THEN 'Out of Stock'
-                    WHEN ps.total_quantity < 10 THEN 'Low Stock'
-                    WHEN ps.total_quantity < 50 THEN 'Medium Stock'
-                    ELSE 'High Stock'
-                END
-            ORDER BY 
-                CASE stock_status
-                    WHEN 'Out of Stock' THEN 1
-                    WHEN 'Low Stock' THEN 2
-                    WHEN 'Medium Stock' THEN 3
-                    ELSE 4
-                END
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, StockStatusRow>(sql);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, StockStatusRow>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     // ============================================================
@@ -681,11 +622,10 @@ impl AnalyticsRepository {
     /// Query 8: Tendência de Vendas Diárias (com Média Móvel de 7 dias)
     pub async fn get_daily_sales_trend(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<DailySalesTrendRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 DATE(created_at) AS date,
                 COUNT(*) AS daily_orders,
@@ -705,45 +645,22 @@ impl AnalyticsRepository {
               AND created_at >= date('now', '-' || $1 || ' days')
             GROUP BY DATE(created_at)
             ORDER BY date ASC
-        "#
-        } else {
-            r#"
-            SELECT 
-                DATE(created_at) AS date,
-                COUNT(*) AS daily_orders,
-                SUM(total_price) AS daily_revenue,
-                AVG(SUM(total_price)) OVER (
-                    ORDER BY DATE(created_at) 
-                    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
-                ) AS moving_avg_7d_revenue,
-                AVG(COUNT(*)) OVER (
-                    ORDER BY DATE(created_at) 
-                    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
-                ) AS moving_avg_7d_orders
-            FROM orders
-            WHERE payment_status = 'paid'
-              AND _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY DATE(created_at)
-            ORDER BY date ASC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, DailySalesTrendRow>(sql).bind(days);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, DailySalesTrendRow>(sql)
+            .bind(days)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 9: Crescimento de Clientes ao Longo do Tempo
     pub async fn get_customer_growth(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         months: i64,
     ) -> sqlx::Result<Vec<CustomerGrowthRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT DISTINCT
                 strftime('%Y-%m', c.created_at) AS month,
                 COUNT(DISTINCT c.id) AS new_customers,
@@ -761,42 +678,22 @@ impl AnalyticsRepository {
               AND c.created_at >= date('now', '-' || $1 || ' months')
             GROUP BY strftime('%Y-%m', c.created_at)
             ORDER BY month ASC
-        "#
-        } else {
-            r#"
-            SELECT 
-                strftime('%Y-%m', created_at) AS month,
-                COUNT(*) AS new_customers,
-                SUM(COUNT(*)) OVER (ORDER BY strftime('%Y-%m', created_at)) AS cumulative_customers,
-                LAG(COUNT(*)) OVER (ORDER BY strftime('%Y-%m', created_at)) AS previous_month,
-                ROUND(
-                    (COUNT(*) - LAG(COUNT(*)) OVER (ORDER BY strftime('%Y-%m', created_at))) * 100.0 
-                    / NULLIF(LAG(COUNT(*)) OVER (ORDER BY strftime('%Y-%m', created_at)), 0),
-                    2
-                ) AS growth_percentage
-            FROM customers
-            WHERE _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' months')
-            GROUP BY strftime('%Y-%m', created_at)
-            ORDER BY month ASC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, CustomerGrowthRow>(sql).bind(months);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, CustomerGrowthRow>(sql)
+            .bind(months)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 10: Ticket Médio ao Longo do Tempo
     pub async fn get_average_order_value(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         months: i64,
     ) -> sqlx::Result<Vec<AverageOrderValueRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 strftime('%Y-%m', created_at) AS month,
                 COUNT(*) AS order_count,
@@ -814,33 +711,13 @@ impl AnalyticsRepository {
               AND created_at >= date('now', '-' || $1 || ' months')
             GROUP BY strftime('%Y-%m', created_at)
             ORDER BY month ASC
-        "#
-        } else {
-            r#"
-            SELECT 
-                strftime('%Y-%m', created_at) AS month,
-                COUNT(*) AS order_count,
-                AVG(total_price) AS avg_order_value,
-                LAG(AVG(total_price)) OVER (ORDER BY strftime('%Y-%m', created_at)) AS previous_avg,
-                ROUND(
-                    (AVG(total_price) - LAG(AVG(total_price)) OVER (ORDER BY strftime('%Y-%m', created_at))) * 100.0
-                    / NULLIF(LAG(AVG(total_price)) OVER (ORDER BY strftime('%Y-%m', created_at)), 0),
-                    2
-                ) AS avg_change_percentage
-            FROM orders
-            WHERE payment_status = 'paid'
-              AND _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' months')
-            GROUP BY strftime('%Y-%m', created_at)
-            ORDER BY month ASC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, AverageOrderValueRow>(sql).bind(months);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, AverageOrderValueRow>(sql)
+            .bind(months)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     // ============================================================
@@ -850,11 +727,10 @@ impl AnalyticsRepository {
     /// Query 11: Distribuição de Vendas por Método de Pagamento
     pub async fn get_payment_method_distribution(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<PaymentMethodDistributionRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 p.method AS payment_method,
                 SUM(p.amount) AS total_amount,
@@ -873,41 +749,21 @@ impl AnalyticsRepository {
               AND p.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY p.method
             ORDER BY total_amount DESC
-        "#
-        } else {
-            r#"
-            SELECT 
-                p.method AS payment_method,
-                SUM(p.amount) AS total_amount,
-                COUNT(*) AS transaction_count,
-                ROUND(
-                    SUM(p.amount) * 100.0 / SUM(SUM(p.amount)) OVER (),
-                    2
-                ) AS percentage
-            FROM payments p
-            INNER JOIN transactions t ON t.id = p.transaction_id
-            WHERE p.status = 'captured'
-              AND p._status != 'deleted'
-              AND p.created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY p.method
-            ORDER BY total_amount DESC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, PaymentMethodDistributionRow>(sql).bind(days);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, PaymentMethodDistributionRow>(sql)
+            .bind(days)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 12: Distribuição de Produtos por Categoria
     pub async fn get_category_distribution(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
     ) -> sqlx::Result<Vec<CategoryDistributionRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 c.name AS category_name,
                 COUNT(DISTINCT pc.product_id) AS product_count,
@@ -922,40 +778,21 @@ impl AnalyticsRepository {
               AND c.shop_id = $1
             GROUP BY c.id, c.name
             ORDER BY product_count DESC
-        "#
-        } else {
-            r#"
-            SELECT 
-                c.name AS category_name,
-                COUNT(DISTINCT pc.product_id) AS product_count,
-                ROUND(
-                    COUNT(DISTINCT pc.product_id) * 100.0 / SUM(COUNT(DISTINCT pc.product_id)) OVER (),
-                    2
-                ) AS percentage
-            FROM product_categories pc
-            INNER JOIN categories c ON c.id = pc.category_id
-            INNER JOIN products p ON p.id = pc.product_id
-            WHERE p._status != 'deleted'
-            GROUP BY c.id, c.name
-            ORDER BY product_count DESC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, CategoryDistributionRow>(sql);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, CategoryDistributionRow>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 13: Distribuição de Pedidos por Status
     pub async fn get_order_status_distribution(
         &self,
-        shop_id: Option<String>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<Vec<OrderStatusDistributionRow>> {
-        let sql = if shop_id.is_some() {
-            r#"
+        let sql = r#"
             SELECT 
                 payment_status,
                 COUNT(*) AS order_count,
@@ -974,38 +811,17 @@ impl AnalyticsRepository {
               AND created_at >= date('now', '-' || $1 || ' days')
             GROUP BY payment_status
             ORDER BY order_count DESC
-        "#
-        } else {
-            r#"
-            SELECT 
-                payment_status,
-                COUNT(*) AS order_count,
-                SUM(total_price) AS total_revenue,
-                ROUND(
-                    COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (),
-                    2
-                ) AS order_percentage,
-                ROUND(
-                    SUM(total_price) * 100.0 / SUM(SUM(total_price)) OVER (),
-                    2
-                ) AS revenue_percentage
-            FROM orders
-            WHERE _status != 'deleted'
-              AND created_at >= date('now', '-' || $1 || ' days')
-            GROUP BY payment_status
-            ORDER BY order_count DESC
-        "#
-        };
+        "#;
 
-        let mut query = sqlx::query_as::<_, OrderStatusDistributionRow>(sql).bind(days);
-        if let Some(ref id) = shop_id {
-            query = query.bind(id);
-        }
-        query.fetch_all(&self.pool).await
+        sqlx::query_as::<_, OrderStatusDistributionRow>(sql)
+            .bind(days)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
     }
 
     /// Query 14: Distribuição de Clientes por Grupo
-    pub async fn get_customer_group_distribution(&self) -> sqlx::Result<Vec<CustomerGroupDistributionRow>> {
+    pub async fn get_customer_group_distribution(&self, shop_id: &str) -> sqlx::Result<Vec<CustomerGroupDistributionRow>> {
         let sql = r#"
             SELECT 
                 COALESCE(cg.name, 'Sem Grupo') AS group_name,
@@ -1019,11 +835,13 @@ impl AnalyticsRepository {
             INNER JOIN customer_groups cg ON cg.id = cgm.customer_group_id
             INNER JOIN customers c ON c.id = cgm.customer_id
             WHERE c._status != 'deleted'
+              AND cg.shop_id = $1
             GROUP BY cg.id, COALESCE(cg.name, 'Sem Grupo')
             ORDER BY customer_count DESC
         "#;
 
         sqlx::query_as::<_, CustomerGroupDistributionRow>(sql)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }
@@ -1033,7 +851,7 @@ impl AnalyticsRepository {
     // ============================================================
 
     /// Query 15: Métricas de Performance por Mês (Vendas, Receita, Clientes, Estoque)
-    pub async fn get_monthly_performance_metrics(&self, months: i64) -> sqlx::Result<Vec<MonthlyPerformanceMetricsRow>> {
+    pub async fn get_monthly_performance_metrics(&self, shop_id: &str, months: i64) -> sqlx::Result<Vec<MonthlyPerformanceMetricsRow>> {
         let sql = r#"
             WITH monthly_metrics AS (
                 SELECT 
@@ -1045,14 +863,18 @@ impl AnalyticsRepository {
                         SELECT SUM(im.quantity)
                         FROM transactions t
                         INNER JOIN inventory_movements im ON im.transaction_id = t.id
+                        INNER JOIN customers cu ON cu.id = t.customer_id
+                        INNER JOIN orders ord ON ord.customer_id = cu.id AND ord.id = t.order_id
                         WHERE t.type = 'sale'
                           AND t.status = 'completed'
                           AND t._status != 'deleted'
+                          AND ord.shop_id = $2
                           AND strftime('%Y-%m', t.created_at) = strftime('%Y-%m', o.created_at)
                           AND im.type = 'out'
                     ), 0) AS stock_sold
                 FROM orders o
                 WHERE o._status != 'deleted'
+                  AND o.shop_id = $2
                   AND o.created_at >= date('now', '-' || $1 || ' months')
                 GROUP BY strftime('%Y-%m', o.created_at)
             ),
@@ -1082,12 +904,13 @@ impl AnalyticsRepository {
 
         sqlx::query_as::<_, MonthlyPerformanceMetricsRow>(sql)
             .bind(months)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }
 
     /// Query 16: Métricas por Produto (Vendas, Receita, Margem, Estoque)
-    pub async fn get_product_metrics(&self, days: i64, limit: i64) -> sqlx::Result<Vec<ProductMetricsRow>> {
+    pub async fn get_product_metrics(&self, shop_id: &str, days: i64, limit: i64) -> sqlx::Result<Vec<ProductMetricsRow>> {
         let sql = r#"
             WITH product_metrics AS (
                 SELECT 
@@ -1100,8 +923,13 @@ impl AnalyticsRepository {
                 FROM products p
                 LEFT JOIN transaction_items ti ON ti.product_id = p.id
                 LEFT JOIN transactions t ON t.id = ti.transaction_id AND t.type = 'sale'
+                LEFT JOIN customers cu ON cu.id = t.customer_id
+                LEFT JOIN orders o ON o.customer_id = cu.id AND o.id = t.order_id
+                LEFT JOIN product_categories pc ON pc.product_id = p.id
+                LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
                 LEFT JOIN inventory_levels il ON il.product_id = p.id AND il._status != 'deleted'
                 WHERE p._status != 'deleted'
+                  AND c.shop_id = $3
                   AND (t.created_at >= date('now', '-' || $1 || ' days') OR t.created_at IS NULL)
                 GROUP BY p.id, COALESCE(ti.name_snapshot, p.name)
                 HAVING total_quantity_sold > 0
@@ -1120,6 +948,7 @@ impl AnalyticsRepository {
         sqlx::query_as::<_, ProductMetricsRow>(sql)
             .bind(days)
             .bind(limit)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }
@@ -1129,15 +958,16 @@ impl AnalyticsRepository {
     // ============================================================
 
     /// Query 17: Progresso de Meta de Vendas Mensal
-    pub async fn get_monthly_sales_progress(&self, target_revenue: f64) -> sqlx::Result<MonthlySalesProgressRow> {
+    pub async fn get_monthly_sales_progress(&self, shop_id: &str, target_revenue: f64) -> sqlx::Result<MonthlySalesProgressRow> {
         let sql = r#"
             WITH monthly_target AS (
                 SELECT 
                     SUM(total_price) AS current_revenue,
-                    $1 AS target_revenue
+                    $2 AS target_revenue
                 FROM orders
                 WHERE payment_status = 'paid'
                   AND _status != 'deleted'
+                  AND shop_id = $1
                   AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')
             )
             SELECT 
@@ -1152,6 +982,7 @@ impl AnalyticsRepository {
         "#;
 
         sqlx::query_as::<_, MonthlySalesProgressRow>(sql)
+            .bind(shop_id)
             .bind(target_revenue)
             .fetch_one(&self.pool)
             .await
@@ -1161,6 +992,7 @@ impl AnalyticsRepository {
     pub async fn get_conversion_rate(
         &self,
         features_config: Option<&str>,
+        shop_id: &str,
         days: i64,
     ) -> sqlx::Result<ConversionRateRow> {
         self.check_module_required(features_config, "checkout")?;
@@ -1173,6 +1005,7 @@ impl AnalyticsRepository {
                 LEFT JOIN orders o ON o.created_at >= c.created_at 
                     AND o.created_at <= datetime(c.created_at, '+1 day')
                     AND o._status != 'deleted'
+                    AND o.shop_id = $2
                 WHERE c._status != 'deleted'
                   AND c.created_at >= date('now', '-' || $1 || ' days')
             )
@@ -1188,6 +1021,7 @@ impl AnalyticsRepository {
 
         sqlx::query_as::<_, ConversionRateRow>(sql)
             .bind(days)
+            .bind(shop_id)
             .fetch_one(&self.pool)
             .await
     }
@@ -1196,6 +1030,7 @@ impl AnalyticsRepository {
     pub async fn get_inventory_capacity(
         &self,
         features_config: Option<&str>,
+        shop_id: &str,
         capacity_limit: f64,
     ) -> sqlx::Result<InventoryCapacityRow> {
         self.check_module_required(features_config, "inventory")?;
@@ -1203,10 +1038,14 @@ impl AnalyticsRepository {
             WITH inventory_capacity AS (
                 SELECT 
                     SUM(il.quantity_on_hand) AS current_stock,
-                    $1 AS capacity_limit
+                    $2 AS capacity_limit
                 FROM inventory_levels il
+                INNER JOIN products p ON p.id = il.product_id
+                LEFT JOIN product_categories pc ON pc.product_id = p.id
+                LEFT JOIN categories c ON c.id = pc.category_id AND c._status != 'deleted'
                 WHERE il._status != 'deleted'
                   AND il.stock_status = 'sellable'
+                  AND c.shop_id = $1
             )
             SELECT 
                 current_stock,
@@ -1219,6 +1058,7 @@ impl AnalyticsRepository {
         "#;
 
         sqlx::query_as::<_, InventoryCapacityRow>(sql)
+            .bind(shop_id)
             .bind(capacity_limit)
             .fetch_one(&self.pool)
             .await
@@ -1229,7 +1069,7 @@ impl AnalyticsRepository {
     // ============================================================
 
     /// Query 20: Ranking de Produtos com Percentil
-    pub async fn get_product_ranking(&self, days: i64, limit: i64) -> sqlx::Result<Vec<ProductRankingRow>> {
+    pub async fn get_product_ranking(&self, shop_id: &str, days: i64, limit: i64) -> sqlx::Result<Vec<ProductRankingRow>> {
         let sql = r#"
             SELECT 
                 COALESCE(ti.name_snapshot, p.name) AS product_name,
@@ -1242,9 +1082,12 @@ impl AnalyticsRepository {
             FROM transaction_items ti
             LEFT JOIN products p ON p.id = ti.product_id
             INNER JOIN transactions t ON t.id = ti.transaction_id
+            INNER JOIN customers c ON c.id = t.customer_id
+            INNER JOIN orders o ON o.customer_id = c.id AND o.id = t.order_id
             WHERE t.type = 'sale'
               AND t.status = 'completed'
               AND t._status != 'deleted'
+              AND o.shop_id = $3
               AND t.created_at >= date('now', '-' || $1 || ' days')
             GROUP BY ti.product_id, COALESCE(ti.name_snapshot, p.name)
             ORDER BY total_revenue DESC
@@ -1254,12 +1097,13 @@ impl AnalyticsRepository {
         sqlx::query_as::<_, ProductRankingRow>(sql)
             .bind(days)
             .bind(limit)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }
 
     /// Query 21: Comparação Mês a Mês (MoM - Month over Month)
-    pub async fn get_month_over_month_growth(&self, months: i64) -> sqlx::Result<Vec<MonthOverMonthGrowthRow>> {
+    pub async fn get_month_over_month_growth(&self, shop_id: &str, months: i64) -> sqlx::Result<Vec<MonthOverMonthGrowthRow>> {
         let sql = r#"
             SELECT 
                 strftime('%Y-%m', created_at) AS month,
@@ -1273,6 +1117,7 @@ impl AnalyticsRepository {
             FROM orders
             WHERE payment_status = 'paid'
               AND _status != 'deleted'
+              AND shop_id = $2
               AND created_at >= date('now', '-' || $1 || ' months')
             GROUP BY strftime('%Y-%m', created_at)
             ORDER BY month ASC
@@ -1280,12 +1125,13 @@ impl AnalyticsRepository {
 
         sqlx::query_as::<_, MonthOverMonthGrowthRow>(sql)
             .bind(months)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }
 
     /// Query 22: Vendas Acumuladas por Período (YTD - Year to Date)
-    pub async fn get_year_to_date_sales(&self) -> sqlx::Result<Vec<YearToDateSalesRow>> {
+    pub async fn get_year_to_date_sales(&self, shop_id: &str) -> sqlx::Result<Vec<YearToDateSalesRow>> {
         let sql = r#"
             SELECT 
                 strftime('%Y-%m', created_at) AS month,
@@ -1302,12 +1148,14 @@ impl AnalyticsRepository {
             FROM orders
             WHERE payment_status = 'paid'
               AND _status != 'deleted'
+              AND shop_id = $1
               AND strftime('%Y', created_at) = strftime('%Y', 'now')
             GROUP BY strftime('%Y-%m', created_at)
             ORDER BY month ASC
         "#;
 
         sqlx::query_as::<_, YearToDateSalesRow>(sql)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }

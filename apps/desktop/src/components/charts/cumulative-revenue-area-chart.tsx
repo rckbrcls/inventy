@@ -52,9 +52,11 @@ export function CumulativeRevenueAreaChart() {
       try {
         setLoading(true)
         const revenueData = await AnalyticsRepository.getCumulativeRevenue(shopId, timeRange)
-        setData(revenueData)
+        console.log("Cumulative revenue data:", revenueData)
+        setData(revenueData || [])
       } catch (error) {
         console.error("Failed to load cumulative revenue data", error)
+        setData([])
       } finally {
         setLoading(false)
       }

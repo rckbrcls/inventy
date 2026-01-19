@@ -54,16 +54,30 @@ impl AnalyticsService {
         None
     }
 
+    async fn get_or_resolve_shop_id(&self, shop_id: Option<String>) -> Result<String, String> {
+        if let Some(shop_id) = shop_id {
+            return Ok(shop_id);
+        }
+        
+        // Se não especificou shop_id, usar shop padrão
+        if let Ok(Some(shop)) = self.shop_service.get_default_shop().await {
+            return Ok(shop.id);
+        }
+        
+        Err("No shop_id provided and no default shop found".to_string())
+    }
+
     pub async fn get_dashboard_stats(
         &self,
         shop_id: Option<String>,
     ) -> Result<DashboardStatsDto, String> {
-        let features_config = self.get_features_config(shop_id).await;
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
+        let features_config = self.get_features_config(Some(shop_id.clone())).await;
         let features_config_str = features_config.as_deref();
         
         let stats = self
             .repo
-            .get_dashboard_stats(features_config_str, LOW_STOCK_THRESHOLD)
+            .get_dashboard_stats(features_config_str, &shop_id, LOW_STOCK_THRESHOLD)
             .await
             .map_err(|e| format!("Failed to fetch dashboard stats: {}", e))?;
 
@@ -75,7 +89,8 @@ impl AnalyticsService {
         shop_id: Option<String>,
         payload: StockMovementsFilterDto,
     ) -> Result<Vec<DailyMovementStatDto>, String> {
-        let features_config = self.get_features_config(shop_id).await;
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
+        let features_config = self.get_features_config(Some(shop_id.clone())).await;
         let features_config_str = features_config.as_deref();
         
         let parsed = parse_time_range(&payload.time_range)?;
@@ -84,7 +99,7 @@ impl AnalyticsService {
 
         let rows = self
             .repo
-            .get_stock_movements(features_config_str, bucket_format, start_at)
+            .get_stock_movements(features_config_str, &shop_id, bucket_format, start_at)
             .await
             .map_err(|e| format!("Failed to fetch stock movements: {}", e))?;
 
@@ -118,12 +133,18 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<CumulativeRevenueDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(90);
         let rows = self
             .repo
-            .get_cumulative_revenue(shop_id, days)
+            .get_cumulative_revenue(&shop_id, days)
             .await
-            .map_err(|e| format!("Failed to fetch cumulative revenue: {}", e))?;
+            .map_err(|e| {
+                eprintln!("Error fetching cumulative revenue: {} (shop_id: {}, days: {})", e, shop_id, days);
+                format!("Failed to fetch cumulative revenue: {}", e)
+            })?;
+
+        eprintln!("Cumulative revenue rows returned: {} (shop_id: {}, days: {})", rows.len(), shop_id, days);
 
         Ok(rows
             .into_iter()
@@ -143,12 +164,13 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<StockMovementsAreaDto>, String> {
-        let features_config = self.get_features_config(shop_id).await;
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
+        let features_config = self.get_features_config(Some(shop_id.clone())).await;
         let features_config_str = features_config.as_deref();
         let days = days.unwrap_or(90);
         let rows = self
             .repo
-            .get_stock_movements_area(features_config_str, days)
+            .get_stock_movements_area(features_config_str, &shop_id, days)
             .await
             .map_err(|e| format!("Failed to fetch stock movements area: {}", e))?;
 
@@ -170,10 +192,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<RevenueByPaymentMethodDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(90);
         let rows = self
             .repo
-            .get_revenue_by_payment_method(shop_id, days)
+            .get_revenue_by_payment_method(&shop_id, days)
             .await
             .map_err(|e| format!("Failed to fetch revenue by payment method: {}", e))?;
 
@@ -199,11 +222,12 @@ impl AnalyticsService {
         days: Option<i64>,
         limit: Option<i64>,
     ) -> Result<Vec<TopProductDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(30);
         let limit = limit.unwrap_or(10);
         let rows = self
             .repo
-            .get_top_products(shop_id, days, limit)
+            .get_top_products(&shop_id, days, limit)
             .await
             .map_err(|e| format!("Failed to fetch top products: {}", e))?;
 
@@ -224,9 +248,10 @@ impl AnalyticsService {
         &self,
         shop_id: Option<String>,
     ) -> Result<Vec<RevenueByCategoryDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let rows = self
             .repo
-            .get_revenue_by_category(shop_id)
+            .get_revenue_by_category(&shop_id)
             .await
             .map_err(|e| format!("Failed to fetch revenue by category: {}", e))?;
 
@@ -247,10 +272,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         months: Option<i64>,
     ) -> Result<Vec<MonthlySalesDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let months = months.unwrap_or(12);
         let rows = self
             .repo
-            .get_monthly_sales(shop_id, months)
+            .get_monthly_sales(&shop_id, months)
             .await
             .map_err(|e| format!("Failed to fetch monthly sales: {}", e))?;
 
@@ -270,11 +296,12 @@ impl AnalyticsService {
         &self,
         shop_id: Option<String>,
     ) -> Result<Vec<StockStatusDto>, String> {
-        let features_config = self.get_features_config(shop_id.clone()).await;
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
+        let features_config = self.get_features_config(Some(shop_id.clone())).await;
         let features_config_str = features_config.as_deref();
         let rows = self
             .repo
-            .get_stock_status(features_config_str, shop_id)
+            .get_stock_status(features_config_str, &shop_id)
             .await
             .map_err(|e| format!("Failed to fetch stock status: {}", e))?;
 
@@ -298,10 +325,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<DailySalesTrendDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(90);
         let rows = self
             .repo
-            .get_daily_sales_trend(shop_id, days)
+            .get_daily_sales_trend(&shop_id, days)
             .await
             .map_err(|e| format!("Failed to fetch daily sales trend: {}", e))?;
 
@@ -323,10 +351,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         months: Option<i64>,
     ) -> Result<Vec<CustomerGrowthDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let months = months.unwrap_or(24);
         let rows = self
             .repo
-            .get_customer_growth(shop_id, months)
+            .get_customer_growth(&shop_id, months)
             .await
             .map_err(|e| format!("Failed to fetch customer growth: {}", e))?;
 
@@ -348,10 +377,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         months: Option<i64>,
     ) -> Result<Vec<AverageOrderValueDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let months = months.unwrap_or(12);
         let rows = self
             .repo
-            .get_average_order_value(shop_id, months)
+            .get_average_order_value(&shop_id, months)
             .await
             .map_err(|e| format!("Failed to fetch average order value: {}", e))?;
 
@@ -377,10 +407,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<PaymentMethodDistributionDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(30);
         let rows = self
             .repo
-            .get_payment_method_distribution(shop_id, days)
+            .get_payment_method_distribution(&shop_id, days)
             .await
             .map_err(|e| format!("Failed to fetch payment method distribution: {}", e))?;
 
@@ -400,9 +431,10 @@ impl AnalyticsService {
         &self,
         shop_id: Option<String>,
     ) -> Result<Vec<CategoryDistributionDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let rows = self
             .repo
-            .get_category_distribution(shop_id)
+            .get_category_distribution(&shop_id)
             .await
             .map_err(|e| format!("Failed to fetch category distribution: {}", e))?;
 
@@ -422,10 +454,11 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<Vec<OrderStatusDistributionDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(30);
         let rows = self
             .repo
-            .get_order_status_distribution(shop_id, days)
+            .get_order_status_distribution(&shop_id, days)
             .await
             .map_err(|e| format!("Failed to fetch order status distribution: {}", e))?;
 
@@ -444,10 +477,12 @@ impl AnalyticsService {
     /// Query 14: Distribuição de Clientes por Grupo
     pub async fn get_customer_group_distribution(
         &self,
+        shop_id: Option<String>,
     ) -> Result<Vec<CustomerGroupDistributionDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let rows = self
             .repo
-            .get_customer_group_distribution()
+            .get_customer_group_distribution(&shop_id)
             .await
             .map_err(|e| format!("Failed to fetch customer group distribution: {}", e))?;
 
@@ -468,12 +503,14 @@ impl AnalyticsService {
     /// Query 15: Métricas de Performance por Mês (Vendas, Receita, Clientes, Estoque)
     pub async fn get_monthly_performance_metrics(
         &self,
+        shop_id: Option<String>,
         months: Option<i64>,
     ) -> Result<Vec<MonthlyPerformanceMetricsDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let months = months.unwrap_or(12);
         let rows = self
             .repo
-            .get_monthly_performance_metrics(months)
+            .get_monthly_performance_metrics(&shop_id, months)
             .await
             .map_err(|e| format!("Failed to fetch monthly performance metrics: {}", e))?;
 
@@ -492,14 +529,16 @@ impl AnalyticsService {
     /// Query 16: Métricas por Produto (Vendas, Receita, Margem, Estoque)
     pub async fn get_product_metrics(
         &self,
+        shop_id: Option<String>,
         days: Option<i64>,
         limit: Option<i64>,
     ) -> Result<Vec<ProductMetricsDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(30);
         let limit = limit.unwrap_or(10);
         let rows = self
             .repo
-            .get_product_metrics(days, limit)
+            .get_product_metrics(&shop_id, days, limit)
             .await
             .map_err(|e| format!("Failed to fetch product metrics: {}", e))?;
 
@@ -522,12 +561,14 @@ impl AnalyticsService {
     /// Query 17: Progresso de Meta de Vendas Mensal
     pub async fn get_monthly_sales_progress(
         &self,
+        shop_id: Option<String>,
         target_revenue: Option<f64>,
     ) -> Result<MonthlySalesProgressDto, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let target_revenue = target_revenue.unwrap_or(100000.0);
         let row = self
             .repo
-            .get_monthly_sales_progress(target_revenue)
+            .get_monthly_sales_progress(&shop_id, target_revenue)
             .await
             .map_err(|e| format!("Failed to fetch monthly sales progress: {}", e))?;
 
@@ -545,12 +586,13 @@ impl AnalyticsService {
         shop_id: Option<String>,
         days: Option<i64>,
     ) -> Result<ConversionRateDto, String> {
-        let features_config = self.get_features_config(shop_id).await;
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
+        let features_config = self.get_features_config(Some(shop_id.clone())).await;
         let features_config_str = features_config.as_deref();
         let days = days.unwrap_or(30);
         let row = self
             .repo
-            .get_conversion_rate(features_config_str, days)
+            .get_conversion_rate(features_config_str, &shop_id, days)
             .await
             .map_err(|e| format!("Failed to fetch conversion rate: {}", e))?;
 
@@ -567,12 +609,13 @@ impl AnalyticsService {
         shop_id: Option<String>,
         capacity_limit: Option<f64>,
     ) -> Result<InventoryCapacityDto, String> {
-        let features_config = self.get_features_config(shop_id).await;
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
+        let features_config = self.get_features_config(Some(shop_id.clone())).await;
         let features_config_str = features_config.as_deref();
         let capacity_limit = capacity_limit.unwrap_or(10000.0);
         let row = self
             .repo
-            .get_inventory_capacity(features_config_str, capacity_limit)
+            .get_inventory_capacity(features_config_str, &shop_id, capacity_limit)
             .await
             .map_err(|e| format!("Failed to fetch inventory capacity: {}", e))?;
 
@@ -590,14 +633,16 @@ impl AnalyticsService {
     /// Query 20: Ranking de Produtos com Percentil
     pub async fn get_product_ranking(
         &self,
+        shop_id: Option<String>,
         days: Option<i64>,
         limit: Option<i64>,
     ) -> Result<Vec<ProductRankingDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let days = days.unwrap_or(30);
         let limit = limit.unwrap_or(20);
         let rows = self
             .repo
-            .get_product_ranking(days, limit)
+            .get_product_ranking(&shop_id, days, limit)
             .await
             .map_err(|e| format!("Failed to fetch product ranking: {}", e))?;
 
@@ -615,12 +660,14 @@ impl AnalyticsService {
     /// Query 21: Comparação Mês a Mês (MoM - Month over Month)
     pub async fn get_month_over_month_growth(
         &self,
+        shop_id: Option<String>,
         months: Option<i64>,
     ) -> Result<Vec<MonthOverMonthGrowthDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let months = months.unwrap_or(12);
         let rows = self
             .repo
-            .get_month_over_month_growth(months)
+            .get_month_over_month_growth(&shop_id, months)
             .await
             .map_err(|e| format!("Failed to fetch month over month growth: {}", e))?;
 
@@ -636,10 +683,11 @@ impl AnalyticsService {
     }
 
     /// Query 22: Vendas Acumuladas por Período (YTD - Year to Date)
-    pub async fn get_year_to_date_sales(&self) -> Result<Vec<YearToDateSalesDto>, String> {
+    pub async fn get_year_to_date_sales(&self, shop_id: Option<String>) -> Result<Vec<YearToDateSalesDto>, String> {
+        let shop_id = self.get_or_resolve_shop_id(shop_id).await?;
         let rows = self
             .repo
-            .get_year_to_date_sales()
+            .get_year_to_date_sales(&shop_id)
             .await
             .map_err(|e| format!("Failed to fetch year to date sales: {}", e))?;
 
