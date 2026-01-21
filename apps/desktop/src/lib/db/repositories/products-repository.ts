@@ -1,33 +1,33 @@
-import { invoke } from '@tauri-apps/api/core'
+import { invoke } from "@tauri-apps/api/core";
 import type {
   Product,
   CreateProductDTO,
   UpdateProductDTO,
   ProductListFilter,
-} from '@uru/types'
+} from "@uru/types";
 
 export const ProductsRepository = {
   async list(): Promise<Product[]> {
-    return invoke('list_products')
+    return invoke("list_products");
   },
 
   async listFiltered(filters: ProductListFilter): Promise<Product[]> {
-    return invoke('list_products_filtered', { filters })
+    return invoke("list_products_filtered", { filters });
   },
 
   async getById(id: string): Promise<Product | null> {
-    return invoke('get_product', { id })
+    return invoke("get_product", { id });
   },
 
   async create(payload: CreateProductDTO): Promise<Product> {
-    return invoke('create_product', { payload })
+    return invoke("create_product", { payload });
   },
 
   async update(payload: UpdateProductDTO): Promise<Product> {
-    return invoke('update_product', { payload })
+    return invoke("update_product", { payload });
   },
 
   async delete(id: string): Promise<void> {
-    return invoke('delete_product', { id })
+    return invoke("delete_product", { id });
   },
-}
+};
