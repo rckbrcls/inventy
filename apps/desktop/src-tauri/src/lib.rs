@@ -263,7 +263,7 @@ pub fn run() {
         .setup(|app| {
             let app_data_dir = app.path().app_data_dir()?;
             fs::create_dir_all(&app_data_dir)?;
-            let db_path = app_data_dir.join("inventy.db");
+            let db_path = app_data_dir.join("uru.db");
             if !db_path.exists() {
                 OpenOptions::new()
                     .create(true)

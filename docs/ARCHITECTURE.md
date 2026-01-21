@@ -1,4 +1,4 @@
-# Arquitetura e Regras de Negócio: Inventy Desktop
+# Arquitetura e Regras de Negócio: Uru Desktop
 
 ## 1. Arquitetura do Sistema
 
@@ -93,7 +93,7 @@ CREATE TABLE inventory_movements (
 
 ### Mecânica "Mother-Satellite"
 
-1.  **Descoberta**: O Desktop anuncia seu IP via mDNS (Bonjour). O Mobile escaneia e encontra `Inventy Server`.
+1.  **Descoberta**: O Desktop anuncia seu IP via mDNS (Bonjour). O Mobile escaneia e encontra `Uru Server`.
 2.  **Pull (Mobile -> Pede dados)**: Mobile envia seu `last_pulled_at`. Desktop responde com todos registros onde `updated_at > last_pulled_at`.
 3.  **Push (Mobile -> Envia dados)**: Mobile envia registros criados/alterados offline. Desktop aplica (Last Write Wins) e atualiza o `updated_at`.
 

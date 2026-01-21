@@ -1,4 +1,4 @@
-# Protocolo de Rede e Sincronização: Inventy
+# Protocolo de Rede e Sincronização: Uru
 
 Esta documentação define como os dispositivos (Mother Node e Satellites) se comunicam na Rede Local (LAN). O protocolo é desenhado para ser "Zero Config" e resiliente a falhas de conexão.
 
@@ -19,8 +19,8 @@ Para evitar que o usuário precise digitar o IP do servidor manualmente (ex: `19
 
 Ao iniciar, o Desktop App anuncia o serviço na rede local:
 
-- **Service Name**: `_inventy-http._tcp.local`
-- **Instance Name**: `Inventy Server ({HostName})`
+- **Service Name**: `_uru-http._tcp.local`
+- **Instance Name**: `Uru Server ({HostName})`
 - **Port**: `3000`
 - **TXT Records**:
   - `version`: `1.0`
@@ -28,7 +28,7 @@ Ao iniciar, o Desktop App anuncia o serviço na rede local:
 
 ### Satellite Node (Busca)
 
-O App Mobile escaneia a rede procurando por serviços `_inventy-http._tcp`. Ao encontrar, resolve o IP e tenta conectar.
+O App Mobile escaneia a rede procurando por serviços `_uru-http._tcp`. Ao encontrar, resolve o IP e tenta conectar.
 
 ---
 

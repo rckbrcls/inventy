@@ -1,5 +1,5 @@
 {
-  "name": "inventy",
+  "name": "uru-monorepo",
   "private": true,
   "scripts": {
     "build": "turbo run build",

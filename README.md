@@ -1,8 +1,8 @@
-# Inventy: The Local-First Inventory Cloud
+# Uru: The Local-First Inventory Cloud
 
 > **Manage your inventory in real-time across multiple devices using your own Local Network. No cloud subscriptions, no internet interaction required.**
 
-**Inventy** is a high-performance, "Premium" aesthetics inventory management system designed for small businesses that need reliability and speed. It operates on a robust **Mother-Satellite Architecture**, where a Desktop computer acts as the local server for multiple mobile devices.
+**Uru** is a high-performance, "Premium" aesthetics inventory management system designed for small businesses that need reliability and speed. It operates on a robust **Mother-Satellite Architecture**, where a Desktop computer acts as the local server for multiple mobile devices.
 
 ---
 
@@ -13,7 +13,7 @@ Most inventory apps are either:
 1.  **Cloud-based**: Slow, require monthly subscriptions, and stop working when the internet goes down.
 2.  **Single-device**: Data is trapped on one phone or computer.
 
-**Inventy** bridges this gap. It gives you the power of a "Cloud" system but runs entirely inside your Wi-Fi router. It is **Offline-First**, meaning you can keep selling even if the Wi-Fi or Power goes out, and everything syncs back up automatically when reconnected.
+**Uru** bridges this gap. It gives you the power of a "Cloud" system but runs entirely inside your Wi-Fi router. It is **Offline-First**, meaning you can keep selling even if the Wi-Fi or Power goes out, and everything syncs back up automatically when reconnected.
 
 ---
 
@@ -62,10 +62,10 @@ We chose this stack to maximize **Performance**, **Beauty**, and **DX (Developer
 
 ## 📡 The Sync Protocol
 
-The heart of Inventy is its ability to keep devices in sync without a central cloud server.
+The heart of Uru is its ability to keep devices in sync without a central cloud server.
 
 1.  **Discovery**:
-    - Mother Node starts up and broadcasts `_inventy-http._tcp` via mDNS.
+    - Mother Node starts up and broadcasts `_uru-http._tcp` via mDNS.
     - Satellites listen and auto-discover the Mother Node IP (e.g., `192.168.1.50:3000`).
 2.  **Authentication**:
     - Satellites perform a handshake (Pairing) to ensure unauthorized devices can't access data.

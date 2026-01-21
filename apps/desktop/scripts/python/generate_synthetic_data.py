@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Synthetic Data Generator for Inventy Database
+Synthetic Data Generator for Uru Database
 Generates realistic test data for all 30 tables respecting foreign key constraints.
 
 Usage:
     pip install faker
-    python scripts/python/generate_synthetic_data.py --db-path ./data/inventy.db --seed 42
+    python scripts/python/generate_synthetic_data.py --db-path ./data/uru.db --seed 42
 """
 
 import argparse
@@ -21,7 +21,7 @@ from faker import Faker
 
 
 class SyntheticDataGenerator:
-    """Generates synthetic data for all Inventy database tables."""
+    """Generates synthetic data for all Uru database tables."""
 
     def __init__(self, db_path: str, seed: int = 42):
         self.db_path = db_path
@@ -281,7 +281,7 @@ class SyntheticDataGenerator:
 
             cursor.execute(
                 """
-                INSERT INTO shops (id, name, legal_name, slug, status, 
+                INSERT INTO shops (id, name, legal_name, slug, status,
                     features_config, mail_config, storage_config, settings, branding,
                     currency, timezone, locale, owner_id, _status, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -417,7 +417,7 @@ class SyntheticDataGenerator:
 
             cursor.execute(
                 """
-                INSERT INTO locations (id, name, type, is_sellable, address_data, 
+                INSERT INTO locations (id, name, type, is_sellable, address_data,
                     _status, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
@@ -754,7 +754,7 @@ class SyntheticDataGenerator:
                 """
                 INSERT INTO brands (id, shop_id, name, slug, logo_url, banner_url,
                     description, rich_description, website_url, status, is_featured,
-                    sort_order, seo_title, seo_keywords, metadata, _status, 
+                    sort_order, seo_title, seo_keywords, metadata, _status,
                     created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
@@ -2098,12 +2098,12 @@ class SyntheticDataGenerator:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate synthetic data for Inventy database",
+        description="Generate synthetic data for Uru database",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python scripts/python/generate_synthetic_data.py --db-path ./data/inventy.db
-    python scripts/python/generate_synthetic_data.py --db-path ./data/inventy.db --seed 12345
+    python scripts/python/generate_synthetic_data.py --db-path ./data/uru.db
+    python scripts/python/generate_synthetic_data.py --db-path ./data/uru.db --seed 12345
         """,
     )
     parser.add_argument(

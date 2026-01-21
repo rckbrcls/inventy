@@ -36,7 +36,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Inventy',
+        title: 'Uru',
       },
     ],
     links: [
@@ -60,28 +60,28 @@ function RootComponent() {
   useEffect(() => {
     const shopIdMatch = location.pathname.match(/\/shops\/([^/]+)/)
     const shopId = shopIdMatch?.[1]
-    
+
     if (shopId && shop?.id !== shopId) {
       setActiveShop(shopId).catch((error) => {
         console.error("Failed to sync shop:", error)
       })
     }
   }, [location.pathname, shop?.id, setActiveShop])
-  
+
   // Determine which sidebar to show based on route
   const getSidebar = () => {
     const path = location.pathname
-    
+
     // System routes (no shop context) - root is now shops list
     if (path === "/" || path.startsWith("/shops/new") || path === "/settings" || path.startsWith("/settings/")) {
       return <SystemSidebar />
     }
-    
+
     // Shop routes (with shop context)
     if (path.startsWith("/shops/") && !path.startsWith("/shops/new")) {
       return <ShopSidebar />
     }
-    
+
     // Default to old sidebar for backward compatibility
     return <AppSidebar />
   }
@@ -89,11 +89,11 @@ function RootComponent() {
   // Build breadcrumb items
   const getBreadcrumbItems = () => {
     const isShopRoute = location.pathname.startsWith("/shops/") && !location.pathname.startsWith("/shops/new")
-    
+
     if (!isShopRoute || location.pathname === "/") {
       // Normal breadcrumb for non-shop routes
       if (location.pathname === '/') return []
-      
+
       return location.pathname.split('/').filter(Boolean).map((segment, index, array) => {
         const isLast = index === array.length - 1
         const path = '/' + array.slice(0, index + 1).join('/')
@@ -105,17 +105,17 @@ function RootComponent() {
         }
       })
     }
-    
+
     // Shop route breadcrumb: Shops > [Shop Name] > [rest of segments]
     const pathSegments = location.pathname.split('/').filter(Boolean)
     const shopIdIndex = pathSegments.indexOf('shops') + 1
     const shopId = pathSegments[shopIdIndex]
     const remainingSegments = pathSegments.slice(shopIdIndex + 1)
-    
+
     const items = [
       { label: shop?.name || 'Shop', path: `/shops/${shopId}/`, isLast: remainingSegments.length === 0 },
     ]
-    
+
     if (remainingSegments.length > 0) {
       remainingSegments.forEach((segment, index) => {
         const isLast = index === remainingSegments.length - 1
@@ -127,7 +127,7 @@ function RootComponent() {
         })
       })
     }
-    
+
     return items
   }
 

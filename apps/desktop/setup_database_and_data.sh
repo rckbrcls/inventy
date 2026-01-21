@@ -8,7 +8,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PYTHON_DIR="$ROOT_DIR/scripts/python"
 VENV_DIR="$PYTHON_DIR/.venv"
 DB_DIR="$HOME/Library/Application Support/com.tauri.dev"
-DB_PATH="$DB_DIR/inventy.db"
+DB_PATH="$DB_DIR/uru.db"
 SCHEMA_PATH="$ROOT_DIR/src-tauri/migrations/001_initial_schema.sql"
 SCRIPT_PATH="$PYTHON_DIR/generate_synthetic_data.py"
 

@@ -1,4 +1,4 @@
-# Arquitetura e Regras de Negócio: Inventy
+# Arquitetura e Regras de Negócio: Uru
 
 ## 1. Arquitetura do Sistema
 

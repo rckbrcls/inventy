@@ -1,4 +1,4 @@
-# Documentação do Banco de Dados: Inventy
+# Documentação do Banco de Dados: Uru
 
 Esta documentação detalha a estrutura do banco de dados SQLite utilizado tanto no **Mother Node (Desktop)** quanto nos **Satellite Nodes (Mobile)**. O schema é desenhado para suportar o protocolo de sincronização do WatermelonDB.
 

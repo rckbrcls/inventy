@@ -1,5 +1,5 @@
 {
-  "name": "mobile",
+  "name": "uru-mobile",
   "version": "1.0.0",
   "scripts": {
     "android": "expo start --android",
