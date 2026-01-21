@@ -1,7 +1,7 @@
 use crate::features::user::dtos::user_dto::{CreateUserDTO, UpdateUserDTO};
 use crate::features::user::models::user_model::User;
-use crate::features::user_identity::repositories::user_identities_repository::UserIdentitiesRepository;
 use crate::features::user::repositories::user_repository::UserRepository;
+use crate::features::user_identity::repositories::user_identities_repository::UserIdentitiesRepository;
 use crate::features::user_role::repositories::user_roles_repository::UserRolesRepository;
 use crate::features::user_session::repositories::user_sessions_repository::UserSessionsRepository;
 use sqlx::SqlitePool;
@@ -11,7 +11,7 @@ pub struct UserService {
     repo: UserRepository,
     identities_repo: UserIdentitiesRepository,
     roles_repo: UserRolesRepository,
-    sessions_repo: UserSessionsRepository,
+    _sessions_repo: UserSessionsRepository,
 }
 
 impl UserService {
@@ -25,7 +25,7 @@ impl UserService {
             repo,
             identities_repo,
             roles_repo,
-            sessions_repo,
+            _sessions_repo: sessions_repo,
         }
     }
 

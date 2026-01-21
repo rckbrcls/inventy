@@ -71,7 +71,7 @@ impl ShopService {
 
     pub async fn delete_shop(&self, id: &str) -> Result<(), String> {
         // Verificar se a loja existe
-        let shop = self
+        let _shop = self
             .repo
             .find_by_id(id)
             .await
@@ -100,18 +100,22 @@ impl ShopService {
         // 12. shop
 
         // 1. Deletar shipments e dependências (via CASCADE)
-        sqlx::query("DELETE FROM shipments WHERE order_id IN (SELECT id FROM orders WHERE shop_id = $1)")
-            .bind(id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| format!("Erro ao deletar envios: {}", e))?;
+        sqlx::query(
+            "DELETE FROM shipments WHERE order_id IN (SELECT id FROM orders WHERE shop_id = $1)",
+        )
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Erro ao deletar envios: {}", e))?;
 
         // 2. Deletar reviews relacionados a orders
-        sqlx::query("DELETE FROM reviews WHERE order_id IN (SELECT id FROM orders WHERE shop_id = $1)")
-            .bind(id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| format!("Erro ao deletar avaliações: {}", e))?;
+        sqlx::query(
+            "DELETE FROM reviews WHERE order_id IN (SELECT id FROM orders WHERE shop_id = $1)",
+        )
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Erro ao deletar avaliações: {}", e))?;
 
         // 3. Deletar orders
         sqlx::query("DELETE FROM orders WHERE shop_id = $1")
@@ -146,12 +150,12 @@ impl ShopService {
                 INNER JOIN products p ON p.id = il.product_id
                 INNER JOIN brands b ON b.id = p.brand_id
                 WHERE b.shop_id = $1
-            )"
+            )",
         )
-            .bind(id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| format!("Erro ao deletar movimentações de estoque: {}", e))?;
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Erro ao deletar movimentações de estoque: {}", e))?;
 
         // 7. Deletar inventory_levels relacionados a products
         sqlx::query(
@@ -163,12 +167,12 @@ impl ShopService {
                 SELECT p.id FROM products p
                 INNER JOIN brands b ON b.id = p.brand_id
                 WHERE b.shop_id = $1
-            )"
+            )",
         )
-            .bind(id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| format!("Erro ao deletar níveis de estoque: {}", e))?;
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Erro ao deletar níveis de estoque: {}", e))?;
 
         // 8. Deletar product_categories (join table)
         sqlx::query(
@@ -198,12 +202,12 @@ impl ShopService {
                 SELECT p.id FROM products p
                 INNER JOIN brands b ON b.id = p.brand_id
                 WHERE b.shop_id = $1
-            )"
+            )",
         )
-            .bind(id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| format!("Erro ao atualizar itens de transação: {}", e))?;
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Erro ao atualizar itens de transação: {}", e))?;
 
         // 10. Deletar products (categoria e marca serão SET NULL automaticamente)
         sqlx::query(
@@ -215,12 +219,12 @@ impl ShopService {
                 SELECT p.id FROM products p
                 INNER JOIN brands b ON b.id = p.brand_id
                 WHERE b.shop_id = $1
-            )"
+            )",
         )
-            .bind(id)
-            .execute(&mut *tx)
-            .await
-            .map_err(|e| format!("Erro ao deletar produtos: {}", e))?;
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| format!("Erro ao deletar produtos: {}", e))?;
 
         // 11. Deletar brands
         sqlx::query("DELETE FROM brands WHERE shop_id = $1")

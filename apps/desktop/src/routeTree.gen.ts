@@ -286,8 +286,8 @@ export interface FileRoutesByFullPath {
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/shops/new': typeof ShopsNewRoute
-  '/shops': typeof ShopsIndexRoute
-  '/shops/$shopId': typeof ShopsShopIdIndexRoute
+  '/shops/': typeof ShopsIndexRoute
+  '/shops/$shopId/': typeof ShopsShopIdIndexRoute
   '/shops/$shopId/brands/new': typeof ShopsShopIdBrandsNewRoute
   '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
   '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
@@ -298,16 +298,16 @@ export interface FileRoutesByFullPath {
   '/shops/$shopId/products/new': typeof ShopsShopIdProductsNewRoute
   '/shops/$shopId/refunds/new': typeof ShopsShopIdRefundsNewRoute
   '/shops/$shopId/transactions/new': typeof ShopsShopIdTransactionsNewRoute
-  '/shops/$shopId/brands': typeof ShopsShopIdBrandsIndexRoute
-  '/shops/$shopId/categories': typeof ShopsShopIdCategoriesIndexRoute
-  '/shops/$shopId/checkouts': typeof ShopsShopIdCheckoutsIndexRoute
-  '/shops/$shopId/customers': typeof ShopsShopIdCustomersIndexRoute
-  '/shops/$shopId/inventory': typeof ShopsShopIdInventoryIndexRoute
-  '/shops/$shopId/orders': typeof ShopsShopIdOrdersIndexRoute
-  '/shops/$shopId/payments': typeof ShopsShopIdPaymentsIndexRoute
-  '/shops/$shopId/products': typeof ShopsShopIdProductsIndexRoute
-  '/shops/$shopId/refunds': typeof ShopsShopIdRefundsIndexRoute
-  '/shops/$shopId/transactions': typeof ShopsShopIdTransactionsIndexRoute
+  '/shops/$shopId/brands/': typeof ShopsShopIdBrandsIndexRoute
+  '/shops/$shopId/categories/': typeof ShopsShopIdCategoriesIndexRoute
+  '/shops/$shopId/checkouts/': typeof ShopsShopIdCheckoutsIndexRoute
+  '/shops/$shopId/customers/': typeof ShopsShopIdCustomersIndexRoute
+  '/shops/$shopId/inventory/': typeof ShopsShopIdInventoryIndexRoute
+  '/shops/$shopId/orders/': typeof ShopsShopIdOrdersIndexRoute
+  '/shops/$shopId/payments/': typeof ShopsShopIdPaymentsIndexRoute
+  '/shops/$shopId/products/': typeof ShopsShopIdProductsIndexRoute
+  '/shops/$shopId/refunds/': typeof ShopsShopIdRefundsIndexRoute
+  '/shops/$shopId/transactions/': typeof ShopsShopIdTransactionsIndexRoute
   '/shops/$shopId/brands/$brandId/edit': typeof ShopsShopIdBrandsBrandIdEditRoute
   '/shops/$shopId/categories/$categoryId/edit': typeof ShopsShopIdCategoriesCategoryIdEditRoute
   '/shops/$shopId/checkouts/$checkoutId/edit': typeof ShopsShopIdCheckoutsCheckoutIdEditRoute
@@ -319,8 +319,8 @@ export interface FileRoutesByFullPath {
   '/shops/$shopId/products/$productId/edit': typeof ShopsShopIdProductsProductIdEditRoute
   '/shops/$shopId/refunds/$refundId/edit': typeof ShopsShopIdRefundsRefundIdEditRoute
   '/shops/$shopId/transactions/$transactionId/edit': typeof ShopsShopIdTransactionsTransactionIdEditRoute
-  '/shops/$shopId/customers/addresses': typeof ShopsShopIdCustomersAddressesIndexRoute
-  '/shops/$shopId/customers/groups': typeof ShopsShopIdCustomersGroupsIndexRoute
+  '/shops/$shopId/customers/addresses/': typeof ShopsShopIdCustomersAddressesIndexRoute
+  '/shops/$shopId/customers/groups/': typeof ShopsShopIdCustomersGroupsIndexRoute
   '/shops/$shopId/customers/addresses/$addressId/edit': typeof ShopsShopIdCustomersAddressesAddressIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -418,8 +418,8 @@ export interface FileRouteTypes {
     | '/pairing'
     | '/settings'
     | '/shops/new'
-    | '/shops'
-    | '/shops/$shopId'
+    | '/shops/'
+    | '/shops/$shopId/'
     | '/shops/$shopId/brands/new'
     | '/shops/$shopId/categories/new'
     | '/shops/$shopId/checkouts/new'
@@ -430,16 +430,16 @@ export interface FileRouteTypes {
     | '/shops/$shopId/products/new'
     | '/shops/$shopId/refunds/new'
     | '/shops/$shopId/transactions/new'
-    | '/shops/$shopId/brands'
-    | '/shops/$shopId/categories'
-    | '/shops/$shopId/checkouts'
-    | '/shops/$shopId/customers'
-    | '/shops/$shopId/inventory'
-    | '/shops/$shopId/orders'
-    | '/shops/$shopId/payments'
-    | '/shops/$shopId/products'
-    | '/shops/$shopId/refunds'
-    | '/shops/$shopId/transactions'
+    | '/shops/$shopId/brands/'
+    | '/shops/$shopId/categories/'
+    | '/shops/$shopId/checkouts/'
+    | '/shops/$shopId/customers/'
+    | '/shops/$shopId/inventory/'
+    | '/shops/$shopId/orders/'
+    | '/shops/$shopId/payments/'
+    | '/shops/$shopId/products/'
+    | '/shops/$shopId/refunds/'
+    | '/shops/$shopId/transactions/'
     | '/shops/$shopId/brands/$brandId/edit'
     | '/shops/$shopId/categories/$categoryId/edit'
     | '/shops/$shopId/checkouts/$checkoutId/edit'
@@ -451,8 +451,8 @@ export interface FileRouteTypes {
     | '/shops/$shopId/products/$productId/edit'
     | '/shops/$shopId/refunds/$refundId/edit'
     | '/shops/$shopId/transactions/$transactionId/edit'
-    | '/shops/$shopId/customers/addresses'
-    | '/shops/$shopId/customers/groups'
+    | '/shops/$shopId/customers/addresses/'
+    | '/shops/$shopId/customers/groups/'
     | '/shops/$shopId/customers/addresses/$addressId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -619,7 +619,7 @@ declare module '@tanstack/react-router' {
     '/shops/': {
       id: '/shops/'
       path: '/shops'
-      fullPath: '/shops'
+      fullPath: '/shops/'
       preLoaderRoute: typeof ShopsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -633,77 +633,77 @@ declare module '@tanstack/react-router' {
     '/shops/$shopId/': {
       id: '/shops/$shopId/'
       path: '/shops/$shopId'
-      fullPath: '/shops/$shopId'
+      fullPath: '/shops/$shopId/'
       preLoaderRoute: typeof ShopsShopIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/transactions/': {
       id: '/shops/$shopId/transactions/'
       path: '/shops/$shopId/transactions'
-      fullPath: '/shops/$shopId/transactions'
+      fullPath: '/shops/$shopId/transactions/'
       preLoaderRoute: typeof ShopsShopIdTransactionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/refunds/': {
       id: '/shops/$shopId/refunds/'
       path: '/shops/$shopId/refunds'
-      fullPath: '/shops/$shopId/refunds'
+      fullPath: '/shops/$shopId/refunds/'
       preLoaderRoute: typeof ShopsShopIdRefundsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/products/': {
       id: '/shops/$shopId/products/'
       path: '/shops/$shopId/products'
-      fullPath: '/shops/$shopId/products'
+      fullPath: '/shops/$shopId/products/'
       preLoaderRoute: typeof ShopsShopIdProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/payments/': {
       id: '/shops/$shopId/payments/'
       path: '/shops/$shopId/payments'
-      fullPath: '/shops/$shopId/payments'
+      fullPath: '/shops/$shopId/payments/'
       preLoaderRoute: typeof ShopsShopIdPaymentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/orders/': {
       id: '/shops/$shopId/orders/'
       path: '/shops/$shopId/orders'
-      fullPath: '/shops/$shopId/orders'
+      fullPath: '/shops/$shopId/orders/'
       preLoaderRoute: typeof ShopsShopIdOrdersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/inventory/': {
       id: '/shops/$shopId/inventory/'
       path: '/shops/$shopId/inventory'
-      fullPath: '/shops/$shopId/inventory'
+      fullPath: '/shops/$shopId/inventory/'
       preLoaderRoute: typeof ShopsShopIdInventoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/customers/': {
       id: '/shops/$shopId/customers/'
       path: '/shops/$shopId/customers'
-      fullPath: '/shops/$shopId/customers'
+      fullPath: '/shops/$shopId/customers/'
       preLoaderRoute: typeof ShopsShopIdCustomersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/checkouts/': {
       id: '/shops/$shopId/checkouts/'
       path: '/shops/$shopId/checkouts'
-      fullPath: '/shops/$shopId/checkouts'
+      fullPath: '/shops/$shopId/checkouts/'
       preLoaderRoute: typeof ShopsShopIdCheckoutsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/categories/': {
       id: '/shops/$shopId/categories/'
       path: '/shops/$shopId/categories'
-      fullPath: '/shops/$shopId/categories'
+      fullPath: '/shops/$shopId/categories/'
       preLoaderRoute: typeof ShopsShopIdCategoriesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/brands/': {
       id: '/shops/$shopId/brands/'
       path: '/shops/$shopId/brands'
-      fullPath: '/shops/$shopId/brands'
+      fullPath: '/shops/$shopId/brands/'
       preLoaderRoute: typeof ShopsShopIdBrandsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -780,14 +780,14 @@ declare module '@tanstack/react-router' {
     '/shops/$shopId/customers/groups/': {
       id: '/shops/$shopId/customers/groups/'
       path: '/shops/$shopId/customers/groups'
-      fullPath: '/shops/$shopId/customers/groups'
+      fullPath: '/shops/$shopId/customers/groups/'
       preLoaderRoute: typeof ShopsShopIdCustomersGroupsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shops/$shopId/customers/addresses/': {
       id: '/shops/$shopId/customers/addresses/'
       path: '/shops/$shopId/customers/addresses'
-      fullPath: '/shops/$shopId/customers/addresses'
+      fullPath: '/shops/$shopId/customers/addresses/'
       preLoaderRoute: typeof ShopsShopIdCustomersAddressesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

@@ -8,7 +8,7 @@ use sqlx::SqlitePool;
 pub struct CustomerService {
     pool: SqlitePool,
     repo: CustomerRepository,
-    addresses_repo: CustomerAddressesRepository,
+    _addresses_repo: CustomerAddressesRepository,
     memberships_repo: CustomerGroupMembershipsRepository,
 }
 
@@ -20,14 +20,14 @@ impl CustomerService {
         Self {
             pool,
             repo,
-            addresses_repo,
+            _addresses_repo: addresses_repo,
             memberships_repo,
         }
     }
 
     pub async fn create_customer(&self, payload: CreateCustomerDTO) -> Result<Customer, String> {
         let (customer, addresses, memberships) = payload.into_models();
-        
+
         let mut tx = self
             .pool
             .begin()
@@ -35,7 +35,8 @@ impl CustomerService {
             .map_err(|e| format!("Failed to start transaction: {}", e))?;
 
         // Create customer
-        let created_customer = sqlx::query_as::<_, Customer>(r#"
+        let created_customer = sqlx::query_as::<_, Customer>(
+            r#"
             INSERT INTO customers (
                 id, type, email, phone, first_name, last_name, company_name,
                 tax_id, tax_id_type, state_tax_id, status, currency, language,
@@ -48,35 +49,36 @@ impl CustomerService {
                 $23, $24, $25
             )
             RETURNING *
-        "#)
-            .bind(&customer.id)
-            .bind(&customer.r#type)
-            .bind(&customer.email)
-            .bind(&customer.phone)
-            .bind(&customer.first_name)
-            .bind(&customer.last_name)
-            .bind(&customer.company_name)
-            .bind(&customer.tax_id)
-            .bind(&customer.tax_id_type)
-            .bind(&customer.state_tax_id)
-            .bind(&customer.status)
-            .bind(&customer.currency)
-            .bind(&customer.language)
-            .bind(&customer.tags)
-            .bind(&customer.accepts_marketing)
-            .bind(&customer.customer_group_id)
-            .bind(&customer.total_spent)
-            .bind(&customer.orders_count)
-            .bind(&customer.last_order_at)
-            .bind(&customer.notes)
-            .bind(&customer.metadata)
-            .bind(&customer.custom_attributes)
-            .bind(&customer.sync_status)
-            .bind(&customer.created_at)
-            .bind(&customer.updated_at)
-            .fetch_one(&mut *tx)
-            .await
-            .map_err(|e| format!("Failed to create customer: {}", e))?;
+        "#,
+        )
+        .bind(&customer.id)
+        .bind(&customer.r#type)
+        .bind(&customer.email)
+        .bind(&customer.phone)
+        .bind(&customer.first_name)
+        .bind(&customer.last_name)
+        .bind(&customer.company_name)
+        .bind(&customer.tax_id)
+        .bind(&customer.tax_id_type)
+        .bind(&customer.state_tax_id)
+        .bind(&customer.status)
+        .bind(&customer.currency)
+        .bind(&customer.language)
+        .bind(&customer.tags)
+        .bind(&customer.accepts_marketing)
+        .bind(&customer.customer_group_id)
+        .bind(&customer.total_spent)
+        .bind(&customer.orders_count)
+        .bind(&customer.last_order_at)
+        .bind(&customer.notes)
+        .bind(&customer.metadata)
+        .bind(&customer.custom_attributes)
+        .bind(&customer.sync_status)
+        .bind(&customer.created_at)
+        .bind(&customer.updated_at)
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(|e| format!("Failed to create customer: {}", e))?;
 
         // Create addresses if any
         if !addresses.is_empty() {

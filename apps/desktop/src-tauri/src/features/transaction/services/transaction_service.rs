@@ -1,8 +1,8 @@
-use crate::features::transaction::dtos::transaction_dto::CreateTransactionDTO;
-use crate::features::transaction::models::transaction_model::{InventoryMovement, Transaction};
 use crate::features::customer::repositories::customer_repository::CustomerRepository;
 use crate::features::inventory::repositories::inventory_levels_repository::InventoryLevelsRepository;
 use crate::features::inventory::repositories::inventory_movements_repository::InventoryMovementsRepository;
+use crate::features::transaction::dtos::transaction_dto::CreateTransactionDTO;
+use crate::features::transaction::models::transaction_model::{InventoryMovement, Transaction};
 use crate::features::transaction::repositories::transaction_items_repository::TransactionItemsRepository;
 use crate::features::transaction::repositories::transactions_repository::TransactionsRepository;
 use chrono::Utc;
@@ -12,8 +12,8 @@ use uuid::Uuid;
 pub struct TransactionService {
     pool: SqlitePool,
     repo: TransactionsRepository,
-    items_repo: TransactionItemsRepository,
-    movements_repo: InventoryMovementsRepository,
+    _items_repo: TransactionItemsRepository,
+    _movements_repo: InventoryMovementsRepository,
 }
 
 impl TransactionService {
@@ -24,8 +24,8 @@ impl TransactionService {
         Self {
             pool,
             repo,
-            items_repo,
-            movements_repo,
+            _items_repo: items_repo,
+            _movements_repo: movements_repo,
         }
     }
 
@@ -81,29 +81,31 @@ impl TransactionService {
         // Create items if any
         if !items.is_empty() {
             for item in items {
-                sqlx::query(r#"
+                sqlx::query(
+                    r#"
                     INSERT INTO transaction_items (
                         id, transaction_id, product_id, sku_snapshot, name_snapshot,
                         quantity, unit_price, unit_cost, attributes_snapshot, tax_details,
                         _status, created_at, updated_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-                "#)
-                    .bind(item.id)
-                    .bind(item.transaction_id)
-                    .bind(item.product_id)
-                    .bind(item.sku_snapshot)
-                    .bind(item.name_snapshot)
-                    .bind(item.quantity)
-                    .bind(item.unit_price)
-                    .bind(item.unit_cost)
-                    .bind(item.attributes_snapshot)
-                    .bind(item.tax_details)
-                    .bind(item.sync_status)
-                    .bind(item.created_at)
-                    .bind(item.updated_at)
-                    .execute(&mut *tx)
-                    .await
-                    .map_err(|e| format!("Erro ao criar itens da transação: {}", e))?;
+                "#,
+                )
+                .bind(item.id)
+                .bind(item.transaction_id)
+                .bind(item.product_id)
+                .bind(item.sku_snapshot)
+                .bind(item.name_snapshot)
+                .bind(item.quantity)
+                .bind(item.unit_price)
+                .bind(item.unit_cost)
+                .bind(item.attributes_snapshot)
+                .bind(item.tax_details)
+                .bind(item.sync_status)
+                .bind(item.created_at)
+                .bind(item.updated_at)
+                .execute(&mut *tx)
+                .await
+                .map_err(|e| format!("Erro ao criar itens da transação: {}", e))?;
             }
         }
 
@@ -305,7 +307,10 @@ impl TransactionService {
             .map_err(|e| format!("Erro ao listar transações: {}", e))
     }
 
-    pub async fn list_transactions_by_shop(&self, shop_id: &str) -> Result<Vec<Transaction>, String> {
+    pub async fn list_transactions_by_shop(
+        &self,
+        shop_id: &str,
+    ) -> Result<Vec<Transaction>, String> {
         self.repo
             .list_by_shop(shop_id)
             .await
