@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal, Trash2, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -43,14 +44,13 @@ import { Label } from "@/components/ui/label"
 import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
 import {
-  CustomerGroupMembership,
   CustomerGroupMembershipsRepository,
 } from "@/lib/db/repositories/customer-group-memberships-repository"
-import { Customer, CustomersRepository } from "@/lib/db/repositories/customers-repository"
+import { CustomersRepository } from "@/lib/db/repositories/customers-repository"
 import {
-  CustomerGroup,
   CustomerGroupsRepository,
 } from "@/lib/db/repositories/customer-groups-repository"
+import type { CustomerGroupMembership, Customer, CustomerGroup } from "@uru/types"
 
 type MembershipRow = CustomerGroupMembership & {
   customer?: Customer
@@ -59,6 +59,7 @@ type MembershipRow = CustomerGroupMembership & {
 
 export function CustomerGroupMembershipsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<MembershipRow[]>([])
   const [customers, setCustomers] = React.useState<Customer[]>([])
   const [groups, setGroups] = React.useState<CustomerGroup[]>([])
@@ -186,7 +187,7 @@ export function CustomerGroupMembershipsTable() {
           <Button
             variant="link"
             className="p-0 h-auto font-medium"
-            onClick={() => navigate({ to: "/customers" })}
+            onClick={() => navigate({ to: `/shops/${shopId}/customers` })}
           >
             {getCustomerName(row.original.customer)}
           </Button>

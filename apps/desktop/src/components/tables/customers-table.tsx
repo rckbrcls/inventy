@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Customer, CustomersRepository } from "@/lib/db/repositories/customers-repository"
+import { CustomersRepository } from "@/lib/db/repositories/customers-repository"
+import type { Customer } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -241,7 +242,7 @@ export function CustomersTable() {
         emptyMessage="No customers found."
         action={{
           label: "New Customer",
-          to: shopId ? `/shops/${shopId}/customers/new` : "/customers/new",
+          to: `/shops/${shopId}/customers/new`,
         }}
       />
 

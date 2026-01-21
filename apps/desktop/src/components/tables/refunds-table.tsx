@@ -25,8 +25,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Refund, RefundsRepository, REFUND_STATUSES, REFUND_REASONS } from "@/lib/db/repositories/refunds-repository"
-import { Payment, PaymentsRepository } from "@/lib/db/repositories/payments-repository"
+import { RefundsRepository, REFUND_REASONS } from "@/lib/db/repositories/refunds-repository"
+import { PaymentsRepository } from "@/lib/db/repositories/payments-repository"
+import type { Refund } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -61,7 +62,6 @@ export function RefundsTable() {
   const navigate = useNavigate()
   const { shopId } = useShop()
   const [data, setData] = React.useState<RefundRow[]>([])
-  const [payments, setPayments] = React.useState<Payment[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
@@ -72,7 +72,6 @@ export function RefundsTable() {
         RefundsRepository.list(),
         PaymentsRepository.list(),
       ])
-      setPayments(paymentsData)
 
       const paymentsMap = new Map(paymentsData.map((p) => [p.id, p]))
 
@@ -267,7 +266,7 @@ export function RefundsTable() {
         emptyMessage="No refunds found."
         action={{
           label: "New Refund",
-          to: shopId ? `/shops/${shopId}/refunds/new` : "/refunds/new",
+          to: `/shops/${shopId}/refunds/new`,
         }}
       />
 

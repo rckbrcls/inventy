@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
-import { Category, CategoriesRepository } from "@/lib/db/repositories/categories-repository"
+import { CategoriesRepository } from "@/lib/db/repositories/categories-repository"
+import type { Category } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -217,7 +218,7 @@ export function CategoriesTable() {
         emptyMessage="No categories found."
         action={{
           label: "New Category",
-          to: shopId ? `/shops/${shopId}/categories/new` : "/categories/new",
+          to: `/shops/${shopId}/categories/new`,
         }}
       />
 

@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Checkout, CheckoutsRepository } from "@/lib/db/repositories/checkouts-repository"
+import { CheckoutsRepository } from "@/lib/db/repositories/checkouts-repository"
+import type { Checkout } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -280,7 +281,7 @@ export function CheckoutsTable() {
         emptyMessage="No checkouts found."
         action={{
           label: "New Checkout",
-          to: shopId ? `/shops/${shopId}/checkouts/new` : "/checkouts/new",
+          to: `/shops/${shopId}/checkouts/new`,
         }}
       />
 

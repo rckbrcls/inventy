@@ -8,15 +8,15 @@ import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
 import {
-  InventoryMovement,
   InventoryMovementsRepository,
 } from "@/lib/db/repositories/inventory-movements-repository"
 import {
-  InventoryLevel,
   InventoryLevelsRepository,
 } from "@/lib/db/repositories/inventory-levels-repository"
-import { Product, ProductsRepository } from "@/lib/db/repositories/products-repository"
-import { Location, LocationsRepository } from "@/lib/db/repositories/locations-repository"
+import { ProductsRepository } from "@/lib/db/repositories/products-repository"
+import { LocationsRepository } from "@/lib/db/repositories/locations-repository"
+import { useShop } from "@/hooks/use-shop"
+import type { InventoryMovement } from "@uru/types"
 
 type MovementRow = InventoryMovement & {
   product_name?: string
@@ -24,6 +24,7 @@ type MovementRow = InventoryMovement & {
 }
 
 export function MovementsTable() {
+  const { shopId } = useShop()
   const [data, setData] = React.useState<MovementRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
 
@@ -183,7 +184,10 @@ export function MovementsTable() {
       filterColumnId="product_name"
       filterPlaceholder="Filter movements..."
       emptyMessage="No movements found."
-      action={{ label: "Adjust Stock", to: "/inventory/new" }}
+      action={{
+        label: "Adjust Stock",
+        to: `/shops/${shopId}/inventory/movements`,
+      }}
     />
   )
 }

@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Order, OrdersRepository } from "@/lib/db/repositories/orders-repository"
+import { OrdersRepository } from "@/lib/db/repositories/orders-repository"
+import type { Order } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -325,7 +326,7 @@ export function OrdersTable() {
         emptyMessage="No orders found."
         action={{
           label: "New Order",
-          to: shopId ? `/shops/${shopId}/orders/new` : "/orders/new",
+          to: `/shops/${shopId}/orders/new`,
         }}
       />
 

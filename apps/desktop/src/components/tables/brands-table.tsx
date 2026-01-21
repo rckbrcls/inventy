@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
-import { Brand, BrandsRepository } from "@/lib/db/repositories/brands-repository"
+import { BrandsRepository } from "@/lib/db/repositories/brands-repository"
+import type { Brand } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -222,7 +223,7 @@ export function BrandsTable() {
         emptyMessage="No brands found."
         action={{
           label: "New Brand",
-          to: shopId ? `/shops/${shopId}/brands/new` : "/brands/new",
+          to: `/shops/${shopId}/brands/new`,
         }}
       />
 

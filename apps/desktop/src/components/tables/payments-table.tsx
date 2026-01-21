@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Payment, PaymentsRepository } from "@/lib/db/repositories/payments-repository"
+import { PaymentsRepository } from "@/lib/db/repositories/payments-repository"
+import type { Payment } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -281,7 +282,7 @@ export function PaymentsTable() {
         emptyMessage="No payments found."
         action={{
           label: "New Payment",
-          to: shopId ? `/shops/${shopId}/payments/new` : "/payments/new",
+          to: `/shops/${shopId}/payments/new`,
         }}
       />
 

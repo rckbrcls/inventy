@@ -26,9 +26,9 @@ import {
 import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
 import {
-  InventoryLevel,
   InventoryLevelsRepository,
 } from "@/lib/db/repositories/inventory-levels-repository"
+import type { InventoryLevel } from "@uru/types"
 import { LocationsRepository } from "@/lib/db/repositories/locations-repository"
 import { ProductsRepository } from "@/lib/db/repositories/products-repository"
 import { useNavigate } from "@tanstack/react-router"
@@ -275,7 +275,7 @@ export function InventoryTable() {
         emptyMessage="No inventory levels found."
         action={{
           label: "Add Inventory Level",
-          to: shopId ? `/shops/${shopId}/inventory/new` : "/inventory/new",
+          to: `/shops/${shopId}/inventory/new`,
         }}
       />
 

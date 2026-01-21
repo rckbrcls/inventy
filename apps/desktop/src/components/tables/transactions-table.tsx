@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Transaction, TransactionsRepository } from "@/lib/db/repositories/transactions-repository"
+import { TransactionsRepository } from "@/lib/db/repositories/transactions-repository"
+import type { Transaction } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -325,7 +326,7 @@ export function TransactionsTable() {
         emptyMessage="No transactions found."
         action={{
           label: "New Transaction",
-          to: shopId ? `/shops/${shopId}/transactions/new` : "/transactions/new",
+          to: `/shops/${shopId}/transactions/new`,
         }}
       />
 

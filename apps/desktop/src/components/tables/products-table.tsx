@@ -25,9 +25,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
-import { Product, ProductsRepository } from "@/lib/db/repositories/products-repository"
-import { Brand, BrandsRepository } from "@/lib/db/repositories/brands-repository"
-import { Category, CategoriesRepository } from "@/lib/db/repositories/categories-repository"
+import { ProductsRepository } from "@/lib/db/repositories/products-repository"
+import { BrandsRepository } from "@/lib/db/repositories/brands-repository"
+import { CategoriesRepository } from "@/lib/db/repositories/categories-repository"
+import type { Product } from "@uru/types"
 import { useNavigate } from "@tanstack/react-router"
 import { useShop } from "@/hooks/use-shop"
 
@@ -40,8 +41,6 @@ export function ProductsTable() {
   const navigate = useNavigate()
   const { shopId } = useShop()
   const [data, setData] = React.useState<ProductRow[]>([])
-  const [brands, setBrands] = React.useState<Brand[]>([])
-  const [categories, setCategories] = React.useState<Category[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
@@ -55,8 +54,6 @@ export function ProductsTable() {
         BrandsRepository.listByShop(shopId),
         CategoriesRepository.listByShop(shopId),
       ])
-      setBrands(brandsData)
-      setCategories(categoriesData)
 
       const brandsMap = new Map(brandsData.map((b) => [b.id, b.name]))
       const categoriesMap = new Map(categoriesData.map((c) => [c.id, c.name]))
@@ -270,7 +267,7 @@ export function ProductsTable() {
         emptyMessage="No products found."
         action={{
           label: "New Product",
-          to: shopId ? `/shops/${shopId}/products/new` : "/products/new",
+          to: `/shops/${shopId}/products/new`,
         }}
       />
 

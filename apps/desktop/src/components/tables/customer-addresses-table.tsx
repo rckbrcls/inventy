@@ -28,10 +28,10 @@ import {
 import { DataTable } from "@/components/tables/data-table"
 import { formatDateTime } from "@/lib/formatters"
 import {
-  CustomerAddress,
   CustomerAddressesRepository,
 } from "@/lib/db/repositories/customer-addresses-repository"
-import { Customer, CustomersRepository } from "@/lib/db/repositories/customers-repository"
+import { CustomersRepository } from "@/lib/db/repositories/customers-repository"
+import type { CustomerAddress, Customer } from "@uru/types"
 
 type CustomerAddressRow = CustomerAddress & {
   customer?: Customer
@@ -135,7 +135,7 @@ export function CustomerAddressesTable() {
           <Button
             variant="link"
             className="p-0 h-auto font-medium"
-            onClick={() => navigate({ to: shopId ? `/shops/${shopId}/customers` : "/customers" })}
+            onClick={() => navigate({ to: `/shops/${shopId}/customers` })}
           >
             {getCustomerName(row.getValue("customer_id"))}
           </Button>
@@ -269,7 +269,7 @@ export function CustomerAddressesTable() {
         emptyMessage="No addresses found."
         action={{
           label: "New Address",
-          to: shopId ? `/shops/${shopId}/customers/addresses/new` : "/customers/addresses/new",
+          to: `/shops/${shopId}/customers/addresses/new`,
         }}
       />
 
