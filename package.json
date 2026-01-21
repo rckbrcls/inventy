@@ -1,73 +1,24 @@
 {
-  "name": "mommy-s-stock-hub",
-  "main": "expo-router/entry",
-  "version": "1.0.0",
+  "name": "uru-monorepo",
+  "private": true,
   "scripts": {
-    "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
-    "test": "jest --watchAll",
-    "lint": "expo lint"
-  },
-  "jest": {
-    "preset": "jest-expo"
-  },
-  "dependencies": {
-    "@expo/vector-icons": "^14.0.2",
-    "@nozbe/watermelondb": "^0.25.5",
-    "@react-native-async-storage/async-storage": "1.23.1",
-    "@react-native-community/datetimepicker": "8.2.0",
-    "@react-native-picker/picker": "2.9.0",
-    "@react-navigation/bottom-tabs": "^7.2.0",
-    "@react-navigation/native": "^7.1.6",
-    "@types/react-router": "^5.1.20",
-    "expo": "~52.0.43",
-    "expo-blur": "~14.0.3",
-    "expo-constants": "~17.0.8",
-    "expo-file-system": "~18.0.12",
-    "expo-font": "~13.0.4",
-    "expo-haptics": "~14.0.1",
-    "expo-linking": "~7.0.5",
-    "expo-notifications": "~0.29.14",
-    "expo-router": "~4.0.20",
-    "expo-splash-screen": "~0.29.22",
-    "expo-status-bar": "~2.0.1",
-    "expo-symbols": "~0.2.2",
-    "expo-system-ui": "~4.0.9",
-    "expo-web-browser": "~14.0.2",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-native": "0.76.9",
-    "react-native-chart-kit": "^6.12.0",
-    "react-native-gesture-handler": "~2.20.2",
-    "react-native-get-random-values": "^1.11.0",
-    "react-native-modal-datetime-picker": "^18.0.0",
-    "react-native-reanimated": "~3.16.1",
-    "react-native-safe-area-context": "4.12.0",
-    "react-native-screens": "~4.4.0",
-    "react-native-svg": "15.8.0",
-    "react-native-web": "~0.19.13",
-    "react-native-webview": "13.12.5",
-    "uuid": "^11.1.0",
-    "xlsx": "^0.18.5",
-    "expo-sharing": "~13.0.1",
-    "expo-document-picker": "~13.0.3"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/plugin-proposal-decorators": "^7.27.1",
-    "@types/jest": "^29.5.12",
-    "@types/react": "~18.3.12",
-    "@types/react-native": "^0.73.0",
-    "@types/react-navigation": "^3.4.0",
-    "@types/react-test-renderer": "^18.3.0",
-    "jest": "^29.2.1",
-    "jest-expo": "~52.0.6",
-    "metro-react-native-babel-preset": "^0.77.0",
-    "react-test-renderer": "18.3.1",
-    "typescript": "^5.3.3"
+    "prettier": "^3.7.4",
+    "turbo": "^2.7.4",
+    "typescript": "5.9.2"
   },
-  "private": true
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@11.6.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
