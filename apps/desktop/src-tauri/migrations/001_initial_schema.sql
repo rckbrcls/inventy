@@ -1071,9 +1071,6 @@ INSERT OR IGNORE INTO modules (id, code, name, description, category, required_m
 ('mod-reviews', 'reviews', 'Avaliações', 'Sistema de avaliações e reviews', 'marketing', '[]', '["reviews", "product_metrics"]'),
 ('mod-inquiries', 'inquiries', 'Atendimento', 'Sistema de atendimento ao cliente (SAC)', 'marketing', '[]', '["inquiries", "inquiry_messages"]');
 
--- Módulos Opcionais - Analytics
-INSERT OR IGNORE INTO modules (id, code, name, description, category, tables_used) VALUES
-('mod-analytics', 'analytics', 'Analytics', 'Analytics e relatórios (sempre disponível)', 'analytics', '[]');
 
 -- ============================================================
 -- DADOS INICIAIS: TEMPLATES PRÉ-CONFIGURADOS
@@ -1087,7 +1084,7 @@ INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, fea
     'Loja Virtual',
     'Loja online com checkout, estoque e entregas',
     'ecommerce',
-    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "inquiries": true, "reviews": true, "analytics": true, "pos": false, "locations": false}',
+    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "inquiries": true, "reviews": true, "pos": false, "locations": false}',
     '{"allow_guest_checkout": true, "require_shipping": true}',
     '["shipping", "checkout", "inventory", "reviews", "inquiries"]'
 );
@@ -1100,7 +1097,7 @@ INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, fea
     'Loja Física',
     'Loja física com PDV e controle de estoque',
     'retail',
-    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "pos": true, "inventory": true, "locations": true, "inquiries": true, "analytics": true, "shipping": false, "checkout": false, "reviews": false}',
+    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "pos": true, "inventory": true, "locations": true, "inquiries": true, "shipping": false, "checkout": false, "reviews": false}',
     '{"require_shipping": false, "allow_offline_sales": true}',
     '["pos", "inventory", "locations"]'
 );
@@ -1113,7 +1110,7 @@ INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, fea
     'Marketplace',
     'Marketplace multi-vendedor completo',
     'ecommerce',
-    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "locations": true, "inquiries": true, "reviews": true, "analytics": true, "pos": false}',
+    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "locations": true, "inquiries": true, "reviews": true, "pos": false}',
     '{"multi_vendor": true, "allow_guest_checkout": true, "require_shipping": true}',
     '["shipping", "checkout", "inventory", "locations", "reviews", "inquiries"]'
 );
@@ -1126,7 +1123,7 @@ INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, fea
     'Loja Híbrida',
     'Loja física e virtual com todos os recursos',
     'retail',
-    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "pos": true, "locations": true, "inquiries": true, "reviews": true, "analytics": true}',
+    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "shipping": true, "checkout": true, "inventory": true, "pos": true, "locations": true, "inquiries": true, "reviews": true}',
     '{"allow_guest_checkout": true, "require_shipping": true, "allow_offline_sales": true}',
     '["shipping", "checkout", "inventory", "pos", "locations", "reviews", "inquiries"]'
 );
@@ -1139,7 +1136,7 @@ INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, fea
     'Consultoria',
     'Serviços e consultoria sem necessidade de estoque ou entrega',
     'services',
-    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "inquiries": true, "analytics": true, "shipping": false, "inventory": false, "checkout": false, "pos": false, "reviews": false, "locations": false}',
+    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "inquiries": true, "shipping": false, "inventory": false, "checkout": false, "pos": false, "reviews": false, "locations": false}',
     '{"product_type_default": "service", "require_shipping": false}',
     '["inquiries"]'
 );
@@ -1152,7 +1149,7 @@ INSERT OR IGNORE INTO shop_templates (id, code, name, description, category, fea
     'Aula Virtual',
     'Plataforma de educação e cursos online',
     'education',
-    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "checkout": true, "inquiries": true, "reviews": true, "analytics": true, "shipping": false, "inventory": false, "pos": false, "locations": false}',
+    '{"products": true, "customers": true, "transactions": true, "orders": true, "payments": true, "checkout": true, "inquiries": true, "reviews": true, "shipping": false, "inventory": false, "pos": false, "locations": false}',
     '{"product_type_default": "digital", "require_shipping": false, "allow_guest_checkout": false}',
     '["checkout", "reviews", "inquiries"]'
 );

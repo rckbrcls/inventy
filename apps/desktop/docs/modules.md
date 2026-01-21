@@ -86,13 +86,6 @@ Estes módulos formam a base do sistema e não podem ser desativados.
 
 ---
 
-## Módulos Opcionais - Analytics
-
-### 📊 Analytics (`mod-analytics`)
-
-**Descrição:** Analytics e relatórios (sempre disponível).
-**Tabelas:** _Nenhuma_
-
 ---
 
 ## Tabelas de Sistema e Infraestrutura
