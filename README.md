@@ -6,7 +6,7 @@
 
 ---
 
-## 🌟 The Vision
+## The Vision
 
 Most inventory apps are either:
 
@@ -17,7 +17,7 @@ Most inventory apps are either:
 
 ---
 
-## 🏗 Architecture: "Mother & Satellites"
+## Architecture: "Mother & Satellites"
 
 The system is composed of two distinct application types that work in harmony:
 
@@ -47,7 +47,7 @@ The system is composed of two distinct application types that work in harmony:
 
 ---
 
-## 🛠 Technology Stack Breakdown
+## Technology Stack Breakdown
 
 We chose this stack to maximize **Performance**, **Beauty**, and **DX (Developer Experience)**:
 
@@ -60,7 +60,7 @@ We chose this stack to maximize **Performance**, **Beauty**, and **DX (Developer
 
 ---
 
-## 📡 The Sync Protocol
+## The Sync Protocol
 
 The heart of Uru is its ability to keep devices in sync without a central cloud server.
 
@@ -76,7 +76,7 @@ The heart of Uru is its ability to keep devices in sync without a central cloud 
 
 ---
 
-## 💾 Database Schema Principles
+## Database Schema Principles
 
 To support robust two-way syncing, our database schema follows strict rules:
 
@@ -87,7 +87,7 @@ To support robust two-way syncing, our database schema follows strict rules:
 
 ---
 
-## 🗺 Roadmap
+## Roadmap
 
 - [ ] **Phase 1: Foundation**
   - [ ] Establish Monorepo structure (`apps/mobile`, `apps/desktop`, `packages/shared`).
