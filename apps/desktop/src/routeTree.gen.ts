@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PairingRouteImport } from './routes/pairing'
-import { Route as MovementsRouteImport } from './routes/movements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as ShopsNewRouteImport } from './routes/shops/new'
@@ -32,6 +31,7 @@ import { Route as ShopsShopIdProductsNewRouteImport } from './routes/shops/$shop
 import { Route as ShopsShopIdPaymentsNewRouteImport } from './routes/shops/$shopId/payments/new'
 import { Route as ShopsShopIdOrdersNewRouteImport } from './routes/shops/$shopId/orders/new'
 import { Route as ShopsShopIdInventoryNewRouteImport } from './routes/shops/$shopId/inventory/new'
+import { Route as ShopsShopIdInventoryMovementsRouteImport } from './routes/shops/$shopId/inventory/movements'
 import { Route as ShopsShopIdCustomersNewRouteImport } from './routes/shops/$shopId/customers/new'
 import { Route as ShopsShopIdCheckoutsNewRouteImport } from './routes/shops/$shopId/checkouts/new'
 import { Route as ShopsShopIdCategoriesNewRouteImport } from './routes/shops/$shopId/categories/new'
@@ -59,11 +59,6 @@ const SettingsRoute = SettingsRouteImport.update({
 const PairingRoute = PairingRouteImport.update({
   id: '/pairing',
   path: '/pairing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MovementsRoute = MovementsRouteImport.update({
-  id: '/movements',
-  path: '/movements',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -174,6 +169,12 @@ const ShopsShopIdInventoryNewRoute = ShopsShopIdInventoryNewRouteImport.update({
   path: '/shops/$shopId/inventory/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopsShopIdInventoryMovementsRoute =
+  ShopsShopIdInventoryMovementsRouteImport.update({
+    id: '/shops/$shopId/inventory/movements',
+    path: '/shops/$shopId/inventory/movements',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ShopsShopIdCustomersNewRoute = ShopsShopIdCustomersNewRouteImport.update({
   id: '/shops/$shopId/customers/new',
   path: '/shops/$shopId/customers/new',
@@ -282,7 +283,6 @@ const ShopsShopIdCustomersAddressesAddressIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/shops/new': typeof ShopsNewRoute
@@ -292,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
   '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
   '/shops/$shopId/customers/new': typeof ShopsShopIdCustomersNewRoute
+  '/shops/$shopId/inventory/movements': typeof ShopsShopIdInventoryMovementsRoute
   '/shops/$shopId/inventory/new': typeof ShopsShopIdInventoryNewRoute
   '/shops/$shopId/orders/new': typeof ShopsShopIdOrdersNewRoute
   '/shops/$shopId/payments/new': typeof ShopsShopIdPaymentsNewRoute
@@ -325,7 +326,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/shops/new': typeof ShopsNewRoute
@@ -335,6 +335,7 @@ export interface FileRoutesByTo {
   '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
   '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
   '/shops/$shopId/customers/new': typeof ShopsShopIdCustomersNewRoute
+  '/shops/$shopId/inventory/movements': typeof ShopsShopIdInventoryMovementsRoute
   '/shops/$shopId/inventory/new': typeof ShopsShopIdInventoryNewRoute
   '/shops/$shopId/orders/new': typeof ShopsShopIdOrdersNewRoute
   '/shops/$shopId/payments/new': typeof ShopsShopIdPaymentsNewRoute
@@ -369,7 +370,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/movements': typeof MovementsRoute
   '/pairing': typeof PairingRoute
   '/settings': typeof SettingsRoute
   '/shops/new': typeof ShopsNewRoute
@@ -379,6 +379,7 @@ export interface FileRoutesById {
   '/shops/$shopId/categories/new': typeof ShopsShopIdCategoriesNewRoute
   '/shops/$shopId/checkouts/new': typeof ShopsShopIdCheckoutsNewRoute
   '/shops/$shopId/customers/new': typeof ShopsShopIdCustomersNewRoute
+  '/shops/$shopId/inventory/movements': typeof ShopsShopIdInventoryMovementsRoute
   '/shops/$shopId/inventory/new': typeof ShopsShopIdInventoryNewRoute
   '/shops/$shopId/orders/new': typeof ShopsShopIdOrdersNewRoute
   '/shops/$shopId/payments/new': typeof ShopsShopIdPaymentsNewRoute
@@ -414,7 +415,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/movements'
     | '/pairing'
     | '/settings'
     | '/shops/new'
@@ -424,6 +424,7 @@ export interface FileRouteTypes {
     | '/shops/$shopId/categories/new'
     | '/shops/$shopId/checkouts/new'
     | '/shops/$shopId/customers/new'
+    | '/shops/$shopId/inventory/movements'
     | '/shops/$shopId/inventory/new'
     | '/shops/$shopId/orders/new'
     | '/shops/$shopId/payments/new'
@@ -457,7 +458,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/movements'
     | '/pairing'
     | '/settings'
     | '/shops/new'
@@ -467,6 +467,7 @@ export interface FileRouteTypes {
     | '/shops/$shopId/categories/new'
     | '/shops/$shopId/checkouts/new'
     | '/shops/$shopId/customers/new'
+    | '/shops/$shopId/inventory/movements'
     | '/shops/$shopId/inventory/new'
     | '/shops/$shopId/orders/new'
     | '/shops/$shopId/payments/new'
@@ -500,7 +501,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/movements'
     | '/pairing'
     | '/settings'
     | '/shops/new'
@@ -510,6 +510,7 @@ export interface FileRouteTypes {
     | '/shops/$shopId/categories/new'
     | '/shops/$shopId/checkouts/new'
     | '/shops/$shopId/customers/new'
+    | '/shops/$shopId/inventory/movements'
     | '/shops/$shopId/inventory/new'
     | '/shops/$shopId/orders/new'
     | '/shops/$shopId/payments/new'
@@ -544,7 +545,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  MovementsRoute: typeof MovementsRoute
   PairingRoute: typeof PairingRoute
   SettingsRoute: typeof SettingsRoute
   ShopsNewRoute: typeof ShopsNewRoute
@@ -554,6 +554,7 @@ export interface RootRouteChildren {
   ShopsShopIdCategoriesNewRoute: typeof ShopsShopIdCategoriesNewRoute
   ShopsShopIdCheckoutsNewRoute: typeof ShopsShopIdCheckoutsNewRoute
   ShopsShopIdCustomersNewRoute: typeof ShopsShopIdCustomersNewRoute
+  ShopsShopIdInventoryMovementsRoute: typeof ShopsShopIdInventoryMovementsRoute
   ShopsShopIdInventoryNewRoute: typeof ShopsShopIdInventoryNewRoute
   ShopsShopIdOrdersNewRoute: typeof ShopsShopIdOrdersNewRoute
   ShopsShopIdPaymentsNewRoute: typeof ShopsShopIdPaymentsNewRoute
@@ -600,13 +601,6 @@ declare module '@tanstack/react-router' {
       path: '/pairing'
       fullPath: '/pairing'
       preLoaderRoute: typeof PairingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/movements': {
-      id: '/movements'
-      path: '/movements'
-      fullPath: '/movements'
-      preLoaderRoute: typeof MovementsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -749,6 +743,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopsShopIdInventoryNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shops/$shopId/inventory/movements': {
+      id: '/shops/$shopId/inventory/movements'
+      path: '/shops/$shopId/inventory/movements'
+      fullPath: '/shops/$shopId/inventory/movements'
+      preLoaderRoute: typeof ShopsShopIdInventoryMovementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shops/$shopId/customers/new': {
       id: '/shops/$shopId/customers/new'
       path: '/shops/$shopId/customers/new'
@@ -880,7 +881,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  MovementsRoute: MovementsRoute,
   PairingRoute: PairingRoute,
   SettingsRoute: SettingsRoute,
   ShopsNewRoute: ShopsNewRoute,
@@ -890,6 +890,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopsShopIdCategoriesNewRoute: ShopsShopIdCategoriesNewRoute,
   ShopsShopIdCheckoutsNewRoute: ShopsShopIdCheckoutsNewRoute,
   ShopsShopIdCustomersNewRoute: ShopsShopIdCustomersNewRoute,
+  ShopsShopIdInventoryMovementsRoute: ShopsShopIdInventoryMovementsRoute,
   ShopsShopIdInventoryNewRoute: ShopsShopIdInventoryNewRoute,
   ShopsShopIdOrdersNewRoute: ShopsShopIdOrdersNewRoute,
   ShopsShopIdPaymentsNewRoute: ShopsShopIdPaymentsNewRoute,

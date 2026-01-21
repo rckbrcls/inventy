@@ -108,6 +108,7 @@ const menuStructure: Record<string, ModuleConfig[]> = {
       icon: Inbox,
       items: [
         { title: "Inventory", url: "/shops/$shopId/inventory", icon: Inbox },
+        { title: "Movements", url: "/shops/$shopId/inventory/movements", icon: ArrowRightLeft },
       ],
     },
   ],
@@ -126,7 +127,7 @@ const menuStructure: Record<string, ModuleConfig[]> = {
 export function ShopSidebar() {
   const { shop, isModuleEnabled } = useShop()
   const location = useLocation()
-  
+
   // Extract shopId from pathname
   const shopIdMatch = location.pathname.match(/\/shops\/([^/]+)/)
   const shopId = shopIdMatch?.[1] || shop?.id || ""
@@ -145,7 +146,7 @@ export function ShopSidebar() {
 
   const renderModule = (module: ModuleConfig) => {
     const ModuleIcon = module.icon
-    
+
     return (
       <SidebarMenuItem key={module.code}>
         <Collapsible defaultOpen className="group/collapsible">

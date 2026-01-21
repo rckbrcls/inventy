@@ -33,7 +33,7 @@ import { InventoryLevelsRepository } from "@/lib/db/repositories/inventory-level
 import { ProductsRepository, Product } from "@/lib/db/repositories/products-repository"
 import { LocationsRepository, Location } from "@/lib/db/repositories/locations-repository"
 
-export const Route = createFileRoute("/movements")({
+export const Route = createFileRoute("/shops/$shopId/inventory/movements")({
   component: MovementsRoute,
 })
 
