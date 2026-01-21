@@ -1,5 +1,6 @@
 export type Checkout = {
   id: string;
+  shop_id: string | null;
   token: string;
   user_id: string | null;
   email: string | null;
@@ -25,6 +26,7 @@ export type Checkout = {
 };
 
 export type CreateCheckoutDTO = {
+  shop_id?: string;
   user_id?: string;
   email?: string;
   items?: string;

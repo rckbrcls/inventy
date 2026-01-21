@@ -31,7 +31,7 @@ use crate::features::category::commands::category_commands::{
     create_category, update_category, delete_category, get_category, list_categories_by_shop, list_categories,
 };
 use crate::features::checkout::commands::checkout_commands::{
-    create_checkout, update_checkout, delete_checkout, get_checkout, get_checkout_by_token, list_checkouts,
+    create_checkout, update_checkout, delete_checkout, get_checkout, get_checkout_by_token, list_checkouts, list_checkouts_by_shop,
 };
 use crate::features::refund::commands::refund_commands::{
     create_refund, update_refund, delete_refund, get_refund, list_refunds, list_refunds_by_payment, update_refund_status,
@@ -173,6 +173,7 @@ pub fn run() {
             get_checkout,
             get_checkout_by_token,
             list_checkouts,
+            list_checkouts_by_shop,
             // Customers
             create_customer,
             update_customer,

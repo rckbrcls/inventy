@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc};
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Checkout {
     pub id: String,
+    pub shop_id: Option<String>,
     pub token: String,
     pub user_id: Option<String>,
     pub email: Option<String>,

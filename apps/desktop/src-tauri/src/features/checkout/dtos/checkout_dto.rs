@@ -10,6 +10,7 @@ fn generate_token() -> String {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateCheckoutDTO {
+    pub shop_id: Option<String>,
     pub user_id: Option<String>,
     pub email: Option<String>,
     pub items: Option<String>,
@@ -35,6 +36,7 @@ impl CreateCheckoutDTO {
 
         Checkout {
             id: Uuid::new_v4().to_string(),
+            shop_id: self.shop_id,
             token,
             user_id: self.user_id,
             email: self.email,
@@ -84,15 +86,17 @@ pub struct UpdateCheckoutDTO {
 impl UpdateCheckoutDTO {
     pub fn apply_to_checkout(self, existing: Checkout) -> Checkout {
         let now = Utc::now();
-        
-        let completed_at = if self.status.as_deref() == Some("completed") && existing.completed_at.is_none() {
-            Some(now)
-        } else {
-            existing.completed_at
-        };
+
+        let completed_at =
+            if self.status.as_deref() == Some("completed") && existing.completed_at.is_none() {
+                Some(now)
+            } else {
+                existing.completed_at
+            };
 
         Checkout {
             id: existing.id,
+            shop_id: existing.shop_id,
             token: existing.token,
             user_id: existing.user_id,
             email: self.email.or(existing.email),
@@ -100,7 +104,9 @@ impl UpdateCheckoutDTO {
             shipping_address: self.shipping_address.or(existing.shipping_address),
             billing_address: self.billing_address.or(existing.billing_address),
             shipping_line: self.shipping_line.or(existing.shipping_line),
-            applied_discount_codes: self.applied_discount_codes.or(existing.applied_discount_codes),
+            applied_discount_codes: self
+                .applied_discount_codes
+                .or(existing.applied_discount_codes),
             currency: self.currency.or(existing.currency),
             subtotal_price: self.subtotal_price.or(existing.subtotal_price),
             total_tax: self.total_tax.or(existing.total_tax),

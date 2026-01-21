@@ -345,6 +345,7 @@ CREATE TABLE IF NOT EXISTS refunds (
 -- 18. Checkouts
 CREATE TABLE IF NOT EXISTS checkouts (
     id TEXT PRIMARY KEY,
+    shop_id TEXT REFERENCES shops(id) ON DELETE RESTRICT,
     token TEXT UNIQUE NOT NULL,
     user_id TEXT REFERENCES users(id) ON DELETE SET NULL, -- Manter checkout abandonado
     email TEXT,
@@ -949,6 +950,7 @@ CREATE INDEX IF NOT EXISTS idx_inventory_movements_level ON inventory_movements(
 CREATE INDEX IF NOT EXISTS idx_refunds_payment ON refunds(payment_id) WHERE _status != 'deleted';
 CREATE INDEX IF NOT EXISTS idx_refunds_status ON refunds(status) WHERE _status != 'deleted';
 
+CREATE INDEX IF NOT EXISTS idx_checkouts_shop ON checkouts(shop_id) WHERE _status != 'deleted';
 CREATE INDEX IF NOT EXISTS idx_checkouts_user ON checkouts(user_id) WHERE _status != 'deleted';
 CREATE INDEX IF NOT EXISTS idx_checkouts_status ON checkouts(status) WHERE _status != 'deleted';
 

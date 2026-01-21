@@ -63,4 +63,11 @@ impl CheckoutService {
             .await
             .map_err(|e| format!("Failed to list checkouts: {}", e))
     }
+
+    pub async fn list_checkouts_by_shop(&self, shop_id: &str) -> Result<Vec<Checkout>, String> {
+        self.repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Failed to list checkouts by shop: {}", e))
+    }
 }

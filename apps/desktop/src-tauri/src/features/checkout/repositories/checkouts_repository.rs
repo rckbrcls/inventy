@@ -14,40 +14,41 @@ impl CheckoutsRepository {
     pub async fn create(&self, checkout: Checkout) -> Result<Checkout> {
         let sql = r#"
             INSERT INTO checkouts (
-                id, token, user_id, email, items, shipping_address, billing_address,
+                id, shop_id, token, user_id, email, items, shipping_address, billing_address,
                 shipping_line, applied_discount_codes, currency, subtotal_price,
                 total_tax, total_shipping, total_discounts, total_price, status,
                 reservation_expires_at, completed_at, metadata, recovery_url,
                 _status, created_at, updated_at
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
             RETURNING *
         "#;
 
         sqlx::query_as::<_, Checkout>(sql)
             .bind(checkout.id) // $1
-            .bind(checkout.token) // $2
-            .bind(checkout.user_id) // $3
-            .bind(checkout.email) // $4
-            .bind(checkout.items) // $5
-            .bind(checkout.shipping_address) // $6
-            .bind(checkout.billing_address) // $7
-            .bind(checkout.shipping_line) // $8
-            .bind(checkout.applied_discount_codes) // $9
-            .bind(checkout.currency) // $10
-            .bind(checkout.subtotal_price) // $11
-            .bind(checkout.total_tax) // $12
-            .bind(checkout.total_shipping) // $13
-            .bind(checkout.total_discounts) // $14
-            .bind(checkout.total_price) // $15
-            .bind(checkout.status) // $16
-            .bind(checkout.reservation_expires_at) // $17
-            .bind(checkout.completed_at) // $18
-            .bind(checkout.metadata) // $19
-            .bind(checkout.recovery_url) // $20
-            .bind(checkout.sync_status) // $21
-            .bind(checkout.created_at) // $22
-            .bind(checkout.updated_at) // $23
+            .bind(checkout.shop_id) // $2
+            .bind(checkout.token) // $3
+            .bind(checkout.user_id) // $4
+            .bind(checkout.email) // $5
+            .bind(checkout.items) // $6
+            .bind(checkout.shipping_address) // $7
+            .bind(checkout.billing_address) // $8
+            .bind(checkout.shipping_line) // $9
+            .bind(checkout.applied_discount_codes) // $10
+            .bind(checkout.currency) // $11
+            .bind(checkout.subtotal_price) // $12
+            .bind(checkout.total_tax) // $13
+            .bind(checkout.total_shipping) // $14
+            .bind(checkout.total_discounts) // $15
+            .bind(checkout.total_price) // $16
+            .bind(checkout.status) // $17
+            .bind(checkout.reservation_expires_at) // $18
+            .bind(checkout.completed_at) // $19
+            .bind(checkout.metadata) // $20
+            .bind(checkout.recovery_url) // $21
+            .bind(checkout.sync_status) // $22
+            .bind(checkout.created_at) // $23
+            .bind(checkout.updated_at) // $24
             .fetch_one(&self.pool)
             .await
     }
@@ -129,6 +130,15 @@ impl CheckoutsRepository {
         let sql = "SELECT * FROM checkouts ORDER BY created_at DESC";
 
         sqlx::query_as::<_, Checkout>(sql)
+            .fetch_all(&self.pool)
+            .await
+    }
+
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Checkout>> {
+        let sql = "SELECT * FROM checkouts WHERE shop_id = $1 ORDER BY created_at DESC";
+
+        sqlx::query_as::<_, Checkout>(sql)
+            .bind(shop_id)
             .fetch_all(&self.pool)
             .await
     }

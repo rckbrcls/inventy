@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Script para resetar o banco de dados, criar o schema e preencher com dados sintéticos
+# Script para resetar o banco de dados, criar o schema e preencher com dados sintéticos na raiz do projeto
 # Uso: ./setup_database_and_data.sh
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PYTHON_DIR="$ROOT_DIR/scripts/python"
+PYTHON_DIR="$ROOT_DIR/scripts"
 VENV_DIR="$PYTHON_DIR/.venv"
 DB_DIR="$HOME/Library/Application Support/com.tauri.dev"
 DB_PATH="$DB_DIR/uru.db"
-SCHEMA_PATH="$ROOT_DIR/src-tauri/migrations/001_initial_schema.sql"
-SCRIPT_PATH="$PYTHON_DIR/generate_synthetic_data.py"
+SCHEMA_PATH="$ROOT_DIR/apps/desktop/src-tauri/migrations/001_initial_schema.sql"
+SCRIPT_PATH="$PYTHON_DIR/python/generate_synthetic_data.py"
 
 # Verificar se sqlite3 está instalado
 if ! command -v sqlite3 &> /dev/null; then
@@ -48,24 +48,23 @@ echo "   ✓ Schema aplicado"
 echo ""
 echo "🐍 Configurando ambiente Python..."
 
-# Criar venv se não existir
-if [[ ! -d "$VENV_DIR" ]]; then
+# Criar venv se não existir ou se estiver quebrado (após mover a pasta)
+if [[ ! -d "$VENV_DIR" ]] || [[ ! -f "$VENV_DIR/bin/python3" ]]; then
   echo "   Criando venv em $VENV_DIR"
+  rm -rf "$VENV_DIR"
   python3 -m venv "$VENV_DIR"
 fi
 
-# Ativar venv
-echo "   Ativando venv"
-source "$VENV_DIR/bin/activate"
+VENV_PYTHON="$VENV_DIR/bin/python3"
 
 # Instalar dependências se necessário
 echo "   Instalando/atualizando dependências"
-pip install --upgrade pip --quiet
-pip install faker --quiet
+"$VENV_PYTHON" -m pip install --upgrade pip --quiet
+"$VENV_PYTHON" -m pip install faker --quiet
 
 echo ""
 echo "🎲 Gerando dados sintéticos..."
-python "$SCRIPT_PATH" --db-path "$DB_PATH" --seed 42
+"$VENV_PYTHON" "$SCRIPT_PATH" --db-path "$DB_PATH" --seed 42
 
 echo ""
 echo "✅ Banco de dados criado e preenchido com sucesso!"

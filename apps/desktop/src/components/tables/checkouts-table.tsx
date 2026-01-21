@@ -46,9 +46,11 @@ export function CheckoutsTable() {
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
 
   const loadData = React.useCallback(async () => {
+    if (!shopId) return
+
     try {
       setIsLoading(true)
-      const checkouts = await CheckoutsRepository.list()
+      const checkouts = await CheckoutsRepository.listByShop(shopId)
       setData(checkouts)
     } catch (error) {
       console.error("Failed to load checkouts:", error)
@@ -56,7 +58,7 @@ export function CheckoutsTable() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [shopId])
 
   React.useEffect(() => {
     loadData()

@@ -51,3 +51,12 @@ pub async fn list_checkouts(pool: State<'_, SqlitePool>) -> Result<Vec<Checkout>
     let service = CheckoutService::new(pool.inner().clone());
     service.list_checkouts().await
 }
+
+#[tauri::command]
+pub async fn list_checkouts_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<Checkout>, String> {
+    let service = CheckoutService::new(pool.inner().clone());
+    service.list_checkouts_by_shop(&shop_id).await
+}
