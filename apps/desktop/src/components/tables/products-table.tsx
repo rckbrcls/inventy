@@ -47,7 +47,7 @@ export function ProductsTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const [products, brandsData, categoriesData] = await Promise.all([
@@ -96,7 +96,11 @@ export function ProductsTable() {
   }
 
   const handleEdit = (product: Product) => {
-    navigate({ to: "/products/$productId/edit", params: { productId: product.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/products/$productId/edit",
+      params: { shopId, productId: product.id },
+    })
   }
 
   const columns: ColumnDef<ProductRow>[] = React.useMemo(
@@ -245,7 +249,7 @@ export function ProductsTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -264,7 +268,10 @@ export function ProductsTable() {
         filterColumnId="name"
         filterPlaceholder="Filter products..."
         emptyMessage="No products found."
-        action={{ label: "New Product", to: "/products/new" }}
+        action={{
+          label: "New Product",
+          to: shopId ? `/shops/${shopId}/products/new` : "/products/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

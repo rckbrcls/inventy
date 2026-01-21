@@ -63,7 +63,7 @@ export function InventoryTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const [inventoryLevels, products, locations] = await Promise.all([
@@ -110,9 +110,10 @@ export function InventoryTable() {
   }
 
   const handleEdit = (item: InventoryLevel) => {
+    if (!shopId) return
     navigate({
-      to: "/inventory/$inventoryLevelId/edit",
-      params: { inventoryLevelId: item.id },
+      to: "/shops/$shopId/inventory/$inventoryLevelId/edit",
+      params: { shopId, inventoryLevelId: item.id },
     })
   }
 
@@ -253,7 +254,7 @@ export function InventoryTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -272,7 +273,10 @@ export function InventoryTable() {
         filterColumnId="product_name"
         filterPlaceholder="Filter inventory..."
         emptyMessage="No inventory levels found."
-        action={{ label: "Add Inventory Level", to: "/inventory/new" }}
+        action={{
+          label: "Add Inventory Level",
+          to: shopId ? `/shops/${shopId}/inventory/new` : "/inventory/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

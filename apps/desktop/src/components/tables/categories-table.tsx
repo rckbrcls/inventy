@@ -42,7 +42,7 @@ export function CategoriesTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const categories = await CategoriesRepository.listByShop(shopId)
@@ -85,7 +85,11 @@ export function CategoriesTable() {
   }
 
   const handleEdit = (category: Category) => {
-    navigate({ to: "/categories/$categoryId/edit", params: { categoryId: category.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/categories/$categoryId/edit",
+      params: { shopId, categoryId: category.id },
+    })
   }
 
   const columns: ColumnDef<CategoryWithParentName>[] = React.useMemo(
@@ -192,7 +196,7 @@ export function CategoriesTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -211,7 +215,10 @@ export function CategoriesTable() {
         filterColumnId="name"
         filterPlaceholder="Filter categories..."
         emptyMessage="No categories found."
-        action={{ label: "New Category", to: "/categories/new" }}
+        action={{
+          label: "New Category",
+          to: shopId ? `/shops/${shopId}/categories/new` : "/categories/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

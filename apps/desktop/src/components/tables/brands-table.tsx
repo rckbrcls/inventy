@@ -38,7 +38,7 @@ export function BrandsTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const brands = await BrandsRepository.listByShop(shopId)
@@ -71,7 +71,11 @@ export function BrandsTable() {
   }
 
   const handleEdit = (brand: Brand) => {
-    navigate({ to: "/brands/$brandId/edit", params: { brandId: brand.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/brands/$brandId/edit",
+      params: { shopId, brandId: brand.id },
+    })
   }
 
   const columns: ColumnDef<Brand>[] = React.useMemo(
@@ -197,7 +201,7 @@ export function BrandsTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -216,7 +220,10 @@ export function BrandsTable() {
         filterColumnId="name"
         filterPlaceholder="Filter brands..."
         emptyMessage="No brands found."
-        action={{ label: "New Brand", to: "/brands/new" }}
+        action={{
+          label: "New Brand",
+          to: shopId ? `/shops/${shopId}/brands/new` : "/brands/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

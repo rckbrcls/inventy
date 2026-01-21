@@ -40,7 +40,7 @@ export function CustomersTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const customers = await CustomersRepository.listByShop(shopId)
@@ -73,7 +73,11 @@ export function CustomersTable() {
   }
 
   const handleEdit = (customer: Customer) => {
-    navigate({ to: "/customers/$customerId/edit", params: { customerId: customer.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/customers/$customerId/edit",
+      params: { shopId, customerId: customer.id },
+    })
   }
 
   const getDisplayName = (customer: CustomerRow) => {
@@ -216,7 +220,7 @@ export function CustomersTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -235,7 +239,10 @@ export function CustomersTable() {
         filterColumnId="email"
         filterPlaceholder="Filter customers..."
         emptyMessage="No customers found."
-        action={{ label: "New Customer", to: "/customers/new" }}
+        action={{
+          label: "New Customer",
+          to: shopId ? `/shops/${shopId}/customers/new` : "/customers/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

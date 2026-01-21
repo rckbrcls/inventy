@@ -27,6 +27,7 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Payment, PaymentsRepository } from "@/lib/db/repositories/payments-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 const getStatusVariant = (status: string) => {
   switch (status) {
@@ -64,6 +65,7 @@ const getMethodLabel = (method: string) => {
 
 export function PaymentsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<Payment[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
@@ -101,7 +103,11 @@ export function PaymentsTable() {
   }
 
   const handleEdit = (payment: Payment) => {
-    navigate({ to: "/payments/$paymentId/edit", params: { paymentId: payment.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/payments/$paymentId/edit",
+      params: { shopId, paymentId: payment.id },
+    })
   }
 
   const columns: ColumnDef<Payment>[] = React.useMemo(
@@ -254,7 +260,7 @@ export function PaymentsTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -273,7 +279,10 @@ export function PaymentsTable() {
         filterColumnId="transaction_id"
         filterPlaceholder="Filter by transaction..."
         emptyMessage="No payments found."
-        action={{ label: "New Payment", to: "/payments/new" }}
+        action={{
+          label: "New Payment",
+          to: shopId ? `/shops/${shopId}/payments/new` : "/payments/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

@@ -73,7 +73,7 @@ export function TransactionsTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const transactions = await TransactionsRepository.listByShop(shopId)
@@ -121,9 +121,10 @@ export function TransactionsTable() {
   }
 
   const handleEdit = (transaction: Transaction) => {
+    if (!shopId) return
     navigate({
-      to: "/transactions/$transactionId/edit",
-      params: { transactionId: transaction.id },
+      to: "/shops/$shopId/transactions/$transactionId/edit",
+      params: { shopId, transactionId: transaction.id },
     })
   }
 
@@ -303,7 +304,7 @@ export function TransactionsTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -322,7 +323,10 @@ export function TransactionsTable() {
         filterColumnId="type"
         filterPlaceholder="Filter transactions..."
         emptyMessage="No transactions found."
-        action={{ label: "New Transaction", to: "/transactions/new" }}
+        action={{
+          label: "New Transaction",
+          to: shopId ? `/shops/${shopId}/transactions/new` : "/transactions/new",
+        }}
       />
 
       {/* Delete Confirmation Dialog */}

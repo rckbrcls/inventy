@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal, Pencil, Trash2, Star } from "lucide-react"
 import { toast } from "sonner"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -38,6 +39,7 @@ type CustomerAddressRow = CustomerAddress & {
 
 export function CustomerAddressesTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<CustomerAddressRow[]>([])
   const [customers, setCustomers] = React.useState<Map<string, Customer>>(new Map())
   const [isLoading, setIsLoading] = React.useState(true)
@@ -88,9 +90,10 @@ export function CustomerAddressesTable() {
   }
 
   const handleEdit = (address: CustomerAddress) => {
+    if (!shopId) return
     navigate({
-      to: "/customers/addresses/$addressId/edit",
-      params: { addressId: address.id },
+      to: "/shops/$shopId/customers/addresses/$addressId/edit",
+      params: { shopId, addressId: address.id },
     })
   }
 
@@ -132,7 +135,7 @@ export function CustomerAddressesTable() {
           <Button
             variant="link"
             className="p-0 h-auto font-medium"
-            onClick={() => navigate({ to: "/customers" })}
+            onClick={() => navigate({ to: shopId ? `/shops/${shopId}/customers` : "/customers" })}
           >
             {getCustomerName(row.getValue("customer_id"))}
           </Button>
@@ -245,7 +248,7 @@ export function CustomerAddressesTable() {
         },
       },
     ],
-    [customers, navigate]
+    [customers, navigate, shopId]
   )
 
   if (isLoading) {
@@ -264,7 +267,10 @@ export function CustomerAddressesTable() {
         filterColumnId="full_address"
         filterPlaceholder="Filter addresses..."
         emptyMessage="No addresses found."
-        action={{ label: "New Address", to: "/customers/addresses/new" }}
+        action={{
+          label: "New Address",
+          to: shopId ? `/shops/${shopId}/customers/addresses/new` : "/customers/addresses/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

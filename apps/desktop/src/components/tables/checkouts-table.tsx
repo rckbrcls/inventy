@@ -27,6 +27,7 @@ import { DataTable } from "@/components/tables/data-table"
 import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Checkout, CheckoutsRepository } from "@/lib/db/repositories/checkouts-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type CheckoutRow = Checkout
 
@@ -38,6 +39,7 @@ const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | 
 
 export function CheckoutsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<CheckoutRow[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [deleteId, setDeleteId] = React.useState<string | null>(null)
@@ -75,7 +77,11 @@ export function CheckoutsTable() {
   }
 
   const handleEdit = (checkout: Checkout) => {
-    navigate({ to: "/checkouts/$checkoutId/edit", params: { checkoutId: checkout.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/checkouts/$checkoutId/edit",
+      params: { shopId, checkoutId: checkout.id },
+    })
   }
 
   const getItemsCount = (items: string | null): number => {
@@ -253,7 +259,7 @@ export function CheckoutsTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -272,7 +278,10 @@ export function CheckoutsTable() {
         filterColumnId="email"
         filterPlaceholder="Filter by email..."
         emptyMessage="No checkouts found."
-        action={{ label: "New Checkout", to: "/checkouts/new" }}
+        action={{
+          label: "New Checkout",
+          to: shopId ? `/shops/${shopId}/checkouts/new` : "/checkouts/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

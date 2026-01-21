@@ -89,7 +89,7 @@ export function OrdersTable() {
 
   const loadData = React.useCallback(async () => {
     if (!shopId) return
-    
+
     try {
       setIsLoading(true)
       const orders = await OrdersRepository.listByShop(shopId)
@@ -137,7 +137,11 @@ export function OrdersTable() {
   }
 
   const handleEdit = (order: Order) => {
-    navigate({ to: "/orders/$orderId/edit", params: { orderId: order.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/orders/$orderId/edit",
+      params: { shopId, orderId: order.id },
+    })
   }
 
   const columns: ColumnDef<OrderRow>[] = React.useMemo(
@@ -300,7 +304,7 @@ export function OrdersTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -319,7 +323,10 @@ export function OrdersTable() {
         filterColumnId="order_number"
         filterPlaceholder="Filter orders..."
         emptyMessage="No orders found."
-        action={{ label: "New Order", to: "/orders/new" }}
+        action={{
+          label: "New Order",
+          to: shopId ? `/shops/${shopId}/orders/new` : "/orders/new",
+        }}
       />
 
       {/* Delete Confirmation Dialog */}

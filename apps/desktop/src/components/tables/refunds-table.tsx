@@ -28,6 +28,7 @@ import { formatCurrency, formatDateTime } from "@/lib/formatters"
 import { Refund, RefundsRepository, REFUND_STATUSES, REFUND_REASONS } from "@/lib/db/repositories/refunds-repository"
 import { Payment, PaymentsRepository } from "@/lib/db/repositories/payments-repository"
 import { useNavigate } from "@tanstack/react-router"
+import { useShop } from "@/hooks/use-shop"
 
 type RefundRow = Refund & {
   payment_method?: string
@@ -58,6 +59,7 @@ const getReasonLabel = (reason: string | null) => {
 
 export function RefundsTable() {
   const navigate = useNavigate()
+  const { shopId } = useShop()
   const [data, setData] = React.useState<RefundRow[]>([])
   const [payments, setPayments] = React.useState<Payment[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
@@ -112,7 +114,11 @@ export function RefundsTable() {
   }
 
   const handleEdit = (refund: Refund) => {
-    navigate({ to: "/refunds/$refundId/edit", params: { refundId: refund.id } })
+    if (!shopId) return
+    navigate({
+      to: "/shops/$shopId/refunds/$refundId/edit",
+      params: { shopId, refundId: refund.id },
+    })
   }
 
   const columns: ColumnDef<RefundRow>[] = React.useMemo(
@@ -240,7 +246,7 @@ export function RefundsTable() {
         },
       },
     ],
-    []
+    [shopId]
   )
 
   if (isLoading) {
@@ -259,7 +265,10 @@ export function RefundsTable() {
         filterColumnId="payment_id"
         filterPlaceholder="Filter refunds..."
         emptyMessage="No refunds found."
-        action={{ label: "New Refund", to: "/refunds/new" }}
+        action={{
+          label: "New Refund",
+          to: shopId ? `/shops/${shopId}/refunds/new` : "/refunds/new",
+        }}
       />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
