@@ -272,3 +272,47 @@ pub async fn get_year_to_date_sales(
     let service = AnalyticsService::new(pool.inner().clone());
     service.get_year_to_date_sales(Some(shop_id)).await
 }
+
+// Product Review Analytics Commands
+#[tauri::command]
+pub async fn get_top_rated_products(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+    limit: Option<i64>,
+    min_reviews: Option<i64>,
+) -> Result<Vec<TopRatedProductDto>, String> {
+    eprintln!("[get_top_rated_products command] Received shop_id: {:?}, limit: {:?}, min_reviews: {:?}", shop_id, limit, min_reviews);
+    let service = AnalyticsService::new(pool.inner().clone());
+    service.get_top_rated_products(Some(shop_id), limit, min_reviews).await
+}
+
+#[tauri::command]
+pub async fn get_product_review_analytics(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+    limit: Option<i64>,
+) -> Result<Vec<ProductReviewAnalyticsDto>, String> {
+    eprintln!("[get_product_review_analytics command] Received shop_id: {:?}, limit: {:?}", shop_id, limit);
+    let service = AnalyticsService::new(pool.inner().clone());
+    service.get_product_review_analytics(Some(shop_id), limit).await
+}
+
+#[tauri::command]
+pub async fn get_review_stats_summary(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<ReviewStatsSummaryDto, String> {
+    eprintln!("[get_review_stats_summary command] Received shop_id: {:?}", shop_id);
+    let service = AnalyticsService::new(pool.inner().clone());
+    service.get_review_stats_summary(Some(shop_id)).await
+}
+
+#[tauri::command]
+pub async fn get_rating_distribution(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<RatingDistributionDto>, String> {
+    eprintln!("[get_rating_distribution command] Received shop_id: {:?}", shop_id);
+    let service = AnalyticsService::new(pool.inner().clone());
+    service.get_rating_distribution(Some(shop_id)).await
+}

@@ -30,6 +30,9 @@ import { AverageOrderValueLineChart } from "@/components/charts/average-order-va
 import { OrderStatusDistributionPieChart } from "@/components/charts/order-status-distribution-pie-chart"
 import { ConversionRateRadialChart } from "@/components/charts/conversion-rate-radial-chart"
 import { InventoryCapacityRadialChart } from "@/components/charts/inventory-capacity-radial-chart"
+import { TopRatedProductsBarChart } from "@/components/charts/top-rated-products-bar-chart"
+import { RatingDistributionBarChart } from "@/components/charts/rating-distribution-bar-chart"
+import { ReviewStatsSummaryCard } from "@/components/charts/review-stats-summary-card"
 
 export const Route = createFileRoute("/shops/$shopId/")({
   component: ShopDashboardRoute,
@@ -157,6 +160,12 @@ function ShopDashboardRoute() {
       <CustomerGrowthLineChart />
       <AverageOrderValueLineChart />
       <TopProductsBarChart />
+      {/* Product Reviews Analytics Section */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <ReviewStatsSummaryCard />
+        <RatingDistributionBarChart />
+      </div>
+      <TopRatedProductsBarChart />
       <RevenueByCategoryBarChart />
       <MonthlySalesBarChart />
       <StockStatusBarChart />

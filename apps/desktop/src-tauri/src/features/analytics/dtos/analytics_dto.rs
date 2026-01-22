@@ -252,3 +252,45 @@ pub struct MonthlySalesProgressFilterDto {
 pub struct InventoryCapacityFilterDto {
     pub capacity_limit: Option<f64>,
 }
+
+// Product Review Analytics DTOs (using product_metrics table)
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TopRatedProductDto {
+    pub product_id: String,
+    pub product_name: String,
+    pub average_rating: f64,
+    pub review_count: i64,
+    pub rating_rank: i64,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProductReviewAnalyticsDto {
+    pub product_id: String,
+    pub product_name: String,
+    pub average_rating: f64,
+    pub review_count: i64,
+    pub rating_distribution: String, // JSON string with star counts
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ReviewStatsSummaryDto {
+    pub total_reviews: i64,
+    pub average_rating: f64,
+    pub products_with_reviews: i64,
+    pub five_star_count: i64,
+    pub four_star_count: i64,
+    pub three_star_count: i64,
+    pub two_star_count: i64,
+    pub one_star_count: i64,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RatingDistributionDto {
+    pub rating: i64,
+    pub count: i64,
+    pub percentage: f64,
+}

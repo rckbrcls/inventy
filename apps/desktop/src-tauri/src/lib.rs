@@ -11,6 +11,8 @@ use crate::features::analytics::commands::analytics_commands::{
     get_monthly_performance_metrics, get_product_metrics,
     get_monthly_sales_progress, get_conversion_rate, get_inventory_capacity,
     get_product_ranking, get_month_over_month_growth, get_year_to_date_sales,
+    // Product Review Analytics
+    get_top_rated_products, get_product_review_analytics, get_review_stats_summary, get_rating_distribution,
 };
 use crate::features::inquiry::commands::inquiry_commands::{
     create_inquiry, delete_inquiry, get_inquiry, list_inquiries, list_inquiries_by_shop,
@@ -138,6 +140,11 @@ pub fn run() {
             get_product_ranking,
             get_month_over_month_growth,
             get_year_to_date_sales,
+            // Product Review Analytics
+            get_top_rated_products,
+            get_product_review_analytics,
+            get_review_stats_summary,
+            get_rating_distribution,
             // Products
             create_product,
             update_product,
