@@ -1293,17 +1293,20 @@ class SyntheticDataGenerator:
 
             status = random.choice(statuses)
 
+            shop_id = random.choice(self.shop_ids)
+
             cursor.execute(
                 """
-                INSERT INTO checkouts (id, token, user_id, email, items, shipping_address,
+                INSERT INTO checkouts (id, shop_id, token, user_id, email, items, shipping_address,
                     billing_address, shipping_line, applied_discount_codes, currency,
                     subtotal_price, total_tax, total_shipping, total_discounts, total_price,
                     status, reservation_expires_at, completed_at, metadata, recovery_url,
                     _status, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (
                     checkout_id,
+                    shop_id,
                     self._uuid(),
                     self._random_choice_or_none(self.user_ids, 0.4),
                     self.fake.email(),

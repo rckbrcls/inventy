@@ -342,7 +342,51 @@ CREATE TABLE IF NOT EXISTS refunds (
     created_by TEXT REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 18. Checkouts
+-- 18. Sessões de PDV (Point of Sale Sessions)
+-- Uma sessão representa um "turno de caixa" - desde a abertura até o fechamento
+CREATE TABLE IF NOT EXISTS pos_sessions (
+    id TEXT PRIMARY KEY,
+    shop_id TEXT NOT NULL REFERENCES shops(id) ON DELETE RESTRICT,
+    location_id TEXT REFERENCES locations(id) ON DELETE RESTRICT, -- Balcão/loja física onde o PDV opera
+    operator_id TEXT NOT NULL REFERENCES users(id) ON DELETE RESTRICT, -- Operador do caixa
+    terminal_id TEXT, -- Identificador do terminal/dispositivo
+    session_number INTEGER, -- Sequencial por shop
+    status TEXT DEFAULT 'open' CHECK (status IN ('open', 'paused', 'closed', 'cancelled')),
+
+    -- Valores de abertura
+    opening_cash_amount REAL DEFAULT 0, -- Dinheiro inicial no caixa
+    opening_notes TEXT, -- Observações da abertura
+    opened_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    -- Valores de fechamento
+    closing_cash_amount REAL, -- Dinheiro contado no fechamento
+    closing_notes TEXT, -- Observações do fechamento
+    closed_at DATETIME,
+    closed_by TEXT REFERENCES users(id) ON DELETE SET NULL, -- Quem fechou (pode ser diferente do operador)
+
+    -- Totais calculados (atualizados durante a sessão)
+    total_sales REAL DEFAULT 0, -- Total de vendas
+    total_returns REAL DEFAULT 0, -- Total de devoluções
+    total_cash_in REAL DEFAULT 0, -- Total de suprimentos (entrada manual de dinheiro)
+    total_cash_out REAL DEFAULT 0, -- Total de sangrias (retirada de dinheiro)
+    transaction_count INTEGER DEFAULT 0, -- Quantidade de transações
+
+    -- Diferença de caixa (calculada no fechamento)
+    expected_cash_amount REAL, -- Valor esperado no fechamento
+    cash_difference REAL, -- Diferença (real - esperado)
+
+    metadata TEXT DEFAULT '{}', -- JSONB para dados adicionais
+    _status TEXT DEFAULT 'created',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_shop ON pos_sessions(shop_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_location ON pos_sessions(location_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_operator ON pos_sessions(operator_id) WHERE _status != 'deleted';
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_status ON pos_sessions(shop_id, status) WHERE _status != 'deleted';
+
+-- 19. Checkouts
 CREATE TABLE IF NOT EXISTS checkouts (
     id TEXT PRIMARY KEY,
     shop_id TEXT REFERENCES shops(id) ON DELETE RESTRICT,
@@ -1064,7 +1108,7 @@ INSERT OR IGNORE INTO modules (id, code, name, description, category, required_m
 -- Módulos Opcionais - Vendas
 INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used) VALUES
 ('mod-checkout', 'checkout', 'Checkout', 'Carrinho de compras e checkout', 'sales', '[]', '["checkouts"]'),
-('mod-pos', 'pos', 'Ponto de Venda', 'Sistema de ponto de venda (PDV)', 'sales', '[]', '[]');
+('mod-pos', 'pos', 'Ponto de Venda', 'Sistema de ponto de venda (PDV)', 'sales', '[]', '[\"pos_sessions\"]');
 
 -- Módulos Opcionais - Marketing e Suporte
 INSERT OR IGNORE INTO modules (id, code, name, description, category, required_modules, tables_used) VALUES
