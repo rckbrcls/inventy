@@ -134,6 +134,14 @@ impl ReviewService {
     // Non-transactional methods (simple operations)
     // ============================================================
 
+    /// Get reviews for a shop
+    pub async fn get_shop_reviews(&self, shop_id: &str) -> Result<Vec<Review>, String> {
+        self.reviews_repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Erro ao buscar reviews da loja: {}", e))
+    }
+
     /// Get reviews for a product
     pub async fn get_product_reviews(&self, product_id: &str) -> Result<Vec<Review>, String> {
         self.reviews_repo

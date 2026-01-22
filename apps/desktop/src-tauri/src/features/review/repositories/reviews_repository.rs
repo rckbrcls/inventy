@@ -109,6 +109,21 @@ impl ReviewsRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Review>> {
+        let sql = r#"
+            SELECT r.*
+            FROM reviews r
+            JOIN orders o ON r.order_id = o.id
+            WHERE o.shop_id = $1
+            ORDER BY r.created_at DESC
+        "#;
+
+        sqlx::query_as::<_, Review>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     // ============================================================
     // Transaction-aware methods (for use in services)
     // ============================================================
