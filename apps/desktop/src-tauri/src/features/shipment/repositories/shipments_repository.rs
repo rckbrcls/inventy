@@ -138,6 +138,20 @@ impl ShipmentsRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Shipment>> {
+        let sql = r#"
+            SELECT s.*
+            FROM shipments s
+            JOIN orders o ON s.order_id = o.id
+            WHERE o.shop_id = $1
+            ORDER BY s.created_at DESC
+        "#;
+        sqlx::query_as::<_, Shipment>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     // ============================================================
     // Transaction-aware methods (for use in services)
     // ============================================================

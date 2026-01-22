@@ -1,4 +1,4 @@
-use crate::features::shipment::dtos::shipment_dto::CreateShipmentDTO;
+use crate::features::shipment::dtos::shipment_dto::{CreateShipmentDTO, UpdateShipmentDTO};
 use crate::features::shipment::models::shipment_model::Shipment;
 use crate::features::shipment::services::shipment_service::ShipmentService;
 use tauri::State;
@@ -11,6 +11,16 @@ pub async fn create_shipment(
 ) -> Result<Shipment, String> {
     let service = ShipmentService::new(pool.inner().clone());
     service.create_shipment(payload).await
+}
+
+#[tauri::command]
+pub async fn update_shipment(
+    pool: State<'_, SqlitePool>,
+    id: String,
+    payload: UpdateShipmentDTO,
+) -> Result<Shipment, String> {
+    let service = ShipmentService::new(pool.inner().clone());
+    service.update_shipment(&id, payload).await
 }
 
 #[tauri::command]
@@ -37,4 +47,13 @@ pub async fn list_shipments(
 ) -> Result<Vec<Shipment>, String> {
     let service = ShipmentService::new(pool.inner().clone());
     service.list_shipments().await
+}
+
+#[tauri::command]
+pub async fn list_shipments_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<Shipment>, String> {
+    let service = ShipmentService::new(pool.inner().clone());
+    service.list_shipments_by_shop(&shop_id).await
 }

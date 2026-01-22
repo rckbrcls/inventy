@@ -80,6 +80,9 @@ use crate::features::inventory::commands::inventory_movement_commands::{
 use crate::features::location::commands::location_commands::{
     create_location, update_location, delete_location, get_location, list_locations,
 };
+use crate::features::shipment::commands::shipment_commands::{
+    create_shipment, update_shipment, delete_shipment, get_shipment, list_shipments, list_shipments_by_shop,
+};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use tauri::Manager;
 use std::fs;
@@ -242,6 +245,13 @@ pub fn run() {
             delete_location,
             get_location,
             list_locations,
+            // Shipments
+            create_shipment,
+            update_shipment,
+            delete_shipment,
+            get_shipment,
+            list_shipments,
+            list_shipments_by_shop,
             // Modules
             get_module,
             get_module_by_code,

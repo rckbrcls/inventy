@@ -1,4 +1,4 @@
-use crate::features::shipment::dtos::shipment_dto::CreateShipmentDTO;
+use crate::features::shipment::dtos::shipment_dto::{CreateShipmentDTO, UpdateShipmentDTO};
 use crate::features::shipment::models::shipment_model::{Shipment, ShipmentEvent, ShipmentItem};
 use crate::features::shipment::repositories::shipment_events_repository::ShipmentEventsRepository;
 use crate::features::shipment::repositories::shipment_items_repository::ShipmentItemsRepository;
@@ -268,6 +268,39 @@ impl ShipmentService {
         Ok(created_shipment)
     }
 
+    pub async fn update_shipment(&self, id: &str, payload: UpdateShipmentDTO) -> Result<Shipment, String> {
+        let mut shipment = self.repo.get_by_id(id).await
+            .map_err(|e| format!("Erro ao buscar envio: {}", e))?
+            .ok_or("Envio não encontrado".to_string())?;
+
+        if let Some(v) = payload.location_id { shipment.location_id = Some(v); }
+        if let Some(v) = payload.status { shipment.status = Some(v); }
+        if let Some(v) = payload.carrier_company { shipment.carrier_company = Some(v); }
+        if let Some(v) = payload.carrier_service { shipment.carrier_service = Some(v); }
+        if let Some(v) = payload.tracking_number { shipment.tracking_number = Some(v); }
+        if let Some(v) = payload.tracking_url { shipment.tracking_url = Some(v); }
+        if let Some(v) = payload.weight_g { shipment.weight_g = Some(v); }
+        if let Some(v) = payload.height_mm { shipment.height_mm = Some(v); }
+        if let Some(v) = payload.width_mm { shipment.width_mm = Some(v); }
+        if let Some(v) = payload.depth_mm { shipment.depth_mm = Some(v); }
+        if let Some(v) = payload.package_type { shipment.package_type = Some(v); }
+        if let Some(v) = payload.shipping_label_url { shipment.shipping_label_url = Some(v); }
+        if let Some(v) = payload.invoice_url { shipment.invoice_url = Some(v); }
+        if let Some(v) = payload.invoice_key { shipment.invoice_key = Some(v); }
+        if let Some(v) = payload.cost_amount { shipment.cost_amount = Some(v); }
+        if let Some(v) = payload.insurance_amount { shipment.insurance_amount = Some(v); }
+        if let Some(v) = payload.estimated_delivery_at { shipment.estimated_delivery_at = Some(v); }
+        if let Some(v) = payload.shipped_at { shipment.shipped_at = Some(v); }
+        if let Some(v) = payload.delivered_at { shipment.delivered_at = Some(v); }
+        if let Some(v) = payload.metadata { shipment.metadata = Some(v); }
+        if let Some(v) = payload.customs_info { shipment.customs_info = Some(v); }
+
+        shipment.updated_at = Some(Utc::now());
+
+        self.repo.update(shipment).await
+            .map_err(|e| format!("Erro ao atualizar envio: {}", e))
+    }
+
     pub async fn delete_shipment(&self, id: &str) -> Result<(), String> {
         let mut tx = self
             .pool
@@ -315,6 +348,13 @@ impl ShipmentService {
             .list()
             .await
             .map_err(|e| format!("Erro ao listar envios: {}", e))
+    }
+
+    pub async fn list_shipments_by_shop(&self, shop_id: &str) -> Result<Vec<Shipment>, String> {
+        self.repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Erro ao listar envios por loja: {}", e))
     }
 
     pub async fn get_shipment_items(&self, shipment_id: &str) -> Result<Vec<ShipmentItem>, String> {

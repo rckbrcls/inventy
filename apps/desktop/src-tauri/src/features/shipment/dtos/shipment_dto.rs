@@ -1,7 +1,7 @@
+use crate::features::shipment::models::shipment_model::{Shipment, ShipmentItem};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use chrono::{DateTime, Utc};
-use crate::features::shipment::models::shipment_model::{Shipment, ShipmentItem};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateShipmentItemDTO {
@@ -70,7 +70,8 @@ impl CreateShipmentDTO {
             updated_at: Some(now),
         };
 
-        let items = self.items
+        let items = self
+            .items
             .into_iter()
             .map(|i| ShipmentItem {
                 id: Uuid::new_v4().to_string(),
@@ -87,4 +88,29 @@ impl CreateShipmentDTO {
 
         (shipment, items)
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateShipmentDTO {
+    pub location_id: Option<String>,
+    pub status: Option<String>,
+    pub carrier_company: Option<String>,
+    pub carrier_service: Option<String>,
+    pub tracking_number: Option<String>,
+    pub tracking_url: Option<String>,
+    pub weight_g: Option<i32>,
+    pub height_mm: Option<i32>,
+    pub width_mm: Option<i32>,
+    pub depth_mm: Option<i32>,
+    pub package_type: Option<String>,
+    pub shipping_label_url: Option<String>,
+    pub invoice_url: Option<String>,
+    pub invoice_key: Option<String>,
+    pub cost_amount: Option<f64>,
+    pub insurance_amount: Option<f64>,
+    pub estimated_delivery_at: Option<DateTime<Utc>>,
+    pub shipped_at: Option<DateTime<Utc>>,
+    pub delivered_at: Option<DateTime<Utc>>,
+    pub metadata: Option<String>,
+    pub customs_info: Option<String>,
 }
