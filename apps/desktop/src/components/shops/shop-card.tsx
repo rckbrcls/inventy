@@ -96,12 +96,6 @@ export function ShopCard({ shop }: ShopCardProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenuItem asChild>
-                    <Link to="/shops/$shopId/" params={{ shopId: shop.id }}>
-                      Open
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => setDeleteDialogOpen(true)}
                     className="text-destructive"

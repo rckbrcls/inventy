@@ -4,13 +4,12 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
 import { ShopSidebar } from '@/components/sidebars/shop-sidebar'
 import { SystemSidebar } from '@/components/sidebars/system-sidebar'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from "@/components/ui/sonner"
 import { Button } from "@/components/ui/button"
-import { Plus, Building2 } from "lucide-react"
+import { Plus } from "lucide-react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -81,9 +80,6 @@ function RootComponent() {
     if (path.startsWith("/shops/") && !path.startsWith("/shops/new")) {
       return <ShopSidebar />
     }
-
-    // Default to old sidebar for backward compatibility
-    return <AppSidebar />
   }
 
   // Build breadcrumb items

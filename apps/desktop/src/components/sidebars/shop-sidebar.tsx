@@ -12,7 +12,6 @@ import {
   MapPin,
   MessageSquare,
   Package,
-  Plus,
   Receipt,
   Settings,
   ShoppingCart,
@@ -45,6 +44,7 @@ import {
 import { useShop } from "@/hooks/use-shop"
 import { ShopSwitcher } from "@/components/shops/shop-switcher"
 import { useLocation } from "@tanstack/react-router"
+import { Button } from "../ui/button"
 
 type MenuItem = {
   title: string
@@ -267,14 +267,6 @@ export function ShopSidebar() {
             </SidebarMenuItem>
             <SidebarGroupLabel>Modules</SidebarGroupLabel>
             {/* Add Module */}
-            <SidebarMenuItem>
-              <SidebarMenuButton variant={"outline"} asChild>
-                <Link to={buildUrl("/shops/$shopId/add-module")}>
-                  <Settings className="size-4" />
-                  <span>Manage Modules</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
 
             {/* Core Modules */}
             {enabledCore.map((module) => renderModule(module))}
@@ -287,6 +279,15 @@ export function ShopSidebar() {
 
             {/* Marketing Modules */}
             {enabledMarketing.map((module) => renderModule(module))}
+
+            <SidebarMenuItem>
+              <Button className="w-full" variant="outline" asChild>
+                <Link to={buildUrl("/shops/$shopId/add-module")}>
+                  <Settings className="size-4" />
+                  <span>Manage Modules</span>
+                </Link>
+              </Button>
+            </SidebarMenuItem>
 
             <SidebarGroupLabel>Settings</SidebarGroupLabel>
             {/* Shop Settings */}
