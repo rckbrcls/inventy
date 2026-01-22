@@ -56,4 +56,11 @@ impl LocationService {
             .await
             .map_err(|e| format!("Failed to list locations: {}", e))
     }
+
+    pub async fn get_shop_locations(&self, shop_id: &str) -> Result<Vec<Location>, String> {
+        self.repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Failed to list shop locations: {}", e))
+    }
 }

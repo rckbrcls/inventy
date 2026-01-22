@@ -60,6 +60,23 @@ impl LocationsRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Location>> {
+        let sql = r#"
+            SELECT DISTINCT l.* FROM locations l
+            INNER JOIN inventory_levels il ON il.location_id = l.id
+            INNER JOIN products p ON p.id = il.product_id
+            LEFT JOIN categories c ON c.id = p.category_id
+            LEFT JOIN brands b ON b.id = p.brand_id
+            WHERE (c.shop_id = $1 OR b.shop_id = $1)
+            ORDER BY l.name ASC
+        "#;
+
+        sqlx::query_as::<_, Location>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     pub async fn get_by_id(&self, id: &str) -> Result<Option<Location>> {
         let sql = r#"
             SELECT * FROM locations WHERE id = $1

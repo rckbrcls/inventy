@@ -42,3 +42,12 @@ pub async fn list_locations(pool: State<'_, SqlitePool>) -> Result<Vec<Location>
     let service = LocationService::new(pool.inner().clone());
     service.list_locations().await
 }
+
+#[tauri::command]
+pub async fn list_locations_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<Location>, String> {
+    let service = LocationService::new(pool.inner().clone());
+    service.get_shop_locations(&shop_id).await
+}
