@@ -38,3 +38,12 @@ pub async fn list_inquiries(
     let service = InquiryService::new(pool.inner().clone());
     service.list_inquiries().await
 }
+
+#[tauri::command]
+pub async fn list_inquiries_by_shop(
+    pool: State<'_, SqlitePool>,
+    shop_id: String,
+) -> Result<Vec<Inquiry>, String> {
+    let service = InquiryService::new(pool.inner().clone());
+    service.get_shop_inquiries(&shop_id).await
+}

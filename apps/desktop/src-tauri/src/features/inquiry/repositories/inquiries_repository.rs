@@ -115,6 +115,27 @@ impl InquiriesRepository {
             .await
     }
 
+    pub async fn list_by_shop(&self, shop_id: &str) -> Result<Vec<Inquiry>> {
+        let sql = r#"
+            SELECT DISTINCT i.*
+            FROM inquiries i
+            LEFT JOIN orders o ON i.related_order_id = o.id
+            LEFT JOIN products p ON i.related_product_id = p.id
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN brands b ON p.brand_id = b.id
+            WHERE
+                o.shop_id = $1
+                OR c.shop_id = $1
+                OR b.shop_id = $1
+            ORDER BY i.created_at DESC
+        "#;
+
+        sqlx::query_as::<_, Inquiry>(sql)
+            .bind(shop_id)
+            .fetch_all(&self.pool)
+            .await
+    }
+
     // ============================================================
     // Transaction-aware methods (for use in services)
     // ============================================================

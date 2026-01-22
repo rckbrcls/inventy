@@ -12,6 +12,9 @@ use crate::features::analytics::commands::analytics_commands::{
     get_monthly_sales_progress, get_conversion_rate, get_inventory_capacity,
     get_product_ranking, get_month_over_month_growth, get_year_to_date_sales,
 };
+use crate::features::inquiry::commands::inquiry_commands::{
+    create_inquiry, delete_inquiry, get_inquiry, list_inquiries, list_inquiries_by_shop,
+};
 use crate::features::module::commands::modules_commands::{
     get_module, get_module_by_code, list_modules, list_modules_by_category, list_core_modules,
 };
@@ -262,6 +265,12 @@ pub fn run() {
             get_review,
             create_review,
             update_review,
+            // Inquiries
+            create_inquiry,
+            delete_inquiry,
+            get_inquiry,
+            list_inquiries,
+            list_inquiries_by_shop,
             // Modules
             get_module,
             get_module_by_code,

@@ -207,7 +207,7 @@ impl InquiryService {
 
     pub async fn create_inquiry(&self, payload: CreateInquiryDTO) -> Result<Inquiry, String> {
         let (inquiry, messages) = payload.into_models();
-        
+
         let mut tx = self
             .pool
             .begin()
@@ -275,6 +275,13 @@ impl InquiryService {
             .list()
             .await
             .map_err(|e| format!("Erro ao listar inquiries: {}", e))
+    }
+
+    pub async fn get_shop_inquiries(&self, shop_id: &str) -> Result<Vec<Inquiry>, String> {
+        self.repo
+            .list_by_shop(shop_id)
+            .await
+            .map_err(|e| format!("Erro ao buscar inquiries da loja: {}", e))
     }
 
     pub async fn get_inquiry_messages(
