@@ -22,6 +22,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TemplateSelector } from "./template-selector"
 import { ModuleSelector } from "./module-selector"
+import { SupabaseConfigForm, type SupabaseConfig } from "./supabase-config-form"
 import { useShops } from "@/hooks/use-shops"
 import { ModulesRepository } from "@/lib/db/repositories/modules-repository"
 import { ShopTemplatesRepository } from "@/lib/db/repositories/shop-templates-repository"
@@ -69,6 +70,14 @@ export function CreateShopForm() {
     status: "active",
   })
 
+  const [databaseType, setDatabaseType] = React.useState<"sqlite" | "postgres">("sqlite")
+  const [supabaseConfig, setSupabaseConfig] = React.useState<SupabaseConfig>({
+    projectUrl: "",
+    apiKey: "",
+    databaseName: "postgres",
+    port: 5432,
+  })
+
   React.useEffect(() => {
     const loadData = async () => {
       setIsLoading(true)
@@ -112,12 +121,43 @@ export function CreateShopForm() {
     setSelectedModules(allModules)
   }
 
+  const generateConnectionString = (): string => {
+    if (databaseType === "sqlite") {
+      return ""
+    }
+    if (!supabaseConfig.projectUrl || !supabaseConfig.apiKey) {
+      return ""
+    }
+    
+    try {
+      const port = supabaseConfig.port || 5432
+      const url = new URL(supabaseConfig.projectUrl)
+      const host = url.hostname.replace(/^https?:\/\//, "").replace(/\.supabase\.co$/, "")
+      
+      if (!host) {
+        return ""
+      }
+      
+      return `postgresql://postgres:${encodeURIComponent(supabaseConfig.apiKey)}@db.${host}.supabase.co:${port}/${supabaseConfig.databaseName || "postgres"}`
+    } catch {
+      return ""
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.name || !formData.slug) {
       toast.error("Please fill in all required fields")
       return
+    }
+
+    // Validate Supabase config if Postgres is selected
+    if (databaseType === "postgres") {
+      if (!supabaseConfig.projectUrl || !supabaseConfig.apiKey) {
+        toast.error("Please fill in all Supabase configuration fields")
+        return
+      }
     }
 
     try {
@@ -129,6 +169,20 @@ export function CreateShopForm() {
         featuresConfig[moduleCode] = true
       })
 
+      // Build database_config
+      let databaseConfig: string | undefined
+      if (databaseType === "postgres") {
+        const connectionString = generateConnectionString()
+        databaseConfig = JSON.stringify({
+          database_type: "postgres",
+          connection_string: connectionString,
+          max_connections: 5,
+          min_connections: 1,
+          connect_timeout_secs: 30,
+          idle_timeout_secs: 600,
+        })
+      }
+
       const payload = {
         name: formData.name,
         slug: formData.slug,
@@ -138,6 +192,8 @@ export function CreateShopForm() {
         legal_name: formData.legal_name || undefined,
         status: formData.status || undefined,
         features_config: JSON.stringify(featuresConfig),
+        database_type: databaseType,
+        database_config: databaseConfig,
       }
 
       let shop
@@ -271,6 +327,57 @@ export function CreateShopForm() {
                 </Select>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Database Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Database Configuration</CardTitle>
+            <CardDescription>
+              Choose between local SQLite or remote Postgres (Supabase) database.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="sqlite"
+                  name="databaseType"
+                  value="sqlite"
+                  checked={databaseType === "sqlite"}
+                  onChange={(e) => setDatabaseType(e.target.value as "sqlite" | "postgres")}
+                  className="h-4 w-4 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="sqlite" className="font-normal cursor-pointer">
+                  SQLite (Local) - Offline-first, no internet required
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="postgres"
+                  name="databaseType"
+                  value="postgres"
+                  checked={databaseType === "postgres"}
+                  onChange={(e) => setDatabaseType(e.target.value as "sqlite" | "postgres")}
+                  className="h-4 w-4 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="postgres" className="font-normal cursor-pointer">
+                  Postgres (Supabase) - Cloud sync, backup, and multi-device access
+                </Label>
+              </div>
+            </div>
+
+            {databaseType === "postgres" && (
+              <div className="mt-4 p-4 border rounded-lg bg-muted/50">
+                <SupabaseConfigForm
+                  config={supabaseConfig}
+                  onChange={setSupabaseConfig}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
 

@@ -71,8 +71,15 @@ function RootComponent() {
   const getSidebar = () => {
     const path = location.pathname
 
-    // System routes (no shop context) - root is now shops list
-    if (path === "/" || path.startsWith("/shops/new") || path === "/settings" || path.startsWith("/settings/")) {
+    // System routes (no shop context) - root is shops list, settings, modules, templates, users
+    if (
+      path === "/" ||
+      path.startsWith("/shops/new") ||
+      path === "/settings" ||
+      path === "/modules" ||
+      path === "/templates" ||
+      path === "/users"
+    ) {
       return <SystemSidebar />
     }
 

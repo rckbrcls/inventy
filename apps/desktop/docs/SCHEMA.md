@@ -1,6 +1,6 @@
 # Modelagem do Banco de Dados
 
-Este documento apresenta a modelagem completa do banco de dados baseada no schema inicial (`001_initial_schema.sql`).
+Este documento apresenta a modelagem completa do banco de dados baseada na arquitetura multi-database (ver `docs/architecture/multi-database-architecture.md`).
 
 ## Diagrama ER Completo
 

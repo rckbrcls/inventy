@@ -23,10 +23,10 @@ import { useEffect, useState } from "react"
 import { SettingsStore } from "@/lib/stores/settings-store"
 
 export const Route = createFileRoute("/settings")({
-    component: Settings,
+    component: SettingsPage,
 })
 
-function Settings() {
+function SettingsPage() {
     const { theme, setTheme } = useTheme()
     const [organizationName, setOrganizationName] = useState("")
     const [ownerEmail, setOwnerEmail] = useState("")
@@ -91,9 +91,9 @@ function Settings() {
     }
 
     async function handleRestartServer() {
-        console.log("Restarting server with:", { serverPort, serverProtocol });
+        console.log("Restarting server with:", { serverPort, serverProtocol })
         // TODO: Implement actual restart logic
-        alert("Server restart triggering...");
+        alert("Server restart triggering...")
     }
 
     if (isLoading) {

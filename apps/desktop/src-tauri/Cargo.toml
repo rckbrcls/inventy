@@ -26,7 +26,7 @@ tauri-plugin-log = "2"
 tauri-plugin-sql = { version = "2.3.1", features = ["sqlite"] }
 tauri-plugin-store = "2"
 # Architecture Migration Dependencies
-sqlx = { version = "0.8", features = ["sqlite", "runtime-tokio", "macros", "uuid", "chrono"] }
+sqlx = { version = "0.8", features = ["sqlite", "postgres", "runtime-tokio", "macros", "uuid", "chrono"] }
 tokio = { version = "1", features = ["full"] }
 uuid = { version = "1.10.0", features = ["v4", "serde"] }
 chrono = { version = "0.4.38", features = ["serde"] }

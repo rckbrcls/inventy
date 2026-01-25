@@ -32,6 +32,8 @@ export type CreateShopDTO = {
   settings?: string;
   branding?: string;
   owner_id?: string;
+  database_type?: "sqlite" | "postgres";
+  database_config?: string; // JSON string with DatabaseConfig
 };
 
 export type UpdateShopDTO = {

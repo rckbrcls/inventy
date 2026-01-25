@@ -9,8 +9,8 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Layers } from "lucide-react"
 
-export const Route = createFileRoute("/settings/modules")({
-    component: Modules,
+export const Route = createFileRoute("/modules")({
+    component: ModulesPage,
 })
 
 const availableModules = [
@@ -82,7 +82,7 @@ const availableModules = [
     },
 ]
 
-function Modules() {
+function ModulesPage() {
     return (
         <div className="flex flex-col gap-6">
             <div>

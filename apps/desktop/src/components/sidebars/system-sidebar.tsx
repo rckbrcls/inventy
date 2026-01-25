@@ -33,17 +33,17 @@ const systemItems = [
 const managementItems = [
   {
     title: "Modules",
-    url: "/settings/modules",
+    url: "/modules",
     icon: Layers,
   },
   {
     title: "Templates",
-    url: "/settings/templates",
+    url: "/templates",
     icon: FileText,
   },
   {
     title: "Users",
-    url: "/settings/users",
+    url: "/users",
     icon: Users,
   },
 ]

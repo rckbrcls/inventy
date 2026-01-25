@@ -16,7 +16,7 @@ pub mod types;
 // Re-exports for convenience
 pub use error::DatabaseError;
 pub use migrations::MigrationService;
-pub use pool_manager::PoolManager;
+pub use pool_manager::{PoolManager, ShopPool};
 pub use repository_factory::RepositoryFactory;
 pub use traits::*;
 pub use types::*;

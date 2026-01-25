@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Users, Plus, Shield, User } from "lucide-react"
 
-export const Route = createFileRoute("/settings/users")({
+export const Route = createFileRoute("/users")({
     component: UsersPage,
 })
 

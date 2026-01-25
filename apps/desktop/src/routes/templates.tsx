@@ -9,11 +9,11 @@ import {
 import { Button } from "@/components/ui/button"
 import { FileText, Plus } from "lucide-react"
 
-export const Route = createFileRoute("/settings/templates")({
-    component: Templates,
+export const Route = createFileRoute("/templates")({
+    component: TemplatesPage,
 })
 
-function Templates() {
+function TemplatesPage() {
     return (
         <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
@@ -88,7 +88,7 @@ function Templates() {
                     <p className="text-sm text-muted-foreground text-center">
                         Template customization coming soon.
                         <br />
-                        You'll be able to create and edit document templates here.
+                        You&apos;ll be able to create and edit document templates here.
                     </p>
                 </CardContent>
             </Card>
