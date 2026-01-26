@@ -97,8 +97,7 @@ use crate::features::transaction::commands::transaction_commands::{
 
 use crate::features::inventory::commands::inventory_level_commands::{
     adjust_stock, create_inventory_level, delete_inventory_level, get_available_quantity,
-    get_inventory_level, list_inventory_levels, list_inventory_levels_by_shop, transfer_stock,
-    update_inventory_level,
+    get_inventory_level, list_inventory_levels_by_shop, transfer_stock, update_inventory_level,
 };
 use crate::features::inventory::commands::inventory_movement_commands::{
     create_inventory_movement, list_inventory_movements, list_inventory_movements_by_level,
@@ -271,7 +270,6 @@ pub fn run() {
             update_inventory_level,
             delete_inventory_level,
             get_inventory_level,
-            list_inventory_levels,
             list_inventory_levels_by_shop,
             adjust_stock,
             transfer_stock,
@@ -377,13 +375,12 @@ pub fn run() {
             app.manage(repo_factory);
 
             // ============================================================
-            // Legacy Support (Backward Compatibility)
+            // Registry Pool (shops, users, roles, modules, shop_templates)
             // ============================================================
-            // The registry pool is also exposed as the "main" pool for
-            // backward compatibility with existing commands during migration.
-            // TODO: Remove this once all commands are migrated to use RepositoryFactory
-            let legacy_pool = pool_manager.registry().clone();
-            app.manage(legacy_pool);
+            // Exposed as SqlitePool for registry-only commands. Shop data
+            // uses RepositoryFactory + shop_pool(shop_id) per multi-DB architecture.
+            let registry_pool = pool_manager.registry().clone();
+            app.manage(registry_pool);
 
             // Legacy tauri-plugin-sql setup (for frontend SQL access if needed)
             // Note: Migrations are now handled by MigrationService, so we don't add them here

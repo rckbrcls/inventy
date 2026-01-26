@@ -6,11 +6,10 @@ import type {
 } from '@uru/types'
 
 export const CustomerAddressesRepository = {
-  async list(shopId: string): Promise<CustomerAddress[]> {
+  async listByShop(shopId: string): Promise<CustomerAddress[]> {
     if (!shopId) {
       throw new Error('shopId is required for list_customer_addresses')
     }
-    console.log('[CustomerAddressesRepository] Calling list_customer_addresses with shopId:', shopId)
     return invoke('list_customer_addresses', { shopId })
   },
 

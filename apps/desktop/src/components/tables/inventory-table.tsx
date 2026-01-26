@@ -95,10 +95,10 @@ export function InventoryTable() {
   }, [loadData])
 
   const handleDelete = async () => {
-    if (!deleteId) return
+    if (!deleteId || !shopId) return
 
     try {
-      await InventoryLevelsRepository.delete(deleteId)
+      await InventoryLevelsRepository.delete(shopId, deleteId)
       toast.success("Inventory level deleted successfully")
       loadData()
     } catch (error) {

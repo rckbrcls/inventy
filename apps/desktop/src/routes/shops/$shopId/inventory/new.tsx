@@ -66,7 +66,7 @@ function NewInventoryLevel() {
       try {
         setIsLoading(true)
         const [productsList, locationsList] = await Promise.all([
-          ProductsRepository.list(shopId),
+          ProductsRepository.listByShop(shopId),
           LocationsRepository.listByShop(shopId),
         ])
         setProducts(productsList)
@@ -113,7 +113,7 @@ function NewInventoryLevel() {
         aisle_bin_slot: formData.aisle_bin_slot || undefined,
       }
 
-      await InventoryLevelsRepository.create(payload)
+      await InventoryLevelsRepository.create(shopId, payload)
       toast.success("Inventory level created successfully")
       navigate({ to: "/inventory" })
     } catch (error) {

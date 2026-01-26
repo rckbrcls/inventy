@@ -7,10 +7,6 @@ import type {
 } from "@uru/types";
 
 export const PosSessionsRepository = {
-  async list(): Promise<PosSession[]> {
-    return invoke("list_pos_sessions");
-  },
-
   async listByShop(shopId: string): Promise<PosSession[]> {
     return invoke("list_pos_sessions_by_shop", { shopId });
   },

@@ -6,10 +6,6 @@ import type {
 } from "@uru/types";
 
 export const ShipmentsRepository = {
-  async list(): Promise<Shipment[]> {
-    return invoke("list_shipments");
-  },
-
   async listByShop(shopId: string): Promise<Shipment[]> {
     return invoke("list_shipments_by_shop", { shopId });
   },

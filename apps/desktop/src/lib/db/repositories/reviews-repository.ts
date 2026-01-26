@@ -2,10 +2,6 @@ import { invoke } from "@tauri-apps/api/core";
 import type { Review, CreateReviewInput, UpdateReviewInput } from "@uru/types";
 
 export const ReviewsRepository = {
-  async list(): Promise<Review[]> {
-    return invoke("list_reviews");
-  },
-
   async listByShop(shopId: string): Promise<Review[]> {
     return invoke("list_reviews_by_shop", { shopId });
   },

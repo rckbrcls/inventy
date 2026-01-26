@@ -2,10 +2,6 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Brand, CreateBrandDTO, UpdateBrandDTO } from '@uru/types'
 
 export const BrandsRepository = {
-  async list(): Promise<Brand[]> {
-    return invoke('list_brands')
-  },
-
   async listByShop(shopId: string): Promise<Brand[]> {
     return invoke('list_brands_by_shop', { shopId })
   },

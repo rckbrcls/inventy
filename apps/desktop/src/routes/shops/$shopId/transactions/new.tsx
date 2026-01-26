@@ -94,7 +94,7 @@ function NewTransaction() {
     
     const loadProducts = async () => {
       try {
-        const productsList = await ProductsRepository.list(shopId)
+        const productsList = await ProductsRepository.listByShop(shopId)
         setProducts(productsList)
       } catch (error) {
         console.error("Failed to load products:", error)

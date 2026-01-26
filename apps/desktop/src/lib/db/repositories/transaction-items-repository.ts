@@ -6,27 +6,39 @@ import type {
 } from '@uru/types'
 
 export const TransactionItemsRepository = {
-  async list(): Promise<TransactionItem[]> {
-    return invoke('list_transaction_items')
+  async list(shopId: string): Promise<TransactionItem[]> {
+    return invoke('list_transaction_items', { shopId })
   },
 
-  async getById(id: string): Promise<TransactionItem | null> {
-    return invoke('get_transaction_item', { id })
+  async getById(shopId: string, id: string): Promise<TransactionItem | null> {
+    return invoke('get_transaction_item', { shopId, id })
   },
 
-  async listByTransaction(transactionId: string): Promise<TransactionItem[]> {
-    return invoke('list_transaction_items_by_transaction', { transactionId })
+  async listByTransaction(
+    shopId: string,
+    transactionId: string,
+  ): Promise<TransactionItem[]> {
+    return invoke('list_transaction_items_by_transaction', {
+      shopId,
+      transactionId,
+    })
   },
 
-  async create(payload: CreateTransactionItemDTO): Promise<TransactionItem> {
-    return invoke('create_transaction_item', { payload })
+  async create(
+    shopId: string,
+    payload: CreateTransactionItemDTO,
+  ): Promise<TransactionItem> {
+    return invoke('create_transaction_item', { shopId, payload })
   },
 
-  async update(payload: UpdateTransactionItemDTO): Promise<TransactionItem> {
-    return invoke('update_transaction_item', { payload })
+  async update(
+    shopId: string,
+    payload: UpdateTransactionItemDTO,
+  ): Promise<TransactionItem> {
+    return invoke('update_transaction_item', { shopId, payload })
   },
 
-  async delete(id: string): Promise<void> {
-    return invoke('delete_transaction_item', { id })
+  async delete(shopId: string, id: string): Promise<void> {
+    return invoke('delete_transaction_item', { shopId, id })
   },
 }

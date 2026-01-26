@@ -65,8 +65,8 @@ function EditInventoryLevel() {
       try {
         setIsLoading(true)
         const [inventoryLevel, productsList, locationsList] = await Promise.all([
-          InventoryLevelsRepository.getById(inventoryLevelId),
-          ProductsRepository.list(shopId),
+          InventoryLevelsRepository.getById(shopId, inventoryLevelId),
+          ProductsRepository.listByShop(shopId),
           LocationsRepository.listByShop(shopId),
         ])
         if (!inventoryLevel) {
@@ -131,7 +131,7 @@ function EditInventoryLevel() {
         aisle_bin_slot: formData.aisle_bin_slot || undefined,
       }
 
-      await InventoryLevelsRepository.update(payload)
+      await InventoryLevelsRepository.update(shopId, payload)
       toast.success("Inventory level updated successfully")
       navigate({ to: "/inventory" })
     } catch (error) {

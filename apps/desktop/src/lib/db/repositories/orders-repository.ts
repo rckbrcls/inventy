@@ -8,10 +8,6 @@ import type {
 } from '@uru/types'
 
 export const OrdersRepository = {
-  async list(): Promise<Order[]> {
-    return invoke('list_orders')
-  },
-
   async listByShop(shopId: string): Promise<Order[]> {
     return invoke('list_orders_by_shop', { shopId })
   },

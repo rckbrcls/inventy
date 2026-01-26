@@ -6,10 +6,6 @@ import type {
 } from '@uru/types'
 
 export const CustomerGroupsRepository = {
-  async list(shopId: string): Promise<CustomerGroup[]> {
-    return invoke('list_customer_groups', { shopId })
-  },
-
   async listByShop(shopId: string): Promise<CustomerGroup[]> {
     return invoke('list_customer_groups_by_shop', { shopId })
   },

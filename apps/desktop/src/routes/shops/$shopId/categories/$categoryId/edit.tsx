@@ -39,7 +39,7 @@ const CATEGORY_TYPES = [
 
 function EditCategory() {
   const navigate = useNavigate()
-  const { categoryId } = Route.useParams()
+  const { shopId, categoryId } = Route.useParams()
   const [isLoading, setIsLoading] = React.useState(true)
   const [isSaving, setIsSaving] = React.useState(false)
   const [categories, setCategories] = React.useState<Category[]>([])
@@ -63,11 +63,12 @@ function EditCategory() {
 
   React.useEffect(() => {
     const loadData = async () => {
+      if (!shopId) return
       try {
         setIsLoading(true)
         const [category, list] = await Promise.all([
           CategoriesRepository.getById(categoryId),
-          CategoriesRepository.list(),
+          CategoriesRepository.listByShop(shopId),
         ])
         if (!category) {
           toast.error("Category not found")
@@ -99,7 +100,7 @@ function EditCategory() {
       }
     }
     loadData()
-  }, [categoryId, navigate])
+  }, [shopId, categoryId, navigate])
 
   const availableParents = React.useMemo(() => {
     return categories.filter((category) => category.id !== categoryId)

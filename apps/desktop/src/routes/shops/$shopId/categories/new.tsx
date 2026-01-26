@@ -39,6 +39,7 @@ const CATEGORY_TYPES = [
 
 function NewCategory() {
   const navigate = useNavigate()
+  const { shopId } = Route.useParams()
   const [isSaving, setIsSaving] = React.useState(false)
   const [categories, setCategories] = React.useState<Category[]>([])
 
@@ -61,12 +62,13 @@ function NewCategory() {
 
   // Load existing categories for parent selection
   React.useEffect(() => {
-    CategoriesRepository.list()
+    if (!shopId) return
+    CategoriesRepository.listByShop(shopId)
       .then(setCategories)
       .catch((error) => {
         console.error("Failed to load categories:", error)
       })
-  }, [])
+  }, [shopId])
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))

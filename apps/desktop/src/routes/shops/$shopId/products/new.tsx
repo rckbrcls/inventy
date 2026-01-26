@@ -46,6 +46,7 @@ const PRODUCT_STATUSES = [
 
 function NewProduct() {
   const navigate = useNavigate()
+  const { shopId } = Route.useParams()
   const [brands, setBrands] = React.useState<Brand[]>([])
   const [categories, setCategories] = React.useState<Category[]>([])
   const [isSaving, setIsSaving] = React.useState(false)
@@ -75,11 +76,12 @@ function NewProduct() {
   })
 
   React.useEffect(() => {
+    if (!shopId) return
     const loadData = async () => {
       try {
         const [brandsData, categoriesData] = await Promise.all([
-          BrandsRepository.list(),
-          CategoriesRepository.list(),
+          BrandsRepository.listByShop(shopId),
+          CategoriesRepository.listByShop(shopId),
         ])
         setBrands(brandsData)
         setCategories(categoriesData)
@@ -88,7 +90,7 @@ function NewProduct() {
       }
     }
     loadData()
-  }, [])
+  }, [shopId])
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))

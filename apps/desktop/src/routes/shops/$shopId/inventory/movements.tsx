@@ -69,7 +69,7 @@ function MovementsRoute() {
       try {
         setIsLoading(true)
         const [productsList, locationsList] = await Promise.all([
-          ProductsRepository.list(shopId),
+          ProductsRepository.listByShop(shopId),
           LocationsRepository.listByShop(shopId),
         ])
         setProducts(productsList)
@@ -105,10 +105,12 @@ function MovementsRoute() {
       return
     }
 
+    if (!shopId) return
+
     try {
       setIsSaving(true)
 
-      await InventoryLevelsRepository.adjustStock({
+      await InventoryLevelsRepository.adjustStock(shopId, {
         product_id: adjustForm.product_id,
         location_id: adjustForm.location_id,
         new_quantity: parseFloat(adjustForm.new_quantity),
@@ -149,10 +151,12 @@ function MovementsRoute() {
       return
     }
 
+    if (!shopId) return
+
     try {
       setIsSaving(true)
 
-      await InventoryLevelsRepository.transferStock({
+      await InventoryLevelsRepository.transferStock(shopId, {
         product_id: transferForm.product_id,
         from_location_id: transferForm.from_location_id,
         to_location_id: transferForm.to_location_id,

@@ -3,10 +3,6 @@ import type { Payment, CreatePaymentDTO, UpdatePaymentDTO } from "@uru/types";
 import { PAYMENT_METHODS, PAYMENT_STATUSES, RISK_LEVELS } from "@uru/types";
 
 export const PaymentsRepository = {
-  async list(): Promise<Payment[]> {
-    return invoke("list_payments");
-  },
-
   async listByShop(shopId: string): Promise<Payment[]> {
     return invoke("list_payments_by_shop", { shopId });
   },

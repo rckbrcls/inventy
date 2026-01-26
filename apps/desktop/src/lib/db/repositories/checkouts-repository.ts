@@ -6,10 +6,6 @@ import type {
 } from "@uru/types";
 
 export const CheckoutsRepository = {
-  async list(): Promise<Checkout[]> {
-    return invoke("list_checkouts");
-  },
-
   async listByShop(shopId: string): Promise<Checkout[]> {
     return invoke("list_checkouts_by_shop", { shopId });
   },

@@ -55,7 +55,7 @@ export function CustomerAddressesTable() {
       setIsLoading(true)
       console.log('[CustomerAddressesTable] Loading addresses for shopId:', shopId)
       const [addresses, customersList] = await Promise.all([
-        CustomerAddressesRepository.list(shopId),
+        CustomerAddressesRepository.listByShop(shopId),
         CustomersRepository.listByShop(shopId),
       ])
 

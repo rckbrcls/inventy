@@ -2,10 +2,6 @@ import { invoke } from '@tauri-apps/api/core'
 import type { Category, CreateCategoryDTO, UpdateCategoryDTO } from '@uru/types'
 
 export const CategoriesRepository = {
-  async list(): Promise<Category[]> {
-    return invoke('list_categories')
-  },
-
   async listByShop(shopId: string): Promise<Category[]> {
     return invoke('list_categories_by_shop', { shopId })
   },

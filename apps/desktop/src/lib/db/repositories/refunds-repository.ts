@@ -3,10 +3,6 @@ import type { Refund, CreateRefundDTO, UpdateRefundDTO } from '@uru/types'
 import { REFUND_STATUSES, REFUND_REASONS } from '@uru/types'
 
 export const RefundsRepository = {
-  async list(shopId: string): Promise<Refund[]> {
-    return invoke('list_refunds', { shopId })
-  },
-
   async listByShop(shopId: string): Promise<Refund[]> {
     return invoke('list_refunds', { shopId })
   },
